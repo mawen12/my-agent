@@ -1,4 +1,4 @@
-package com.mawen.agent.util;
+package com.mawen.agent.configprovider;
 
 import java.util.Arrays;
 import java.util.HashMap;

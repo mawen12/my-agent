@@ -1,17 +1,18 @@
-package com.mawen.agent.util;
+package com.mawen.agent.configprovider;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.IllformedLocaleException;
 import java.util.List;
 import java.util.Map;
 
 import com.mawen.agent.ConfigProvider;
+import com.mawen.agent.util.AgentLogger;
+import com.mawen.agent.util.ExponentialBackoffRetryPolicy;
+import com.mawen.agent.util.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -135,7 +136,7 @@ public class YamlConfigProvider implements ConfigProvider {
 								continue;
 							}
 							String configKey = entry.getKey().toString();
-							addConfig(configKey, overrideKey, configKey, entry.getValue());
+							addConfig(result, overrideKey, configKey, entry.getValue());
 						}
 					}
 				}
@@ -150,7 +151,7 @@ public class YamlConfigProvider implements ConfigProvider {
 	}
 
 	private static void addConfig(Map<String, Map<String, List<String>>> config, String override, String key, Object value) {
-		Map<String, List<String>> configMap = config.computeIfAbsent(override, key -> new HashMap<>());
+		Map<String, List<String>> configMap = config.computeIfAbsent(override, k -> new HashMap<>());
 
 		if (value instanceof List) {
 			List<String> configValueList = configMap.computeIfAbsent(key, k -> new ArrayList<>());
@@ -165,7 +166,7 @@ public class YamlConfigProvider implements ConfigProvider {
 			}
 		}
 		else if (value instanceof Map) {
-			for (Object mapKey : (Map) ((Map<?, ?>) value).keySet()) {
+			for (Object mapKey : ((Map<?, ?>) value).keySet()) {
 				String propKey = mapKey.toString();
 				Object propValue = ((Map) value).get(propKey);
 				if (propValue != null) {

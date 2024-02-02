@@ -1,7 +1,6 @@
 package com.mawen.agent;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,10 +9,10 @@ import java.util.Map;
 import com.mawen.agent.util.AgentLogger;
 import com.mawen.agent.util.ClassAndMethod;
 import com.mawen.agent.util.ClassMethodArgument;
-import com.mawen.agent.util.DummyConfigProvider;
+import com.mawen.agent.configprovider.DummyConfigProvider;
 import com.mawen.agent.util.JsonUtils;
 import com.mawen.agent.util.ReflectionUtils;
-import com.mawen.agent.util.YamlConfigProvider;
+import com.mawen.agent.configprovider.YamlConfigProvider;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
