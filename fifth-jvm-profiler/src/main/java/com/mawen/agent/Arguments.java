@@ -10,6 +10,7 @@ import java.util.Map;
 import com.mawen.agent.util.AgentLogger;
 import com.mawen.agent.util.ClassAndMethod;
 import com.mawen.agent.util.ClassMethodArgument;
+import com.mawen.agent.util.DummyConfigProvider;
 import com.mawen.agent.util.JsonUtils;
 import com.mawen.agent.util.ReflectionUtils;
 import com.mawen.agent.util.YamlConfigProvider;
@@ -269,7 +270,7 @@ public class Arguments {
 
 	public ConfigProvider getConfigProvider() {
 		if (configProviderConstructor == null) {
-			return new DynamicConfigProvider();
+			return new DummyConfigProvider();
 		}
 		else {
 			try {

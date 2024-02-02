@@ -65,6 +65,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
                 <version>${junit.version}</version>
@@ -109,6 +115,9 @@
 
         <!-- commons-httpclient5 依赖版本 -->
         <httpclient5.version>5.3.1</httpclient5.version>
+
+        <!-- kafka 依赖版本 -->
+        <kafka.version>3.0.0</kafka.version>
 
         <!-- JUnit 依赖版本 -->
         <junit.version>5.10.0</junit.version>
