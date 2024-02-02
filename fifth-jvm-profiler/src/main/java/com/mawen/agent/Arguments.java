@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mawen.agent.reporters.ConsoleOutputReporter;
 import com.mawen.agent.util.AgentLogger;
+import com.mawen.agent.util.ArgumentUtils;
 import com.mawen.agent.util.ClassAndMethod;
 import com.mawen.agent.util.ClassMethodArgument;
 import com.mawen.agent.configprovider.DummyConfigProvider;
@@ -253,7 +255,7 @@ public class Arguments {
 
 	public Reporter getReporter() {
 		if (reporterConstructor == null) {
-			return new;
+			return new ConsoleOutputReporter();
 		}
 		else {
 			try {
