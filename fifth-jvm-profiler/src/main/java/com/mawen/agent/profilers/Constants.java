@@ -8,7 +8,7 @@ public class Constants {
 
 	public static final long DEFAULT_METRIC_INTERVAL = 60_000;
 
-	public static final long MAX_METRIC_INTERVAL = 800_000;
+	public static final int MAX_STRING_LENGTH = 800_000;
 
 	public static final String EXECUTOR_ROLE = "executor";
 
