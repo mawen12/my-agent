@@ -18,6 +18,7 @@
         <module>fifth-jvm-profiler</module>
         <module>six-easeagent</module>
         <module>six-easeagent/core</module>
+        <module>six-easeagent/loader</module>
     </modules>
 
     <dependencyManagement>
