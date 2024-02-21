@@ -19,6 +19,8 @@
         <module>six-easeagent</module>
         <module>six-easeagent/core</module>
         <module>six-easeagent/loader</module>
+        <module>six-easeagent/log4j2</module>
+        <module>six-easeagent/log4j2/log4j2-api</module>
     </modules>
 
     <dependencyManagement>
@@ -338,6 +340,7 @@
 
         <!-- Maven 插件依赖 -->
         <java.version>8</java.version>
+        <file.encoding>UTF-8</file.encoding>
         <maven-clean.version>3.2.0</maven-clean.version>
         <maven-compiler.version>3.10.0</maven-compiler.version>
         <maven-deploy.version>3.0.0</maven-deploy.version>
@@ -358,8 +361,8 @@
         <reactor.version>2023.0.2</reactor.version>
         <spring-cloud.version>2023.0.0</spring-cloud.version>
 
-        <slf4j.version>2.1.0-alpha1</slf4j.version>
-        <log4j.version>3.0.0-beta1</log4j.version>
+        <slf4j.version>1.7.21</slf4j.version>
+        <log4j.version>2.17.1</log4j.version>
         <servlet.version>4.0.1</servlet.version>
 
         <otel.version>1.34.1</otel.version>
