@@ -15,6 +15,7 @@
     <description>Easeagent copy</description>
     <modules>
         <module>log4j2/log4j2-impl</module>
+        <module>plugin-api</module>
     </modules>
 
     <properties>
