@@ -9,9 +9,13 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.example</groupId>
+    <groupId>com.mawen</groupId>
     <artifactId>six-easeagent</artifactId>
     <packaging>pom</packaging>
+    <description>Easeagent copy</description>
+    <modules>
+        <module>log4j2/log4j2-impl</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

@@ -11,6 +11,7 @@
 
     <artifactId>fourth-jvm-hook</artifactId>
     <packaging>jar</packaging>
+    <description>jvm hook</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

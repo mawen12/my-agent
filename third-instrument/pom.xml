@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>third-instrument</artifactId>
+    <description>impl by javassist</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

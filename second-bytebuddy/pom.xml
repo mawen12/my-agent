@@ -11,6 +11,7 @@
 
     <artifactId>second-bytebuddy</artifactId>
     <packaging>jar</packaging>
+    <description>impl by bytebuddy</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

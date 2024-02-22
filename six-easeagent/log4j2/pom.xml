@@ -5,9 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.mawen</groupId>
-        <artifactId>my-agent</artifactId>
+        <artifactId>six-easeagent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>log4j2</artifactId>
