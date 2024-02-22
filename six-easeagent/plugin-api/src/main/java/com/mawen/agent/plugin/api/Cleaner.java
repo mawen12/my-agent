@@ -31,6 +31,16 @@ import java.io.Closeable;
  *        }
  * }</pre>
  * </p>
+ * <p>
+ * example 3:
+ * <pre>{@code
+ *     void callback(AsyncContext ac){
+ *         try (Cleaner cleaner = ac.importToCurrent()){
+ *             // do business
+ *         }
+ *     }
+ * }</pre>
+ * </p>
  *
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/22
