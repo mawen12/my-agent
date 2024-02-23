@@ -5,6 +5,7 @@ import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class AgentImpl {
 
 		if (!arguments.getDurationProfiling().isEmpty()
 				|| !arguments.getArgumentProfiling().isEmpty()) {
-			instrumentation.addTransformer();
+//			instrumentation.addTransformer();
 
 			Set<String> loadedClasses = Arrays.stream(instrumentation.getAllLoadedClasses())
 					.map(Class::getName).collect(Collectors.toSet());
@@ -71,6 +72,6 @@ public class AgentImpl {
 	}
 
 	private List<Profiler> createProfilers(Reporter reporter, Arguments arguments, String processUuid, String appId) {
-
+		return null;
 	}
 }

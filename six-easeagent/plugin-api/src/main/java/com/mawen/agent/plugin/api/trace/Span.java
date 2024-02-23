@@ -2,8 +2,6 @@ package com.mawen.agent.plugin.api.trace;
 
 import javax.annotation.Nullable;
 
-import io.opentelemetry.context.Scope;
-
 /**
  * Here's a typical example of synchronous tracing from perspective
  * of the span:
@@ -63,7 +61,7 @@ public interface Span {
 		 * example, the {@link #PRODUCER} of this message is the {@link #parentId()}
 		 * of the span.
 		 */
-		CONSUMER
+		CONSUMER,
 		;
 	}
 
@@ -194,27 +192,73 @@ public interface Span {
 
 	/**
 	 * Reports the span, even if unfinished. Most users will not call this method.
-	 * This primarily supports two use cases: one-way spans and orphaned
+	 *
+	 * <p>This primarily supports two use cases: one-way spans and orphaned spans.
+	 * For example, a one-way span can be modeled as a span where one tracer calls start and
+	 * another calls finish. In order to report that span from its origin, flush must be called.
+	 *
+	 * <p>Another example is where a user didn't call finish within a deadline or before a shutdown occurs.
+	 * By flushing, you can report what was in progress.
 	 */
+	// a span should not be routinely flushed, only when it has finished, or we don't believe this tracer will finish it.
 	void flush();
 
+	/**
+	 * Usually calls a {@link Request#setHeader(String, String)} for each propagation field to send downstream.
+	 *
+	 * @param request holds propagation fields. For example, an outgoing message or http request.
+	 */
 	void inject(Request request);
 
+	/**
+	 * Sets the current span in scope util the returned object is closed.
+	 * It is a programming error to drop or never close the result.
+	 * Using try-with-resources is preferred for this reason.
+	 */
 	Scope maybeScope();
 
+	/**
+	 * Sets the current span in scope and cache the scope in span util the span is calling {@link #finish()}.
+	 * It is a programming error to drop or never close the result.
+	 * Using try-with-resources is preferred for this reason.
+	 */
 	Span cacheScope();
 
+	/**
+	 * Returns the hex representation of the span's trace ID
+	 */
 	String traceIdString();
 
+	/**
+	 * Returns the hex representation of the span's ID
+	 */
 	String spanIdString();
 
+	/**
+	 * Returns the hex representation of the span's parent ID
+	 */
 	String parentIdString();
 
+	/**
+	 * Unique 8-byte identifier for a trace, set on all spans within it.
+	 */
 	Long traceId();
 
+	/**
+	 * Unique 8-byte identifier of this span within a trace.
+	 *
+	 * <p>A span is uniquely identified in storage by ({@linkplain #traceId}).
+	 */
 	Long spanId();
 
+	/**
+	 * The parent's {@link #spanId()} or null if this the root span in a trace.
+	 */
 	Long parentId();
 
+	/**
+	 * Returns the underlying Span object or {@code null} if there is none.
+	 * Here is some span objects: {@code brave.LazySpan}, {@code brave.RealSpan}.
+	 */
 	Object unwrap();
 }

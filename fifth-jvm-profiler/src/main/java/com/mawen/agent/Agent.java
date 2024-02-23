@@ -21,7 +21,7 @@ public class Agent {
 
 		Arguments arguments = Arguments.parseArgs(args);
 		arguments.runConfigProvider();
-		agentImpl.run();
+//		agentImpl.run();
 	}
 
 }

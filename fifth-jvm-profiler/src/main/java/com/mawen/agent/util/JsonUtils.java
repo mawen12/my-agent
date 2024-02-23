@@ -32,7 +32,7 @@ public class JsonUtils {
 			return "";
 		}
 		try {
-			return mapper.writeValueAsBytes(obj);
+			return mapper.writeValueAsString(obj);
 		}
 		catch (JsonProcessingException e) {
 			throw new RuntimeException(String.format("Failed to serialize %s (%s)", obj, obj.getClass()), e);
@@ -54,7 +54,7 @@ public class JsonUtils {
 			return mapper.readValue(content, valueTypeRef);
 		}
 		catch (JsonProcessingException e) {
-			throw new RuntimeException(String.format("Failed to deserialize %s from json %s",valueTypeRef, content), ex);
+			throw new RuntimeException(String.format("Failed to deserialize %s from json %s",valueTypeRef, content), e);
 		}
 	}
 }
