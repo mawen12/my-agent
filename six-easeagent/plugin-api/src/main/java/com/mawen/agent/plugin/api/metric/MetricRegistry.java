@@ -45,12 +45,13 @@ public interface MetricRegistry {
 
 	/**
 	 * Return the {@link Gauge} registered under this name; or create and register
-	 * a new {@link Gauge} if none is registered.
+	 * a new {@link Gauge} using the provided MetricSupplier if none is registered.
 	 *
 	 * @param name the name of the metric
+	 * @param supplier a Supplier that can be used to manufacture a Gauge
 	 * @return a new or pre-existing {@link Gauge}
 	 */
-	Gauge gauge(String name);
+	Gauge gauge(String name, MetricSupplier<Gauge> supplier);
 
 	/**
 	 * Return the {@link Histogram} registered under this name; or create and register

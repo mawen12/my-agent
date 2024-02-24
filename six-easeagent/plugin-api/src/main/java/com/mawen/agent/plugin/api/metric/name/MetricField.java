@@ -5,6 +5,9 @@ package com.mawen.agent.plugin.api.metric.name;
  * @since 2024/2/23
  */
 public enum MetricField {
+	// common execution time:
+	// min/max/mean
+	// p25/p50/p75/p95/p98/p99/p999
 	MIN_EXECUTION_TIME("min", ConverterType.DURATION, 2),
 	MAX_EXECUTION_TIME("max", ConverterType.DURATION, 2),
 	MEAN_EXECUTION_TIME("mean", ConverterType.DURATION, 2),
@@ -20,6 +23,12 @@ public enum MetricField {
 	EXECUTION_COUNT("cnt"),
 	EXECUTION_ERROR_COUNT("errcnt"),
 
+	// common rate:
+	// m1/m5/m15
+	// retry_m1/retry_m5/retry_m15
+	// ratelimiter_m1/ratelimiter_m5/ratelimiter_m15
+	// circuitbreaker_m1/circuitbreaker_m5/circuitbreaker_m15
+	// m1_error/m5_error/m15_error
 	M1_RATE("m1", ConverterType.RATE, 5),
 	M5_RATE("m5", ConverterType.RATE, 5),
 	M15_RATE("m15", ConverterType.RATE, 5),
@@ -43,6 +52,7 @@ public enum MetricField {
 	TOTAL_COLLECTION_TIME("total_collection_time", ConverterType.RATE, 0),
 	TIMES("times", ConverterType.RATE, 0),
 
+	// channel is for rabbitmq
 	CHANNEL_M1_RATE("channel_m1_rate", ConverterType.RATE, 5),
 	CHANNEL_M5_RATE("channel_m5_rate", ConverterType.RATE, 5),
 	CHANNEL_M15_RATE("channel_m15_rate", ConverterType.RATE, 5),
@@ -52,13 +62,45 @@ public enum MetricField {
 	QUEUE_M1_ERROR_RATE("queue_m1_err_rate", ConverterType.RATE, 5),
 	QUEUE_M5_ERROR_RATE("queue_m5_err_rate", ConverterType.RATE, 5),
 	QUEUE_M15_ERROR_RATE("queue_m15_err_rate", ConverterType.RATE, 5),
-	PRODUCER_M1_RATe("prodrm1", ConverterType.RATE, 5),
+
+	// producer and consumer are for message kafka rabbitmq service
+	PRODUCER_M1_RATE("prodrm1", ConverterType.RATE, 5),
 	PRODUCER_M5_RATE("prodrm5", ConverterType.RATE, 5),
 	PRODUCER_M15_RATE("prodrm15", ConverterType.RATE, 5),
 	PRODUCER_M1_ERROR_RATE("prodrm1err", ConverterType.RATE, 5),
 	PRODUCER_M5_ERROR_RATE("prodrm5err", ConverterType.RATE, 5),
 	PRODUCER_M15_ERROR_RATE("prodrm15err", ConverterType.RATE, 5),
-	CONSUMER()
+	CONSUMER_M1_RATE("consrm1", ConverterType.RATE, 5),
+	CONSUMER_M5_RATE("consrm5", ConverterType.RATE, 5),
+	CONSUMER_M15_RATE("consrm15", ConverterType.RATE, 5),
+	CONSUMER_M1_ERROR_RATE("consrm1err", ConverterType.RATE, 5),
+	CONSUMER_M5_ERROR_RATE("consrm5err", ConverterType.RATE, 5),
+	CONSUMER_M15_ERROR_RATE("consrm15err", ConverterType.RATE, 5),
+	EXECUTION_PRODUCER_ERROR_COUNT("prodrerrcnt"),
+	EXECUTION_CONSUMER_ERROR_COUNT("consrerrrcnt"),
+	EXECUTION_PRODUCER_COUNT("prodrcnt"),
+	EXECUTION_CONSUMER_COUNT("consrcnt"),
+	PRODUCER_MIN_EXECUTION_TIME("prodrmin", ConverterType.DURATION, 2),
+	PRODUCER_MAX_EXECUTION_TIME("prodrmax", ConverterType.DURATION, 2),
+	PRODUCER_MEAN_EXECUTION_TIME("prodrmean", ConverterType.DURATION, 2),
+	PRODUCER_P25_EXECUTION_TIME("prodrp25", ConverterType.DURATION, 2),
+	PRODUCER_P50_EXECUTION_TIME("prodrp50", ConverterType.DURATION, 2),
+	PRODUCER_P75_EXECUTION_TIME("prodrp75", ConverterType.DURATION, 2),
+	PRODUCER_P95_EXECUTION_TIME("prodrp95", ConverterType.DURATION, 2),
+	PRODUCER_P98_EXECUTION_TIME("prodrp98", ConverterType.DURATION, 2),
+	PRODUCER_P99_EXECUTION_TIME("prodrp99", ConverterType.DURATION, 2),
+	PRODUCER_P999_EXECUTION_TIME("prodrp999", ConverterType.DURATION, 2),
+	CONSUMER_MIN_EXECUTION_TIME("consrmin", ConverterType.DURATION, 2),
+	CONSUMER_MAX_EXECUTION_TIME("consrmax", ConverterType.DURATION, 2),
+	CONSUMER_MEAN_EXECUTION_TIME("consrmean", ConverterType.DURATION, 2),
+	CONSUMER_P25_EXECUTION_TIME("consrp25", ConverterType.DURATION, 2),
+	CONSUMER_P50_EXECUTION_TIME("consrp50", ConverterType.DURATION, 2),
+	CONSUMER_P75_EXECUTION_TIME("consrp75", ConverterType.DURATION, 2),
+	CONSUMER_P95_EXECUTION_TIME("consrp95", ConverterType.DURATION, 2),
+	CONSUMER_P98_EXECUTION_TIME("consrp98", ConverterType.DURATION, 2),
+	CONSUMER_P99_EXECUTION_TIME("consrp99", ConverterType.DURATION, 2),
+	CONSUMER_P999_EXECUTION_TIME("consrp999", ConverterType.DURATION, 2),
+	NONE("", ConverterType.RATE, 0)
 	;
 
 	private final String field;
