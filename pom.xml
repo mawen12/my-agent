@@ -403,6 +403,9 @@
         <!-- JUnit 依赖版本 -->
         <junit.version>5.10.0</junit.version>
 
+        <lombok.version>1.18.30</lombok.version>
+        <mockito.version>5.10.0</mockito.version>
+        <mockito-inline.version>5.2.0</mockito-inline.version>
     </properties>
 
     <scm>
