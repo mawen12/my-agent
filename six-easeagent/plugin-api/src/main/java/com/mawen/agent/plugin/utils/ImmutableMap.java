@@ -77,7 +77,7 @@ public class ImmutableMap<K, V> implements Map<K, V> {
 		return delegate.entrySet();
 	}
 
-	public static <K, V> Builder<K, V> build() {
+	public static <K, V> Builder<K, V> builder() {
 		return new Builder<>();
 	}
 

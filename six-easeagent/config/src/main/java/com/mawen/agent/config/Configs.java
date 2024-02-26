@@ -25,7 +25,7 @@ public class Configs implements Config {
 	protected Map<String ,String> source;
 	protected ConfigNotifier notifier;
 
-	private Configs() {
+	protected Configs() {
 
 	}
 
