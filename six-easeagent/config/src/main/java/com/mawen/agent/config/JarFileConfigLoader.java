@@ -29,12 +29,16 @@ public class JarFileConfigLoader {
 				return null;
 			}
 			try (InputStream in = jarFile.getInputStream(zipEntry)) {
-				return
+				return ConfigLoader.loadFromStream(in, file);
+			}
+			catch (IOException e) {
+				LOGGER.debug("Load config file:{} failure: {}", file, e);
 			}
 		}
 		catch (IOException e) {
 			LOGGER.debug("create JarFile:{} failure:{}", agentJarPath, e);
 		}
 
+		return null;
 	}
 }
