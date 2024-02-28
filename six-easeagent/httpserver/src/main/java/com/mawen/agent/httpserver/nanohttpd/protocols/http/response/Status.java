@@ -1,5 +1,7 @@
 package com.mawen.agent.httpserver.nanohttpd.protocols.http.response;
 
+import lombok.Getter;
+
 /**
  * Some HTTP response status codes
  *
@@ -7,7 +9,7 @@ package com.mawen.agent.httpserver.nanohttpd.protocols.http.response;
  * @since 2024/2/27
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status">Status code</a>
  */
-public enum Status {
+public enum Status implements IStatus {
 
 	SWITCH_PROTOCOL(101, "Switching Protocols"),
 
@@ -54,6 +56,7 @@ public enum Status {
 	UNSUPPORTED_HTTP_VERSION(505, "HTTP Version Not Supported"),
 	;
 
+	@Getter
 	private final int requestStatus;
 	private final String description;
 
@@ -69,10 +72,6 @@ public enum Status {
 			}
 		}
 		return null;
-	}
-
-	public int getRequestStatus() {
-		return requestStatus;
 	}
 
 	public String getDescription() {
