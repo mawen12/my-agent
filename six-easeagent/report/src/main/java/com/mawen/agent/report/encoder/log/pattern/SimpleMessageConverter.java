@@ -4,21 +4,21 @@ import com.mawen.agent.plugin.api.otlp.common.AgentLogData;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
- * @since 2024/2/27
+ * @since 2024/2/28
  */
-public class LogDataLoggerPatternConverter extends NamePatternConverter {
+public class SimpleMessageConverter extends LogDataPatternConverter{
+
+	public static final SimpleMessageConverter INSTANCE = new SimpleMessageConverter();
 
 	/**
 	 * Create a new pattern converter.
-	 *
-	 * @param options options, may be null.
 	 */
-	public LogDataLoggerPatternConverter(String[] options) {
-		super("Logger", "logger", options);
+	protected SimpleMessageConverter() {
+		super("msg", "msg");
 	}
 
 	@Override
 	public void format(AgentLogData event, StringBuilder toAppendTo) {
-		abbreviate(event.getLocation(),toAppendTo);
+		toAppendTo.append(event.getBody().asString());
 	}
 }

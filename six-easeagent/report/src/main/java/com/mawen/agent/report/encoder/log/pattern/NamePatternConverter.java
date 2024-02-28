@@ -1,16 +1,22 @@
 package com.mawen.agent.report.encoder.log.pattern;
 
-import com.mawen.agent.plugin.api.otlp.common.AgentLogData;
 import org.apache.logging.log4j.core.pattern.NameAbbreviator;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/27
  */
-public class NamePatternConverter extends LogDataPatternConverter {
+public abstract class NamePatternConverter extends LogDataPatternConverter {
 
 	private final NameAbbreviator abbreviator;
 
+	/**
+	 * Constructor
+	 *
+	 * @param name name of converter
+	 * @param style style name for associated output
+	 * @param options options, may be null, first element will be interpreted as an abbreviation pattern.
+	 */
 	protected NamePatternConverter(final String name, final String style, final String[] options) {
 		super(name, style);
 
@@ -21,5 +27,13 @@ public class NamePatternConverter extends LogDataPatternConverter {
 		}
 	}
 
-
+	/**
+	 * Abbreviate name in string buffer.
+	 *
+	 * @param original string containing name.
+	 * @param destination the StringBuilder to write to
+	 */
+	protected final void abbreviate(final String original, final StringBuilder destination) {
+		abbreviator.abbreviate(original,destination);
+	}
 }
