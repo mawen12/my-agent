@@ -2,11 +2,11 @@ package com.mawen.agent.httpserver.nanohttpd.protocols.http;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
 import com.mawen.agent.httpserver.nanohttpd.protocols.http.content.CookieHandler;
+import com.mawen.agent.httpserver.nanohttpd.protocols.http.request.Method;
 
 /**
  * Handles one session, i.e. parses the HTTP request and returns the response.

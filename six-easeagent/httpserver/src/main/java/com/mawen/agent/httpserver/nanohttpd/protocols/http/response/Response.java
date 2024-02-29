@@ -190,7 +190,7 @@ public class Response implements Closeable {
 	/**
 	 * Create a response with unknown length (using HTTP 1.1 chunking).
 	 */
-	public static Response newChunkedResponse(IStatus status, String mimeType, InputStream data, long totalBytes) {
+	public static Response newChunkedResponse(IStatus status, String mimeType, InputStream data) {
 		return new Response(status, mimeType, data, -1);
 	}
 

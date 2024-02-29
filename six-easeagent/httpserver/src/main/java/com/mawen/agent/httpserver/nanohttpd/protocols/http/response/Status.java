@@ -50,7 +50,7 @@ public enum Status implements IStatus {
 	EXPECTATION_FAILED(417, "Expectation Failed"),
 	TOO_MANY_REQUESTS(429, "Too Many Requests"),
 
-	INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
+	INTERNAL_ERROR(500, "Internal Server Error"),
 	NOT_IMPLEMENTED(501, "Not Implemented"),
 	SERVICE_UNAVAILABLE(503, "Service Unavailable"),
 	UNSUPPORTED_HTTP_VERSION(505, "HTTP Version Not Supported"),

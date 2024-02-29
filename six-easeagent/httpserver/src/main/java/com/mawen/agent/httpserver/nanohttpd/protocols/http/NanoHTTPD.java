@@ -119,10 +119,26 @@ public class NanoHTTPD {
 		return new ClientHandler(this, inputStream, finalAccept);
 	}
 
+	/**
+	 * Decode parameters from a URL, handing the case where a single parameter
+	 * name might have been supplied several times, by return lists of values.
+	 * In general these lists will contain a single element.
+	 *
+	 * @param params original <b>NanoHTTPD</b> parameters values, as passed to the {@link #serve(IHTTPSession)} method.
+	 * @return a map of {@code String} (parameter name) to {@code List<String>} (a list of the values supplied).
+	 */
 	protected static Map<String, List<String>> decodeParameters(Map<String, String> params) {
 		return decodeParameters(params.get(NanoHTTPD.QUERY_STRING_PARAMETER));
 	}
 
+	/**
+	 * Decode parameters from a URL, handing the case where a single parameter
+	 * name might have been supplied several times, by return lists of values.
+	 * In general these lists will contain a single element.
+	 *
+	 * @param queryString a query string pulled from the URL.
+	 * @return a map of {@code String} （parameter name) to {@code List<String>} (a list of the values supplied).
+	 */
 	protected static Map<String, List<String>> decodeParameters(String queryString) {
 		Map<String, List<String>> params = new HashMap<>();
 		if (queryString != null) {
@@ -143,6 +159,12 @@ public class NanoHTTPD {
 		return params;
 	}
 
+	/**
+	 * Decode percent encoded {@code String} values.
+	 *
+	 * @param str the percent encoded {@code String}
+	 * @return expanded form of the input, for example "foo%20bar" becomes "foo bar"
+	 */
 	public static String decodePercent(String str) {
 		String decoded = null;
 		try {
@@ -196,10 +218,22 @@ public class NanoHTTPD {
 		return wasStarted() && !this.myServerSocket.isClosed() && this.myThread.isAlive();
 	}
 
+	/**
+	 * Call before start() to serve over HTTPS instead of HTTP
+	 */
 	public void makeSecure(SSLServerSocketFactory sslServerSocketFactory, String[] sslProtocols) {
 		this.serverSocketFactory = new SecureServerSocketFactory(sslServerSocketFactory, sslProtocols);
 	}
 
+	/**
+	 * This is the "master" method that delegates requests to handlers and makes
+	 * sure there is a response to every request.
+	 * You are not supported to call or override this method in any circumstances.
+	 * But no one will stop you if you do. I'm a Javadoc, not code Police.
+	 *
+	 * @param session the incoming session
+	 * @return a response to the incoming session
+	 */
 	public Response handle(IHTTPSession session) {
 		for (IHandler<IHTTPSession, Response> interceptor : interceptors) {
 			Response response = interceptor.handle(session);
@@ -222,6 +256,12 @@ public class NanoHTTPD {
 		return MIME_TYPES;
 	}
 
+	/**
+	 * Get MIME type from file name extension, if possible
+	 *
+	 * @param uri the string representing a file
+	 * @return the connected mime/type
+	 */
 	public static String getMimeTypeForFile(String uri) {
 		int dot = uri.lastIndexOf('.');
 		String mime = null;
@@ -251,14 +291,31 @@ public class NanoHTTPD {
 		}
 	}
 
+	/**
+	 * Start the server
+	 *
+	 * @throws IOException if the socket is in use.
+	 */
 	public void start() throws IOException {
 		start(NanoHTTPD.SOCKET_READ_TIMEOUT);
 	}
 
-	public void start(int timeout) throws IOException {
+	/**
+	 * Starts the server in (in setDaemon(true) mode).
+	 *
+	 * @param timeout timeout to use for socket connections
+	 */
+	public void start(final int timeout) throws IOException {
 		start(timeout, true);
 	}
 
+	/**
+	 * Start the server.
+	 *
+	 * @param timeout timeout to use for socket connections
+	 * @param daemon start the thread daemon or not.
+	 * @throws IOException if the socket is in use.
+	 */
 	public void start(final int timeout, boolean daemon) throws IOException {
 		this.myServerSocket = this.getServerSocketFactory().create();
 		this.myServerSocket.setReuseAddress(true);
@@ -285,6 +342,9 @@ public class NanoHTTPD {
 		}
 	}
 
+	/**
+	 * Stop the server.
+	 */
 	public void stop() {
 		try {
 			safeClose(this.myServerSocket);
@@ -298,10 +358,26 @@ public class NanoHTTPD {
 		}
 	}
 
+	/**
+	 * Instantiate the server runnable, can be overridden by subclasses to
+	 * provide a subclass of the ServerRunnable
+	 *
+	 * @param timeout the socket timeout to use.
+	 * @return the server runnable.
+	 */
 	protected ServerRunnable createServerRunnable(final int timeout) {
 		return new ServerRunnable(this, timeout);
 	}
 
+	/**
+	 * Override this to customize the server.
+	 *
+	 * <p>(By default, this return a 404 "Not Found" plain text error response.)
+	 *
+	 * @param session The HTTP session
+	 * @return HTTP Response, see class Response for details
+	 */
+	@Deprecated
 	protected Response serve(IHTTPSession session) {
 		return Response.newFixedLengthResponse(Status.NOT_FOUND, NanoHTTPD.MIME_PLAINTEXT, "Not Found");
 	}
