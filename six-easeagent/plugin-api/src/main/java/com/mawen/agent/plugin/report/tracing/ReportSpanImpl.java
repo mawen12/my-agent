@@ -1,6 +1,5 @@
 package com.mawen.agent.plugin.report.tracing;
 
-import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -141,7 +140,7 @@ public class ReportSpanImpl implements ReportSpan{
 		tags = builder.tags == null ? Collections.emptyMap() : new TreeMap<>(builder.tags);
 	}
 
-	public abstract class Builder {
+	public abstract static class Builder {
 		protected String traceId;
 		protected String parentId;
 		protected String id;

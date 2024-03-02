@@ -63,7 +63,7 @@ public class Endpoint {
 	 *
 	 * @see InetSocketAddress#getPort()
 	 */
-	public int getPort() {
+	public int port() {
 		return port;
 	}
 

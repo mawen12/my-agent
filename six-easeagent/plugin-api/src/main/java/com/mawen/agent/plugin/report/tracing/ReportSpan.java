@@ -1,6 +1,5 @@
 package com.mawen.agent.plugin.report.tracing;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
