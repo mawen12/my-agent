@@ -1,5 +1,6 @@
 package com.mawen.agent.report.metric;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.mawen.agent.config.ConfigUtils;
@@ -11,6 +12,9 @@ import com.mawen.agent.plugin.api.config.Const;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.utils.NoNull;
 import com.mawen.agent.plugin.utils.common.StringUtils;
+import com.mawen.agent.report.sender.AgentLoggerSender;
+import com.mawen.agent.report.sender.metric.MetricKafkaSender;
+import lombok.Getter;
 
 import static com.mawen.agent.config.report.ReportConfigConst.*;
 
@@ -38,6 +42,11 @@ public interface MetricProps {
 		return new Default(reportConfig, config);
 	}
 
+	static MetricProps newDefault(Config reportConfig, String prefix) {
+		return new Default(reportConfig, prefix);
+	}
+
+	@Getter
 	class Default implements MetricProps {
 
 		private volatile String senderName;
@@ -85,9 +94,48 @@ public interface MetricProps {
 			}
 
 			checkSenderName();
+			pCfg.put(join(senderPrefix, APPEND_TYPE_KEY), this.senderName);
+			pCfg.put(join(senderPrefix, LOG_APPENDER_KEY), this.name);
+			pCfg.put(join(asyncPrefix, INTERVAL_KEY), Integer.toString(this.interval));
 
+			this.pluginConfigMap = pCfg;
 		}
 
+		public Default(Config reportConfig, String prefix) {
+			this.config = reportConfig;
+			this.senderPrefix = prefix;
+			this.asyncPrefix = getAsyncPrefix(prefix);
+			this.name = this.config.getString(join(this.senderPrefix, LOG_APPENDER_KEY));
+			this.enabled = this.config.getBoolean(join(this.senderPrefix, ENABLED_KEY));
+			this.senderName = this.config.getString(join(this.senderPrefix, APPEND_TYPE_KEY));
+			this.topic = this.config.getString(join(this.senderPrefix, TOPIC_KEY));
+			this.interval = this.config.getInt(join(this.asyncPrefix, INTERVAL_KEY));
+
+			checkSenderName();
+			this.pluginConfigMap = new HashMap<>(this.config.getConfigs());
+		}
+
+		@Override
+		public Configs asReportConfig() {
+			Map<String, String> cfg = this.config.getConfigs();
+			cfg.putAll(this.pluginConfigMap);
+			return new Configs(cfg);
+		}
+
+		@Override
+		public int hashCode() {
+			return this.pluginConfigMap.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof Default)) {
+				return false;
+			}
+
+			Default other = (Default) obj;
+			return this.pluginConfigMap.equals(other.pluginConfigMap);
+		}
 
 		private String generatePrefix() {
 			return "reporter.metric." + this.name + ".sender";

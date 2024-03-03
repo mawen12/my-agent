@@ -1,5 +1,6 @@
 package com.mawen.agent.report.sender.metric.log4j;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +15,13 @@ import com.mawen.agent.report.OutputProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.mom.kafka.KafkaAppender;
 import org.apache.logging.log4j.core.config.Property;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -112,14 +116,37 @@ public interface AppenderManager {
 				Property.createProperty(ProducerConfig.CLIENT_ID_CONFIG, "producer_" + topic + s);
 				if (SecurityProtocol.SSL.name.equals(outputProperties.getSecurityProtocol())) {
 					propertyList.add(Property.createProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, outputProperties.getSecurityProtocol()));
-
+					propertyList.add(Property.createProperty(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, outputProperties.getSSLKeyStoreType()));
+					propertyList.add(Property.createProperty(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, outputProperties.getKeyStoreKey()));
+					propertyList.add(Property.createProperty(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, outputProperties.getKeyStoreCertChain()));
+					propertyList.add(Property.createProperty(SslConfigs.SSL_TRUSTSTORE_CERTIFICATES_CONFIG, outputProperties.getTrustCertificate()));
+					propertyList.add(Property.createProperty(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, outputProperties.getTrustCertificateType()));
+					propertyList.add(Property.createProperty(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, outputProperties.getEndpointAlgorithm()));
 				}
 
+				Property[] properties = new Property[propertyList.size()];
+				propertyList.toArray(properties);
+				Appender appender = KafkaAppender.newBuilder()
+						.setTopic(topic)
+						.setSyncSend(false)
+						.setName(topic + "_kafka_" + s)
+						.setPropertyArray(properties)
+						.setLayout(PatternLayout.newBuilder()
+								.withCharset(StandardCharsets.UTF_8)
+								.withConfiguration(context.getConfiguration())
+								.withPattern("%m%n")
+								.build())
+						.setConfiguration(context.getConfiguration())
+						.build();
+				appender.start();
+				return appender;
 			}
 			catch (Exception e) {
 				LOGGER.warn("can't not create topic : {} kafka appender, error: {}", topic, e.getMessage(), e);
 			}
 			return null;
 		}
+
+
 	}
 }

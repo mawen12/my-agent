@@ -33,26 +33,27 @@ public class HttpSpanJsonEncoder implements Encoder<ReportSpan>{
 
 	@Override
 	public EncodedData encode(ReportSpan input) {
-		return new OkHttp;
+		return new OkHttpJsonRequestBody(this.encoder.encode(input).getData());
 	}
 
 	@Override
 	public String name() {
-		return "";
+		return ENCODER_NAME;
 	}
 
 	@Override
 	public EncodedData encodeList(List<EncodedData> encodedDataItems) {
-		return null;
+		EncodedData body = this.encoder.encodeList(encodedDataItems);
+		return new OkHttpJsonRequestBody(body.getData());
 	}
 
 	@Override
 	public int appendSizeInBytes(int newMsgSize) {
-		return 0;
+		return this.encoder.appendSizeInBytes(newMsgSize);
 	}
 
 	@Override
 	public int packageSizeInBytes(List<Integer> sizes) {
-		return 0;
+		return this.encoder.packageSizeInBytes(sizes);
 	}
 }
