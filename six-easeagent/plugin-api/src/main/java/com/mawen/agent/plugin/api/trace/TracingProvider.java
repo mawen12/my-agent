@@ -6,5 +6,5 @@ package com.mawen.agent.plugin.api.trace;
  */
 public interface TracingProvider {
 
-	TracingProvider tracingSupplier();
+	TracingSupplier tracingSupplier();
 }

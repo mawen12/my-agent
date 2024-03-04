@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import com.mawen.agent.plugin.utils.ImmutableMap;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -11,6 +12,7 @@ import lombok.Data;
  * @since 2024/3/4
  */
 @Data
+@AllArgsConstructor
 public class ErrorPercentModelGauge implements GaugeMetricModel{
 	private BigDecimal m1ErrorPercent;
 	private BigDecimal m5ErrorPercent;

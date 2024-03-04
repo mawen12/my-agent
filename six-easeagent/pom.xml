@@ -21,6 +21,7 @@
         <module>report</module>
         <module>httpserver</module>
         <module>plugins</module>
+        <module>context</module>
     </modules>
 
     <dependencies>

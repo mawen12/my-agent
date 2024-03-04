@@ -6,5 +6,5 @@ package com.mawen.agent.plugin.api.metric;
  */
 public interface MetricProvider {
 
-
+	MetricRegistrySupplier metricSupplier();
 }
