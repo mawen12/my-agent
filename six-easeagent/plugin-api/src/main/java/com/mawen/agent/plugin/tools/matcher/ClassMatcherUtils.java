@@ -1,5 +1,6 @@
 package com.mawen.agent.plugin.tools.matcher;
 
+import com.mawen.agent.plugin.matcher.ClassMatcher;
 import com.mawen.agent.plugin.matcher.IClassMatcher;
 
 /**
@@ -9,6 +10,14 @@ import com.mawen.agent.plugin.matcher.IClassMatcher;
 public class ClassMatcherUtils {
 
 	public static IClassMatcher name(String name) {
-		return ClassMatcher
+		return ClassMatcher.builder()
+				.hasClassName(name)
+				.build();
+	}
+
+	public static IClassMatcher hasSuperType(String name) {
+		return ClassMatcher.builder()
+				.hasSuperClass(name)
+				.build();
 	}
 }

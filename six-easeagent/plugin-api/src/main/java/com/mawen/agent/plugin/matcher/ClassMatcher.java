@@ -31,6 +31,10 @@ public class ClassMatcher implements IClassMatcher {
 		this.notModifier = notModifier;
 	}
 
+	public static ClassMatcherBuilder builder() {
+		return new ClassMatcherBuilder();
+	}
+
 	public static class ClassMatcherBuilder {
 
 		private String name;
@@ -80,6 +84,26 @@ public class ClassMatcher implements IClassMatcher {
 				}
 			}
 			return this.name(className).matchType(ClassMatch.SUPER_CLASS);
+		}
+
+		public ClassMatcherBuilder hasClassName(String className) {
+			return this.name(className).matchType(ClassMatch.NAMED);
+		}
+
+		public ClassMatcherBuilder hasAnnotation(String className) {
+			return this.name(className).matchType(ClassMatch.ANNOTATION);
+		}
+
+		public ClassMatcherBuilder hasInterface(String className) {
+			if (this.name != null && this.name.length() > 0) {
+				// and operate
+				ClassMatcherBuilder builder = new ClassMatcherBuilder();
+				builder.hasSuperClass(className).matchType(ClassMatch.INTERFACE);
+				builder.left = this.build();
+				builder.operator = Operator.AND;
+				return builder;
+			}
+			return this.name(className).matchType(ClassMatch.INTERFACE);
 		}
 
 		public ClassMatcherBuilder matchType(ClassMatch matchType) {

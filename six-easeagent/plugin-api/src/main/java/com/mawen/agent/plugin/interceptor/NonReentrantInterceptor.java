@@ -6,7 +6,7 @@ import com.mawen.agent.plugin.api.Context;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/24
  */
-public interface NoReentrantInterceptor extends Interceptor{
+public interface NonReentrantInterceptor extends Interceptor{
 
 	@Override
 	default void before(MethodInfo methodInfo, Context context) {
