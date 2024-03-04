@@ -24,12 +24,13 @@ public enum MetricValueFetcher {
 	Snapshot98Percentile(Snapshot::get98thPercentile, Snapshot.class),
 	Snapshot99Percentile(Snapshot::get99thPercentile, Snapshot.class),
 	Snapshot999Percentile(Snapshot::get999thPercentile, Snapshot.class),
-	MetricM1Rate(Meter::getOneMinuteRate, Meter.class),
-	MetricM1RateIgnoreZero(Meter::getOneMinuteRate, Meter.class, aDouble -> aDouble),
-	MetricM5Rate(Meter::getFiveMinuteRate, Meter.class),
-	MetricM15Rate(Meter::getFifteenMinuteRate, Meter.class),
-	MetricMeanRate(Meter::getMeanRate, Meter.class),
-	MetricCount(Meter::getCount, Meter.class),
+
+	MeteredM1Rate(Meter::getOneMinuteRate, Meter.class),
+	MeteredM1RateIgnoreZero(Meter::getOneMinuteRate, Meter.class, aDouble -> aDouble),
+	MeteredM5Rate(Meter::getFiveMinuteRate, Meter.class),
+	MeteredM15Rate(Meter::getFifteenMinuteRate, Meter.class),
+	MeteredMeanRate(Meter::getMeanRate, Meter.class),
+	MeteredCount(Meter::getCount, Meter.class),
 	;
 
 	private final Function func;
