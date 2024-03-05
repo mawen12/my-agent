@@ -114,7 +114,7 @@ public class MetricKafkaSender implements Sender {
 
 	private String prepareAppenderAndLogger() {
 		RefreshableAppender build = RefreshableAppender.builder()
-				.name(this.props.getName())
+				.names(this.props.getName())
 				.metricProps(this.props)
 				.appenderManager(appenderManager)
 				.build();

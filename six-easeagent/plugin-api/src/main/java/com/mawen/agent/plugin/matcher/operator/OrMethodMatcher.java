@@ -1,6 +1,5 @@
 package com.mawen.agent.plugin.matcher.operator;
 
-import com.mawen.agent.plugin.matcher.IClassMatcher;
 import com.mawen.agent.plugin.matcher.IMethodMatcher;
 
 /**

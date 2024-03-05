@@ -6,7 +6,6 @@ import com.mawen.agent.plugin.bridge.Agent;
 import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.TraceFlags;
 import io.opentelemetry.api.trace.TraceState;
-import org.checkerframework.checker.units.qual.A;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>

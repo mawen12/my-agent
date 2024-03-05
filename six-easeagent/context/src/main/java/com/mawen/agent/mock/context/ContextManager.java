@@ -6,10 +6,10 @@ import javax.annotation.Nonnull;
 
 import com.mawen.agent.config.Configs;
 import com.mawen.agent.config.PluginConfigManager;
-import com.mawen.agent.mock.context.log.LoggerFactoryImpl;
-import com.mawen.agent.mock.context.log.LoggerMdc;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
+import com.mawen.agent.mock.context.log.LoggerFactoryImpl;
+import com.mawen.agent.mock.context.log.LoggerMdc;
 import com.mawen.agent.plugin.api.InitializeContext;
 import com.mawen.agent.plugin.api.Reporter;
 import com.mawen.agent.plugin.api.config.IPluginConfig;

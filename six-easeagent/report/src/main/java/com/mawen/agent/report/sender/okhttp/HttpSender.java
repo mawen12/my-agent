@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.google.auto.service.AutoService;
 import com.mawen.agent.plugin.api.config.Config;
-import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.async.AgentThreadFactory;
 import com.mawen.agent.plugin.report.Call;
 import com.mawen.agent.plugin.report.EncodedData;

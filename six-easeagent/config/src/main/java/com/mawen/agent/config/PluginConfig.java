@@ -15,7 +15,6 @@ import com.mawen.agent.plugin.api.config.Const;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.api.config.PluginConfigChangeListener;
 import com.mawen.agent.plugin.utils.common.StringUtils;
-import org.checkerframework.common.reflection.qual.NewInstance;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>

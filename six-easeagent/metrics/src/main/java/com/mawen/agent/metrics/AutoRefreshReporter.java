@@ -8,7 +8,6 @@ import com.mawen.agent.metrics.config.MetricsConfig;
 import com.mawen.agent.metrics.converter.Converter;
 import com.mawen.agent.plugin.report.EncodedData;
 import lombok.Getter;
-import org.apache.kafka.common.metrics.MetricConfig;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>

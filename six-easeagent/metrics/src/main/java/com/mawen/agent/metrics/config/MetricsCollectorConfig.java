@@ -1,11 +1,9 @@
 package com.mawen.agent.metrics.config;
 
-import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
 import com.mawen.agent.config.ConfigUtils;
 import com.mawen.agent.plugin.api.config.Config;
-import com.mawen.agent.plugin.api.config.ConfigConst;
 
 import static com.mawen.agent.plugin.api.config.ConfigConst.*;
 

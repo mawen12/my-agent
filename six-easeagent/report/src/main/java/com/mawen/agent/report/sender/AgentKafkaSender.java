@@ -11,9 +11,9 @@ import com.mawen.agent.plugin.report.EncodedData;
 import com.mawen.agent.plugin.report.Sender;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 import com.mawen.agent.report.plugin.NoOpCall;
-import io.opentelemetry.internal.shaded.jctools.queues.MpscArrayQueue;
 import zipkin2.codec.Encoding;
 import zipkin2.reporter.kafka11.KafkaSender;
+import zipkin2.reporter.kafka11.SDKKafkaSender;
 
 import static com.mawen.agent.config.report.ReportConfigConst.*;
 
@@ -73,22 +73,60 @@ public class AgentKafkaSender implements Sender {
 		if (!enabled) {
 			return new NoOpCall<>();
 		}
-		this.sender.sendSpans();
-		return null;
+		zipkin2.Call<Void> call = this.sender.sendSpans(encodedData.getData());
+		return new ZipkinCallWrapper<>(call);
 	}
 
 	@Override
 	public boolean isAvailable() {
-		return false;
+		return (this.sender != null) && (!this.sender.isClose());
 	}
 
 	@Override
 	public void updateConfigs(Map<String, String> changes) {
+		String name = changes.get(join(prefix, APPEND_TYPE_KEY));
+		if (StringUtils.isNotEmpty(name) && !SENDER_NAME.equals(name)) {
+			try {
+				this.close();
+				return;
+			}
+			catch (IOException e) {
+				// ignored
+			}
+		}
 
+		boolean refresh = false;
+		for (String key : changes.keySet()) {
+			if (key.startsWith(OUTPUT_SERVER_V2) || key.startsWith(this.topicKey)) {
+				refresh = true;
+				break;
+			}
+		}
+
+		if (refresh) {
+			try {
+				this.sender.close();
+			}
+			catch (IOException e) {
+				// ignored
+			}
+			this.config.updateConfigsNotNotify(changes);
+			this.init(config, prefix);
+		}
 	}
 
 	@Override
 	public void close() throws IOException {
+		if (this.sender != null) {
+			this.sender.close();
+		}
+	}
 
+	private boolean checkEnable(Config config) {
+		boolean check = config.getBoolean(join(this.prefix, ENABLED_KEY), true);
+		if (check) {
+			return config.getBoolean(OUTPUT_SERVERS_ENABLE);
+		}
+		return false;
 	}
 }

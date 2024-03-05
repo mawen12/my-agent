@@ -1,6 +1,5 @@
 package com.mawen.agent.report.async.log;
 
-import com.mawen.agent.config.report.ReportConfigConst;
 import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 import com.mawen.agent.report.async.AsyncProps;

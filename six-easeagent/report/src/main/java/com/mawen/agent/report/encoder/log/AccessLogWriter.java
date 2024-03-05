@@ -1,9 +1,6 @@
 package com.mawen.agent.report.encoder.log;
 
-import java.net.URL;
 import java.util.Map;
-
-import javax.management.Query;
 
 import com.mawen.agent.plugin.api.logging.AccessLogInfo;
 import zipkin2.internal.JsonEscaper;

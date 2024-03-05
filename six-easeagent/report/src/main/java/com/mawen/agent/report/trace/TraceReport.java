@@ -1,6 +1,5 @@
 package com.mawen.agent.report.trace;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,7 +11,6 @@ import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.bridge.Agent;
-import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.plugin.report.tracing.ReportSpan;
 import com.mawen.agent.report.async.AsyncProps;
 import com.mawen.agent.report.async.trace.SDKAsyncReporter;

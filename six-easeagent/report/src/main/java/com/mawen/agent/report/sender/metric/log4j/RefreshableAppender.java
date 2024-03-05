@@ -98,7 +98,7 @@ public interface RefreshableAppender extends TestableAppender {
 		private AppenderManager appenderManager;
 		private MetricProps metricProps;
 
-		public Builder name(String prefix) {
+		public Builder names(String prefix) {
 			if (TextUtils.isEmpty(prefix)) {
 				prefix = "DefaultPrefix";
 			}

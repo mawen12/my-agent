@@ -1,7 +1,6 @@
 package com.mawen.agent.mock.log4j2;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 

@@ -26,7 +26,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.checkerframework.checker.units.qual.A;
 import zipkin2.Call;
 import zipkin2.CheckResult;
 import zipkin2.reporter.AsyncReporter;

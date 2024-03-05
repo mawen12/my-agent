@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.mawen.agent.plugin.api.config.Config;
-import com.mawen.agent.plugin.report.EncodedData;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 import com.mawen.agent.report.async.AsyncProps;
 import com.mawen.agent.report.async.trace.SDKAsyncReporter;

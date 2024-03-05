@@ -1,6 +1,7 @@
 package com.mawen.agent.report;
 
 import java.util.List;
+import java.util.Map;
 
 import com.mawen.agent.config.Configs;
 import com.mawen.agent.config.report.ReportConfigAdapter;
@@ -14,6 +15,8 @@ import com.mawen.agent.plugin.report.metric.MetricReporterFactory;
 import com.mawen.agent.plugin.report.tracing.ReportSpan;
 import com.mawen.agent.report.async.log.AccessLogReporter;
 import com.mawen.agent.report.async.log.ApplicationLogReporter;
+import com.mawen.agent.report.metric.MetricReporterFactoryImpl;
+import com.mawen.agent.report.plugin.ReporterLoader;
 import com.mawen.agent.report.trace.TraceReport;
 
 /**
@@ -25,7 +28,7 @@ public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
 	private final TraceReport traceReport;
 	private final MetricReporterFactory metricReporterFactory;
 	private final AccessLogReporter accessLogReporter;
-	private final ApplicationLogReporter applicationLogReporter;
+	private final ApplicationLogReporter appLogReporter;
 	private final Config config;
 	private final Config reportConfig;
 
@@ -33,33 +36,41 @@ public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
 		this.config = config;
 		this.reportConfig = new Configs(ReportConfigAdapter.extractReporterConfig(config));
 		this.traceReport = new TraceReport(this.reportConfig);
-		this.metricReporterFactory = metricReporterFactory;
-		this.accessLogReporter = accessLogReporter;
-		this.applicationLogReporter = applicationLogReporter;
+		this.accessLogReporter = new AccessLogReporter(reportConfig);
+		this.appLogReporter = new ApplicationLogReporter(reportConfig);
+		this.metricReporterFactory = MetricReporterFactoryImpl.create(reportConfig);
+
+		this.config.addChangeListener(this);
+	}
+
+	public static AgentReport create(Config config) {
+		ReporterLoader.load();
+		return new DefaultAgentReport(config);
 	}
 
 	@Override
 	public void onChange(List<ChangeItem> list) {
-
+		Map<String, String> changes = ReportConfigAdapter.extractReporterConfig(config);
+		this.reportConfig.updateConfigs(changes);
 	}
 
 	@Override
-	public void report(ReportSpan span) {
-
+	public void report(ReportSpan log) {
+		this.traceReport.report(log);
 	}
 
 	@Override
 	public void report(AccessLogInfo log) {
-
+		this.accessLogReporter.report(log);
 	}
 
 	@Override
 	public void report(AgentLogData log) {
-
+		this.appLogReporter.report(log);
 	}
 
 	@Override
 	public MetricReporterFactory metricReporter() {
-		return null;
+		return this.metricReporterFactory;
 	}
 }

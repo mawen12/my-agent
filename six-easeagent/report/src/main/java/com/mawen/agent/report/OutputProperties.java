@@ -4,9 +4,7 @@ import java.util.Map;
 
 import com.mawen.agent.config.ConfigUtils;
 import com.mawen.agent.config.Configs;
-import com.mawen.agent.config.report.ReportConfigConst;
 import com.mawen.agent.plugin.api.config.Config;
-import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.api.config.ConfigConst.Observability;
 
 import static com.mawen.agent.config.ConfigUtils.*;

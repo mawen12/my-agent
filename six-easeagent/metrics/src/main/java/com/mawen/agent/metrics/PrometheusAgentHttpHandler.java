@@ -7,7 +7,6 @@ import java.io.Writer;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.mawen.agent.httpserver.nano.AgentHttpHandler;
 import com.mawen.agent.httpserver.nano.AgentHttpServer;

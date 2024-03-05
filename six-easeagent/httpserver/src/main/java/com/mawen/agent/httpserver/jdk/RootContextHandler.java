@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.mawen.agent.httpserver.IHttpHandler;
 import com.sun.net.httpserver.HttpExchange;

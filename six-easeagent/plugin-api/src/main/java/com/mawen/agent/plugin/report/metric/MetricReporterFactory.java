@@ -2,7 +2,6 @@ package com.mawen.agent.plugin.report.metric;
 
 import com.mawen.agent.plugin.api.Reporter;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
-import com.mawen.agent.plugin.api.metric.MetricProvider;
 
 /**
  * Metric plugin get reporter from metricReporterFactory

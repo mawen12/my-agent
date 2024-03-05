@@ -7,6 +7,7 @@ import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.report.Encoder;
 import com.mawen.agent.plugin.report.Sender;
 import com.mawen.agent.report.sender.NoOpSender;
+import com.mawen.agent.report.sender.SenderConfigDecorator;
 import com.mawen.agent.report.sender.SenderWithEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
