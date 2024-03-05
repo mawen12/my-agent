@@ -1,6 +1,7 @@
 package com.mawen.agent.report.sender.metric;
 
 import com.mawen.agent.report.metric.MetricProps;
+import com.mawen.agent.report.sender.metric.log4j.AppenderManager;
 import org.apache.logging.log4j.core.Logger;
 
 /**
@@ -17,5 +18,13 @@ public class KeySender {
 	private org.slf4j.Logger consoleLogger;
 	private boolean isConsole = false;
 
+	public KeySender(String key, AppenderManager appenderManager, MetricProps metricProps) {
+		this.key = key;
+		this.appenderManager = appenderManager;
+		this.metricProps = metricProps;
+	}
 
+	public void send(String content) {
+		// TODO mawen
+	}
 }

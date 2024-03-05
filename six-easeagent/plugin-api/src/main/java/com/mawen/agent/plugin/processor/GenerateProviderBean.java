@@ -11,6 +11,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
+import com.mawen.agent.plugin.interceptor.Interceptor;
 import com.mawen.agent.plugin.interceptor.InterceptorProvider;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -34,13 +35,13 @@ class GenerateProviderBean {
 	GenerateProviderBean(TypeElement plugin, TypeElement interceptor,
 	                     Map<String, String> to,
 	                     BeanUtils utils) {
-		this.packageName = utils.packageNameOf(plugin);
-		this.interceptorClass = utils.classNameOf(interceptor).simpleName();
+		this.interceptor = interceptor;
+		this.packageName = utils.packageNameOf(interceptor);
 		this.pluginClass = utils.classNameOf(plugin).canonicalName();
 		this.point = to.get("value");
 		this.qualifier = to.get("qualifier") == null ? "default" : to.get("qualifier");
 		this.providerClassExtension = "$Provider" + to.get("seq");
-		this.interceptor = interceptor;
+		this.interceptorClass = utils.classNameOf(interceptor).simpleName();
 		this.utils = utils;
 	}
 
@@ -56,7 +57,7 @@ class GenerateProviderBean {
 			ExecutableElement pExecute = (ExecutableElement) e;
 			if (pExecute.toString().startsWith("getInterceptorProvider")) {
 				// getInterceptorProvider method generate
-				ParameterizedTypeName returnType = ParameterizedTypeName.get(Supplier.class, InterceptorProvider.class);
+				ParameterizedTypeName returnType = ParameterizedTypeName.get(Supplier.class, Interceptor.class);
 				// final MethodSpec getInterceptorProvider = MethodSpec.methodBuilder("getInterceptorProvider");
 				final MethodSpec getInterceptorProvider = MethodSpec.overriding(pExecute)
 						.addModifiers(Modifier.PUBLIC)
