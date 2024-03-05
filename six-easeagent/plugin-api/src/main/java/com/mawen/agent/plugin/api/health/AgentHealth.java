@@ -11,15 +11,15 @@ public class AgentHealth {
 	private volatile boolean alive = true;
 	private volatile boolean ready;
 
-	public void setReadinessEnabled(boolean readinessEnabled) {
+	public static void setReadinessEnabled(boolean readinessEnabled) {
 		INSTANCE.readinessEnabled = readinessEnabled;
 	}
 
-	public void setAlive(boolean alive) {
+	public static void setAlive(boolean alive) {
 		INSTANCE.alive = alive;
 	}
 
-	public void setReady(boolean ready) {
+	public static void setReady(boolean ready) {
 		INSTANCE.ready = ready;
 	}
 

@@ -1,12 +1,16 @@
 package com.mawen.agent.core;
 
 import java.lang.instrument.Instrumentation;
+import java.util.Set;
 
 import com.mawen.agent.config.ConfigFactory;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.mock.context.ContextManager;
 import com.mawen.agent.plugin.api.config.ConfigConst;
+import com.mawen.agent.plugin.utils.common.StringUtils;
+import lombok.SneakyThrows;
+import net.bytebuddy.dynamic.loading.ClassInjector;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -26,12 +30,25 @@ public class Bootstrap {
 
 	private Bootstrap(){}
 
+	@SneakyThrows
 	public static void start(String args, Instrumentation inst, String javaAgentJarPath) {
 		long begin = System.nanoTime();
 		System.setProperty(ConfigConst.AGENT_JAR_PATH, javaAgentJarPath);
 
 		// add bootstrap classes
+		Set<String> bootstrapClassSet = AppendBootstrapClassLoaderSearch.by(inst, ClassInjector.UsingInstrumentation.Target.BOOTSTRAP);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Injected class: {}",bootstrapClassSet);
+		}
 
+		// initiate configuration
+		String configPath = ConfigFactory.getConfigPath();
+		if (StringUtils.isEmpty(configPath)) {
+			configPath = args;
+		}
+
+		ClassLoader classLoader = Bootstrap.class.getClassLoader();
+		AgentInfoFactory.
 	}
 
 }
