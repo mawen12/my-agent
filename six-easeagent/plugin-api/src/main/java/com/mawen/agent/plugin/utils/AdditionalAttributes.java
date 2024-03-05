@@ -10,11 +10,13 @@ import java.util.Map;
 import com.mawen.agent.plugin.api.logging.Logger;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.utils.common.HostAddress;
+import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/25
  */
+@Getter
 public class AdditionalAttributes {
 	private static final Logger LOGGER = Agent.getLogger(AdditionalAttributes.class);
 
