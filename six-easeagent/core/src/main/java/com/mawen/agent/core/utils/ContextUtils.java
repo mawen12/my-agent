@@ -23,6 +23,10 @@ public class ContextUtils {
 		return context.get(BEGIN_TIME);
 	}
 
+	public static void setEndTime(Context context) {
+		context.put(END_TIME, SystemClock.now());
+	}
+
 	public static Long getEndTime(Context context) {
 		Long endTime = context.remove(END_TIME);
 		if (endTime == null) {

@@ -3,10 +3,13 @@ package com.mawen.agent.plugin.interceptor;
 import java.util.Arrays;
 import java.util.Objects;
 
+import lombok.Builder;
+
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/23
  */
+@Builder
 public class MethodInfo {
 
 	private Object invoker;

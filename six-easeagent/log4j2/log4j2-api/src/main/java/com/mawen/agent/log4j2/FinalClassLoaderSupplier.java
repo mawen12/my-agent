@@ -7,7 +7,7 @@ import org.apache.logging.log4j.util.Supplier;
  * @since 2024/2/22
  */
 public class FinalClassLoaderSupplier implements Supplier<ClassLoader> {
-	private static volatile ClassLoader CLASSLOADER = null;
+	public static volatile ClassLoader CLASSLOADER = null;
 
 	@Override
 	public ClassLoader get() {
