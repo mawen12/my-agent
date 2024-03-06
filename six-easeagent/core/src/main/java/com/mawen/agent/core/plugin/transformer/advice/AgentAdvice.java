@@ -8,13 +8,18 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.stream.IntStream;
 
 import com.mawen.agent.core.plugin.registry.AdviceRegistry;
+import com.mawen.agent.httpserver.nanohttpd.protocols.http.request.Method;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,10 +59,19 @@ import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 import net.bytebuddy.jar.asm.AnnotationVisitor;
 import net.bytebuddy.jar.asm.ClassReader;
+import net.bytebuddy.jar.asm.ClassVisitor;
+import net.bytebuddy.jar.asm.Label;
 import net.bytebuddy.jar.asm.MethodVisitor;
+import net.bytebuddy.jar.asm.Opcodes;
+import net.bytebuddy.jar.asm.TypePath;
+import net.bytebuddy.utility.CompoundList;
 import net.bytebuddy.utility.JavaConstant;
 import net.bytebuddy.utility.JavaType;
 import net.bytebuddy.utility.OpenedClassReader;
+import net.bytebuddy.utility.visitor.ExceptionTableSensitiveMethodVisitor;
+import net.bytebuddy.utility.visitor.FramePaddingMethodVisitor;
+import net.bytebuddy.utility.visitor.LineNumberPrependingMethodVisitor;
+import net.bytebuddy.utility.visitor.StackAwareMethodVisitor;
 
 import static net.bytebuddy.description.method.MethodDescription.*;
 import static net.bytebuddy.matcher.ElementMatchers.*;
@@ -108,14 +122,14 @@ public class AgentAdvice extends Advice {
 	}
 
 	protected AgentAdvice(Dispatcher.Resolved.ForMethodEnter methodEnter, Dispatcher.Resolved.ForMethodExit methodExitNonThrowable,
-			Dispatcher.Resolved.ForMethodExit methodExit) {
+	                      Dispatcher.Resolved.ForMethodExit methodExit) {
 		this(methodEnter, methodExit, methodExitNonThrowable, Assigner.DEFAULT,
 				ExceptionHandler.Default.SUPPRESSING, SuperMethodCall.INSTANCE);
 	}
 
 	private AgentAdvice(Dispatcher.Resolved.ForMethodEnter methodEnter, Dispatcher.Resolved.ForMethodExit methodExit,
-			Dispatcher.Resolved.ForMethodExit methodExitNonThrowable, Assigner assigner,
-			ExceptionHandler exceptionHandler, Implementation delegate) {
+	                    Dispatcher.Resolved.ForMethodExit methodExitNonThrowable, Assigner assigner,
+	                    ExceptionHandler exceptionHandler, Implementation delegate) {
 		super(null, null);
 		this.methodEnter = methodEnter;
 		this.methodExit = methodExit;
@@ -130,9 +144,9 @@ public class AgentAdvice extends Advice {
 	}
 
 	protected static AgentAdvice tto(TypeDescription advice, PostProcessor.Factory postProcessorFactory,
-			ClassFileLocator classFileLocator,
-			List<? extends OffsetMapping.Factory<?>> userFactories,
-			Delegator delegator) {
+	                                 ClassFileLocator classFileLocator,
+	                                 List<? extends OffsetMapping.Factory<?>> userFactories,
+	                                 Delegator delegator) {
 		Dispatcher.Unresolved methodEnter = Dispatcher.Inactive.INSTANCE;
 		Dispatcher.Unresolved methodExit = Dispatcher.Inactive.INSTANCE;
 		Dispatcher.Unresolved methodExitNoException = Dispatcher.Inactive.INSTANCE;
@@ -144,7 +158,8 @@ public class AgentAdvice extends Advice {
 				TypeDescription throwable = al.getValue(ON_THROWABLE).resolve(TypeDescription.class);
 				if (isNoExceptionHandler(throwable)) {
 					methodExitNoException = locate(OnMethodExit.class, INLINE_EXIT, methodExitNoException, methodDescription, delegator);
-				} else {
+				}
+				else {
 					methodExit = locate(OnMethodExit.class, INLINE_EXIT, methodExit, methodDescription, delegator);
 				}
 			}
@@ -174,10 +189,10 @@ public class AgentAdvice extends Advice {
 	}
 
 	private static Dispatcher.Unresolved locate(Class<? extends Annotation> type,
-			MethodDescription.InDefinedShape property,
-			Dispatcher.Unresolved dispatcher,
-			MethodDescription.InDefinedShape methodDescription,
-			Delegator delegator) {
+	                                            MethodDescription.InDefinedShape property,
+	                                            Dispatcher.Unresolved dispatcher,
+	                                            MethodDescription.InDefinedShape methodDescription,
+	                                            Delegator delegator) {
 		AnnotationDescription.Loadable<? extends Annotation> annotation = methodDescription.getDeclaredAnnotations().ofType(type);
 		if (annotation == null) {
 			return dispatcher;
@@ -187,7 +202,8 @@ public class AgentAdvice extends Advice {
 		}
 		else if (!methodDescription.isStatic()) {
 			throw new IllegalStateException("Advice for " + methodDescription + " is not static");
-		} else {
+		}
+		else {
 			return new Dispatcher.Inlining(methodDescription);
 		}
 	}
@@ -209,11 +225,23 @@ public class AgentAdvice extends Advice {
 		Dispatcher.Resolved.ForMethodExit exit;
 		if (instrumentedMethod.isConstructor()) {
 			exit = methodExitNonThrowable;
-		} else {
+		}
+		else {
 			exit = methodExit;
 		}
 
 		if (AdviceRegistry.check(instrumentedType, instrumentedMethod, methodEnter, exit) == 0) {
+			return methodVisitor;
+		}
+
+		methodVisitor = new FramePaddingMethodVisitor(methodEnter.isPrependLineNumber()
+				? new LineNumberPrependingMethodVisitor(methodVisitor)
+				: methodVisitor);
+
+		if (instrumentedMethod.isConstructor()) {
+			return new WithExitAdvice.WithoutExceptionHandling();
+		}
+		else {
 
 		}
 	}
@@ -253,6 +281,51 @@ public class AgentAdvice extends Advice {
 		}
 	}
 
+	protected abstract static class WithExitAdvice extends AdviceVisitor {
+		protected final Label returnHandler;
+
+		protected WithExitAdvice(MethodVisitor methodVisitor,
+		                         Implementation.Context implementationContext,
+		                         Assigner assigner,
+		                         StackManipulation exceptionHandler,
+		                         TypeDescription instrumentedType,
+		                         MethodDescription instrumentedMethod,
+		                         Dispatcher.Resolved.ForMethodEnter methodEnter,
+		                         Dispatcher.Resolved.ForMethodExit methodExit,
+		                         List<? extends TypeDescription> postMethodTypes,
+		                         int writerFlags,
+		                         int readerFlags) {
+			super(new StackAwareMethodVisitor(methodVisitor, instrumentedMethod),
+					implementationContext, assigner, exceptionHandler, instrumentedType, instrumentedMethod,
+					methodEnter, methodExit, postMethodTypes, writerFlags, readerFlags);
+		}
+
+		@Override
+		protected void onUserPrepare() {
+
+		}
+
+		@Override
+		protected void onUserStart() {
+
+		}
+
+		@Override
+		protected void onUserEnd() {
+
+		}
+
+		@Override
+		public void apply(MethodVisitor methodVisitor) {
+
+		}
+	}
+
+	protected abstract static class AdviceVisitor
+			extends ExceptionTableSensitiveMethodVisitor implements Dispatcher.RelocationHandler.Relocation {
+
+	}
+
 	public interface Dispatcher {
 		MethodVisitor IGNORE_METHOD = null;
 		AnnotationVisitor IGNORE_ANNOTATION = null;
@@ -267,28 +340,300 @@ public class AgentAdvice extends Advice {
 			Map<String, TypeDefinition> getNamedTypes();
 
 			Resolved.ForMethodEnter asMethodEnter(List<? extends OffsetMapping.Factory<?>> userFactories,
-					ClassReader classReader,
-					Unresolved methodExit,
-					PostProcessor.Factory postProcessorFactory);
+			                                      ClassReader classReader,
+			                                      Unresolved methodExit,
+			                                      PostProcessor.Factory postProcessorFactory);
 
 			Resolved.ForMethodExit asMethodExit(List<? extends OffsetMapping.Factory<?>> userFactories,
-					ClassReader classReader,
-					Unresolved methodEnter,
-					PostProcessor.Factory postProcessorFactory);
+			                                    ClassReader classReader,
+			                                    Unresolved methodEnter,
+			                                    PostProcessor.Factory postProcessorFactory);
+		}
+
+		interface SuppressionHandler {
+
+			Bound bind(StackManipulation exceptionHandler);
+
+			interface Bound {
+				void onPrepare(MethodVisitor methodVisitor);
+
+				void onStart(MethodVisitor methodVisitor);
+
+				void onEnd(MethodVisitor methodVisitor,
+				           Implementation.Context implementationContext,
+				           MethodSizeHandler.ForAdvice methodSizeHandler,
+				           StackMapFrameHandler.ForAdvice stackMapFrameHandler,
+				           TypeDefinition returnType);
+
+				void onEndWithSkip(MethodVisitor methodVisitor,
+				                   Implementation.Context implementationContext,
+				                   MethodSizeHandler.ForAdvice methodSizeHandler,
+				                   StackMapFrameHandler.ForAdvice stackMapFrameHandler,
+				                   TypeDefinition returnType);
+			}
+
+			enum NoOp implements SuppressionHandler, Bound {
+				INSTANCE;
+
+				@Override
+				public Bound bind(StackManipulation exceptionHandler) {
+					return this;
+				}
+
+				@Override
+				public void onPrepare(MethodVisitor methodVisitor) {
+					// ignored
+				}
+
+				@Override
+				public void onStart(MethodVisitor methodVisitor) {
+					// ignored
+				}
+
+				@Override
+				public void onEnd(MethodVisitor methodVisitor, Context implementationContext, MethodSizeHandler.ForAdvice methodSizeHandler, StackMapFrameHandler.ForAdvice stackMapFrameHandler, TypeDefinition returnType) {
+					// ignored
+				}
+
+				@Override
+				public void onEndWithSkip(MethodVisitor methodVisitor, Context implementationContext, MethodSizeHandler.ForAdvice methodSizeHandler, StackMapFrameHandler.ForAdvice stackMapFrameHandler, TypeDefinition returnType) {
+					// ignored
+				}
+			}
+
+			@AllArgsConstructor(access = AccessLevel.PROTECTED)
+			@HashCodeAndEqualsPlugin.Enhance
+			class Suppressing implements SuppressionHandler {
+				private final TypeDescription suppressedType;
+
+				protected static SuppressionHandler of(TypeDescription suppressedType) {
+					return isNoExceptionHandler(suppressedType)
+							? NoOp.INSTANCE
+							: new Suppressing(suppressedType);
+				}
+
+				@Override
+				public Bound bind(StackManipulation exceptionHandler) {
+					return new Bound(suppressedType, exceptionHandler);
+				}
+
+				@AllArgsConstructor(access = AccessLevel.PROTECTED)
+				protected static class Bound implements SuppressionHandler.Bound {
+					private final TypeDescription suppressedType;
+					private final StackManipulation exceptionHandler;
+					private final Label startOfMethod = new Label();
+					private final Label endOfMethod = new Label();
+
+					@Override
+					public void onPrepare(MethodVisitor methodVisitor) {
+						methodVisitor.visitTryCatchBlock(startOfMethod, endOfMethod, endOfMethod, suppressedType.getInternalName());
+					}
+
+					@Override
+					public void onStart(MethodVisitor methodVisitor) {
+						methodVisitor.visitLabel(startOfMethod);
+					}
+
+					@Override
+					public void onEnd(MethodVisitor methodVisitor, Context implementationContext, MethodSizeHandler.ForAdvice methodSizeHandler, StackMapFrameHandler.ForAdvice stackMapFrameHandler, TypeDefinition returnType) {
+						methodVisitor.visitLabel(endOfMethod);
+						stackMapFrameHandler.injectExceptionFrame(methodVisitor);
+						methodSizeHandler.requireStackSize(1 + exceptionHandler.apply(methodVisitor, implementationContext).getMaximalSize());
+						if (returnType.represents(boolean.class)
+								|| returnType.represents(byte.class)
+								|| returnType.represents(short.class)
+								|| returnType.represents(char.class)
+								|| returnType.represents(int.class)) {
+							methodVisitor.visitInsn(Opcodes.ICONST_0);
+						}
+						else if (returnType.represents(long.class)) {
+							methodVisitor.visitInsn(Opcodes.LCONST_0);
+						}
+						else if (returnType.represents(float.class)) {
+							methodVisitor.visitInsn(Opcodes.FCONST_0);
+						}
+						else if (returnType.represents(double.class)) {
+							methodVisitor.visitInsn(Opcodes.DCONST_0);
+						}
+						else if (returnType.represents(void.class)) {
+							methodVisitor.visitInsn(Opcodes.ACONST_NULL);
+						}
+					}
+
+					@Override
+					public void onEndWithSkip(MethodVisitor methodVisitor, Context implementationContext, MethodSizeHandler.ForAdvice methodSizeHandler, StackMapFrameHandler.ForAdvice stackMapFrameHandler, TypeDefinition returnType) {
+						Label skipExceptionHandler = new Label();
+						methodVisitor.visitJumpInsn(Opcodes.GOTO, skipExceptionHandler);
+						onEnd(methodVisitor, implementationContext, methodSizeHandler, stackMapFrameHandler, returnType);
+						methodVisitor.visitLabel(skipExceptionHandler);
+						stackMapFrameHandler.injectReturnFrame(methodVisitor);
+					}
+				}
+			}
+		}
+
+		interface RelocationHandler {
+
+			Bound bind(MethodDescription instrumentedMethod, Relocation relocation);
+
+			interface Relocation {
+
+				void apply(MethodVisitor methodVisitor);
+
+				@AllArgsConstructor
+				@HashCodeAndEqualsPlugin.Enhance
+				class ForLabel implements Relocation {
+					private final Label label;
+
+					@Override
+					public void apply(MethodVisitor methodVisitor) {
+						methodVisitor.visitJumpInsn(Opcodes.GOTO, label);
+					}
+				}
+			}
+
+			interface Bound {
+				int NO_REQUIRED_SIZE = 0;
+
+				int apply(MethodVisitor methodVisitor, int offset);
+			}
+
+			enum Disabled implements RelocationHandler, Bound {
+				INSTANCE;
+
+				public Bound bind(MethodDescription instrumentMethod, Relocation relocation) {
+					return this;
+				}
+
+				@Override
+				public int apply(MethodVisitor methodVisitor, int offset) {
+					return NO_REQUIRED_SIZE;
+				}
+			}
+
+			@AllArgsConstructor
+			enum ForValue implements RelocationHandler {
+				INTEGER(Opcodes.ILOAD, Opcodes.IFNE, Opcodes.IFEQ, 0) {
+					@Override
+					protected void convertValue(MethodVisitor methodVisitor) {
+						// ignored
+					}
+				},
+
+				LONG(Opcodes.LLOAD, Opcodes.IFNE, Opcodes.IFEQ, 0) {
+					@Override
+					protected void convertValue(MethodVisitor methodVisitor) {
+						methodVisitor.visitInsn(Opcodes.L2I);
+					}
+				},
+
+				FLOAT(Opcodes.FLOAD, Opcodes.IFNE, Opcodes.IFEQ, 2) {
+					@Override
+					protected void convertValue(MethodVisitor methodVisitor) {
+						methodVisitor.visitInsn(Opcodes.FCONST_0);
+						methodVisitor.visitInsn(Opcodes.FCMPL);
+					}
+				},
+
+				DOUBLE(Opcodes.DLOAD, Opcodes.IFNE, Opcodes.IFEQ, 4) {
+					@Override
+					protected void convertValue(MethodVisitor methodVisitor) {
+						methodVisitor.visitInsn(Opcodes.DCONST_0);
+						methodVisitor.visitInsn(Opcodes.DCMPL);
+					}
+				},
+
+				REFERENCE(Opcodes.ALOAD, Opcodes.IFNONNULL, Opcodes.IFNULL, 0) {
+					@Override
+					protected void convertValue(MethodVisitor methodVisitor) {
+						// ignored
+					}
+				};
+
+
+				private final int load;
+				private final int defaultJump;
+				private final int nonDefaultJump;
+				private final int requiredSize;
+
+				protected static RelocationHandler of(TypeDefinition typeDefinition, boolean inverted) {
+					ForValue skipDispatcher;
+					if (typeDefinition.represents(long.class)) {
+						skipDispatcher = LONG;
+					}
+					else if (typeDefinition.represents(float.class)) {
+						skipDispatcher = FLOAT;
+					}
+					else if (typeDefinition.represents(double.class)) {
+						skipDispatcher = DOUBLE;
+					}
+					else if (typeDefinition.represents(void.class)) {
+						throw new IllegalStateException("Cannot skip on default value for void return type");
+					}
+					else if (typeDefinition.isPrimitive()) {
+						skipDispatcher = INTEGER;
+					}
+					else {
+						skipDispatcher = REFERENCE;
+					}
+					return inverted
+							? skipDispatcher.new Inverted()
+							: skipDispatcher;
+				}
+
+				protected abstract void convertValue(MethodVisitor methodVisitor);
+
+				@Override
+				public RelocationHandler.Bound bind(MethodDescription instrumentedMethod, Relocation relocation) {
+					return new Bound(instrumentedMethod, relocation, false);
+				}
+
+				@HashCodeAndEqualsPlugin.Enhance(includeSyntheticFields = true)
+				protected class Inverted implements RelocationHandler {
+					@Override
+					public Bound bind(MethodDescription instrumentedMethod, Relocation relocation) {
+						return new ForValue.Bound(instrumentedMethod, relocation, true);
+					}
+				}
+
+				@AllArgsConstructor(access = AccessLevel.PROTECTED)
+				@HashCodeAndEqualsPlugin.Enhance(includeSyntheticFields = true)
+				protected class Bound implements RelocationHandler.Bound {
+					private final MethodDescription instrumentedMethod;
+					private final Relocation relocation;
+					private final boolean inverted;
+
+					@Override
+					public int apply(MethodVisitor methodVisitor, int offset) {
+						if (instrumentedMethod.isConstructor()) {
+							throw new IllegalStateException("Cannot skip code execution from constructor: " + instrumentedMethod);
+						}
+						methodVisitor.visitVarInsn(load, offset);
+						convertValue(methodVisitor);
+						Label noSkip = new Label();
+						methodVisitor.visitJumpInsn(inverted
+								? nonDefaultJump
+								: defaultJump, noSkip);
+						relocation.apply(methodVisitor);
+						methodVisitor.visitLabel(noSkip);
+						return requiredSize;
+					}
+				}
+			}
 		}
 
 		interface Resolved extends Dispatcher {
 			Map<String, TypeDefinition> getNamedTypes();
 
 			Bound bind(TypeDescription instrumentedType,
-					MethodDescription instrumentedMethod,
-					MethodVisitor methodVisitor,
-					Implementation.Context implementationContext,
-					Assigner assigner,
-					ArgumentHandler.ForInstrumentedMethod argumentHandler,
-					MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
-					StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
-					Advice.Dispatcher.RelocationHandler.Relocation relocation);
+			           MethodDescription instrumentedMethod,
+			           MethodVisitor methodVisitor,
+			           Implementation.Context implementationContext,
+			           Assigner assigner,
+			           ArgumentHandler.ForInstrumentedMethod argumentHandler,
+			           MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
+			           StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
+			           Advice.Dispatcher.RelocationHandler.Relocation relocation);
 
 			Map<Integer, OffsetMapping> getOffsetMapping();
 
@@ -309,9 +654,53 @@ public class AgentAdvice extends Advice {
 				protected final MethodDescription.InDefinedShape adviceMethod;
 				protected final PostProcessor postProcessor;
 				protected final Map<Integer, OffsetMapping> offsetMappings;
-				protected final Advice.Dispatcher.SuppressionHandler suppressionHandler;
-				protected final Advice.Dispatcher.RelocationHandler relocationHandler;
+				protected final SuppressionHandler suppressionHandler;
+				protected final RelocationHandler relocationHandler;
 
+				protected AbstractBase(MethodDescription.InDefinedShape adviceMethod,
+				                       PostProcessor postProcessor,
+				                       List<? extends OffsetMapping.Factory<?>> factories,
+				                       TypeDescription throwableType,
+				                       TypeDescription relocatableType,
+				                       OffsetMapping.Factory.AdviceType adviceType) {
+					this.adviceMethod = adviceMethod;
+					this.postProcessor = postProcessor;
+					Map<TypeDescription, OffsetMapping.Factory<?>> offsetMappings = new HashMap<>();
+					for (OffsetMapping.Factory<?> factory : factories) {
+						offsetMappings.put(TypeDescription.ForLoadedType.of(factory.getAnnotationType()), factory);
+					}
+					this.offsetMappings = new LinkedHashMap<>();
+					for (ParameterDescription.InDefinedShape parameter : adviceMethod.getParameters()) {
+						OffsetMapping offsetMapping = null;
+						for (AnnotationDescription annotationDescription : parameter.getDeclaredAnnotations()) {
+							OffsetMapping.Factory<?> factory = offsetMappings.get(annotationDescription.getAnnotationType());
+							if (factory != null) {
+								OffsetMapping current = factory.make(parameter, (AnnotationDescription.Loadable) annotationDescription.prepare(factory.getAnnotationType()), adviceType);
+								if (offsetMapping == null) {
+									offsetMapping = current;
+								}
+								else {
+									throw new IllegalStateException(parameter + " is bound to both " + current + " and " + offsetMapping);
+								}
+							}
+						}
+						this.offsetMappings.put(parameter.getOffset(), offsetMapping == null
+								? new OffsetMapping.ForArgument.Unresolved(parameter)
+								: offsetMapping);
+					}
+					suppressionHandler = SuppressionHandler.Suppressing.of(throwableType);
+					relocationHandler = RelocationHandler.ForType.of(relocatableType, adviceMethod.getReturnType());
+				}
+
+				@Override
+				public boolean isAlive() {
+					return true;
+				}
+
+				@Override
+				public Map<Integer, OffsetMapping> getOffsetMapping() {
+					return this.offsetMappings;
+				}
 			}
 		}
 
@@ -345,6 +734,16 @@ public class AgentAdvice extends Advice {
 			@Override
 			public Map<String, TypeDefinition> getNamedTypes() {
 				return Collections.emptyMap();
+			}
+
+			@Override
+			public ForMethodEnter asMethodEnter(List<? extends OffsetMapping.Factory<?>> userFactories, ClassReader classReader, Unresolved methodExit, PostProcessor.Factory postProcessorFactory) {
+				return this;
+			}
+
+			@Override
+			public ForMethodExit asMethodExit(List<? extends OffsetMapping.Factory<?>> userFactories, ClassReader classReader, Unresolved methodEnter, PostProcessor.Factory postProcessorFactory) {
+				return this;
 			}
 
 			@Override
@@ -391,6 +790,8 @@ public class AgentAdvice extends Advice {
 			public void apply() {
 				// ignored
 			}
+
+
 		}
 
 		@HashCodeAndEqualsPlugin.Enhance
@@ -426,6 +827,243 @@ public class AgentAdvice extends Advice {
 			public Map<String, TypeDefinition> getNamedTypes() {
 				return null;
 			}
+
+			@Override
+			public Resolved.ForMethodEnter asMethodEnter(List<? extends OffsetMapping.Factory<?>> userFactories, ClassReader classReader, Unresolved methodExit, PostProcessor.Factory postProcessorFactory) {
+				return Resolved.ForMethodEnter.of(adviceMethod,
+						postProcessorFactory.make(adviceMethod, false),
+						namedTypes,
+						userFactories,
+						methodExit.getAdviceType(),
+						classReader,
+						methodExit.isAlive());
+			}
+
+			@Override
+			public Resolved.ForMethodExit asMethodExit(List<? extends OffsetMapping.Factory<?>> userFactories, ClassReader classReader, Unresolved methodEnter, PostProcessor.Factory postProcessorFactory) {
+				return null;
+			}
+
+			protected abstract static class Resolved extends Dispatcher.Resolved.AbstractBase {
+				protected final ClassReader classReader;
+
+				protected Resolved(MethodDescription.InDefinedShape adviceMethod,
+				                   PostProcessor postProcessor,
+				                   List<? extends OffsetMapping.Factory<?>> factories,
+				                   TypeDescription throwableType,
+				                   TypeDescription relocatableType,
+				                   ClassReader classReader) {
+					super(adviceMethod, postProcessor, factories, throwableType, relocatableType, OffsetMapping.Factory.AdviceType.INLINING);
+					this.classReader = classReader;
+				}
+
+				protected abstract Map<Integer, TypeDefinition> resolveInitializationTypes(ArgumentHandler argumentHandler);
+
+				protected abstract MethodVisitor apply(MethodVisitor methodVisitor,
+				                                       Implementation.Context implementationContext,
+				                                       Assigner assigner,
+				                                       ArgumentHandler.ForInstrumentedMethod argumentHandler,
+				                                       ArgumentHandler.ForInstrumentedMethod methodSizeHandler,
+				                                       ArgumentHandler.ForInstrumentedMethod stackMapFrameHandler,
+				                                       TypeDescription instrumentedType,
+				                                       MethodDescription instrumentedMethod,
+				                                       SuppressionHandler.Bound suppressionHandler,
+				                                       RelocationHandler.Bound relocationHandler,
+				                                       StackManipulation exceptionHandler);
+
+
+				protected class AdviceMethodInliner extends ClassVisitor implements Bound {
+					private final TypeDescription instrumentedType;
+					private final MethodDescription instrumentedMethod;
+					private final MethodVisitor methodVisitor;
+					private final Implementation.Context implementationContext;
+					private final Assigner assigner;
+					private final ArgumentHandler.ForInstrumentedMethod argumentHandler;
+					private final ArgumentHandler.ForInstrumentedMethod methodSizeHandler;
+					private final ArgumentHandler.ForInstrumentedMethod stackMapFrameHandler;
+					private final SuppressionHandler.Bound suppressionHandler;
+					private final RelocationHandler.Bound relocationHandler;
+					private final StackManipulation exceptionHandler;
+					private final ClassReader classReader;
+					private final List<Label> labels = new ArrayList<>();
+
+					public AdviceMethodInliner(ClassReader classReader, StackManipulation exceptionHandler, RelocationHandler.Bound relocationHandler, SuppressionHandler.Bound suppressionHandler, ArgumentHandler.ForInstrumentedMethod stackMapFrameHandler, ArgumentHandler.ForInstrumentedMethod methodSizeHandler, ArgumentHandler.ForInstrumentedMethod argumentHandler, Assigner assigner, Context implementationContext, MethodVisitor methodVisitor, MethodDescription instrumentedMethod, TypeDescription instrumentedType) {
+						super(OpenedClassReader.ASM_API);
+						this.classReader = classReader;
+						this.exceptionHandler = exceptionHandler;
+						this.relocationHandler = relocationHandler;
+						this.suppressionHandler = suppressionHandler;
+						this.stackMapFrameHandler = stackMapFrameHandler;
+						this.methodSizeHandler = methodSizeHandler;
+						this.argumentHandler = argumentHandler;
+						this.assigner = assigner;
+						this.implementationContext = implementationContext;
+						this.methodVisitor = methodVisitor;
+						this.instrumentedMethod = instrumentedMethod;
+						this.instrumentedType = instrumentedType;
+					}
+
+					@Override
+					public void prepare() {
+						classReader.accept(new ExceptionTableExtractor(), ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
+						suppressionHandler.onPrepare(methodVisitor);
+					}
+
+					@Override
+					public void initialize() {
+						for (Map.Entry<Integer, TypeDefinition> entry : resolveInitializationTypes(argumentHandler).entrySet()) {
+							if (entry.getValue().represents(boolean.class)
+									|| entry.getValue().represents(byte.class)
+									|| entry.getValue().represents(short.class)
+									|| entry.getValue().represents(char.class)
+									|| entry.getValue().represents(int.class)) {
+								methodVisitor.visitInsn(Opcodes.ICONST_0);
+								methodVisitor.visitVarInsn(Opcodes.ISTORE, entry.getKey());
+							}
+							else if (entry.getValue().represents(long.class)) {
+								methodVisitor.visitInsn(Opcodes.LCONST_0);
+								methodVisitor.visitVarInsn(Opcodes.LSTORE, entry.getKey());
+							}
+							else if (entry.getValue().represents(float.class)) {
+								methodVisitor.visitInsn(Opcodes.FCONST_0);
+								methodVisitor.visitVarInsn(Opcodes.FSTORE, entry.getKey());
+							}
+							else if (entry.getValue().represents(double.class)) {
+								methodVisitor.visitInsn(Opcodes.DCONST_0);
+								methodVisitor.visitVarInsn(Opcodes.DSTORE, entry.getKey());
+							}
+							else {
+								methodVisitor.visitInsn(Opcodes.ACONST_NULL);
+								methodVisitor.visitVarInsn(Opcodes.ASTORE,entry.getKey());
+							}
+							methodSizeHandler.requireStackSize(entry.getValue().getStackSize().getSize());
+						}
+					}
+
+					@Override
+					public void apply() {
+						classReader.accept(this,ClassReader.SKIP_DEBUG | stackMapFrameHandler.getReaderHit());
+					}
+
+					@Override
+					public MethodVisitor visitMethod(int modifiers, String internalName, String descriptor, String signature, String[] exceptions) {
+						return adviceMethod.getInternalName().equals(internalName) && adviceMethod.getDescriptor().equals(descriptor)
+								? new ExceptionTableSubstitutor(Inlining.Resolved.this.apply(methodVisitor, implementationContext, assigner, argumentHandler, methodSizeHandler,
+								stackMapFrameHandler, instrumentedType, instrumentedMethod, suppressionHandler,
+								relocationHandler, exceptionHandler))
+								: IGNORE_METHOD;
+					}
+
+					protected class ExceptionTableExtractor extends ClassVisitor {
+
+						protected ExceptionTableExtractor() {
+							super(OpenedClassReader.ASM_API);
+						}
+
+						@Override
+						public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+							return adviceMethod.getInternalName().equals(name) && adviceMethod.getDescriptor().equals(descriptor)
+									? new ExceptionTableCollector(methodVisitor)
+									: IGNORE_METHOD;
+						}
+					}
+
+					protected class ExceptionTableCollector extends MethodVisitor {
+						private final MethodVisitor methodVisitor;
+
+						public ExceptionTableCollector(MethodVisitor methodVisitor) {
+							super(OpenedClassReader.ASM_API);
+							this.methodVisitor = methodVisitor;
+						}
+
+						@Override
+						public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
+							methodVisitor.visitTryCatchBlock(start,end,handler,type);
+							labels.addAll(Arrays.asList(start, end, handler));
+						}
+
+						@Override
+						public AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
+							return methodVisitor.visitTryCatchAnnotation(typeRef, typePath, descriptor, visible);
+						}
+					}
+
+					protected class ExceptionTableSubstitutor extends MethodVisitor {
+						private Map<Label, Label> substitutions;
+						private int index;
+
+						protected ExceptionTableSubstitutor(MethodVisitor methodVisitor) {
+							super(OpenedClassReader.ASM_API, methodVisitor);
+							substitutions = new IdentityHashMap<>();
+						}
+
+						@Override
+						public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
+							substitutions.put(start, labels.get(index++));
+							substitutions.put(end, labels.get(index++));
+							Label actual = labels.get(index++);
+							substitutions.put(handler, actual);
+							((CodeTranslationVisitor) mv).propagateHandler(actual);
+						}
+
+						@Override
+						public AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
+							return IGNORE_ANNOTATION;
+						}
+
+						@Override
+						public void visitLabel(Label label) {
+							super.visitLabel(resolve(label));
+						}
+
+						@Override
+						public void visitJumpInsn(int opcode, Label label) {
+							super.visitJumpInsn(opcode,resolve(label));
+						}
+
+						@Override
+						public void visitTableSwitchInsn(int min, int max, Label dflt, Label... labels) {
+							super.visitTableSwitchInsn(min, max, dflt, resolve(labels));
+						}
+
+						@Override
+						public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
+							super.visitLookupSwitchInsn(dflt, keys, resolve(labels));
+						}
+
+						private Label resolve(Label label) {
+							Label sub = substitutions.get(label);
+							return sub == null ? label : sub;
+						}
+
+						private Label[] resolve(Label... labels) {
+							return IntStream.range(0, labels.length).mapToObj(i -> resolve(labels[i])).toArray(Label[]::new);
+						}
+					}
+				}
+
+				@HashCodeAndEqualsPlugin.Enhance
+				protected abstract static class ForMethodEnter extends Inlining.Resolved implements Dispatcher.Resolved.ForMethodEnter {
+					private final Map<String, TypeDefinition> namedTypes;
+					private final boolean prependLineNumber;
+
+					public ForMethodEnter(MethodDescription.InDefinedShape adviceMethod,
+					                      PostProcessor postProcessor,
+					                      Map<String, TypeDefinition> namedTypes,
+					                      List<? extends OffsetMapping.Factory<?>> factories,
+					                      TypeDescription exitType,
+					                      ClassReader classReader) {
+						super(adviceMethod, postProcessor,
+								CompoundList.of(Arrays.asList(
+										OffsetMapping.ForArgument.Unresolved.Factory.INSTANCE,
+										OffsetMapping.ForAllArguments.Factory.INSTANCE,
+
+								)));
+						this.namedTypes = namedTypes;
+						this.prependLineNumber = prependLineNumber;
+					}
+				}
+			}
 		}
 	}
 
@@ -453,13 +1091,13 @@ public class AgentAdvice extends Advice {
 		}
 
 		enum Factory {
-			SIMPLE{
+			SIMPLE {
 				@Override
 				protected ForInstrumentedMethod resolve(MethodDescription instrumentMethod, TypeDefinition enterType, TypeDescription exitType, SortedMap<String, TypeDefinition> namedTypes) {
 
 				}
 			},
-			COPYING{
+			COPYING {
 				@Override
 				protected ForInstrumentedMethod resolve(MethodDescription instrumentMethod, TypeDefinition enterType, TypeDescription exitType, SortedMap<String, TypeDefinition> namedTypes) {
 
@@ -468,19 +1106,19 @@ public class AgentAdvice extends Advice {
 			;
 
 			protected abstract ForInstrumentedMethod resolve(MethodDescription instrumentMethod,
-					TypeDefinition enterType,
-					TypeDescription exitType,
-					SortedMap<String, TypeDefinition> namedTypes);
+			                                                 TypeDefinition enterType,
+			                                                 TypeDescription exitType,
+			                                                 SortedMap<String, TypeDefinition> namedTypes);
 		}
 	}
 
 	public interface OffsetMapping {
 
 		Target resolve(TypeDescription instrumentedType,
-				MethodDescription instrumentedMethod,
-				Assigner assigner,
-				ArgumentHandler argumentHandler,
-				Sort sort);
+		               MethodDescription instrumentedMethod,
+		               Assigner assigner,
+		               ArgumentHandler argumentHandler,
+		               Sort sort);
 
 		interface Target {
 			StackManipulation resolveRead();
@@ -842,7 +1480,7 @@ public class AgentAdvice extends Advice {
 			Class<T> getAnnotationType();
 
 			OffsetMapping make(ParameterDescription.InDefinedShape target,
-					AnnotationDescription.Loadable<T> annotation, AdviceType adviceType);
+			                   AnnotationDescription.Loadable<T> annotation, AdviceType adviceType);
 
 			@Getter
 			@AllArgsConstructor
@@ -1010,7 +1648,8 @@ public class AgentAdvice extends Advice {
 				public OffsetMapping make(ParameterDescription.InDefinedShape target, AnnotationDescription.Loadable<Enter> annotation, AdviceType adviceType) {
 					if (adviceType.isDelegation() && !annotation.getValue(ENTER_READ_ONLY).resolve(Boolean.class)) {
 						throw new IllegalStateException("Cannot use writable " + target + " on read-only parameter");
-					} else {
+					}
+					else {
 						return new ForEnterValue(target.getType(), enterType.asGenericType(), annotation);
 					}
 				}
@@ -1510,7 +2149,7 @@ public class AgentAdvice extends Advice {
 				private final StackManipulation deserialization;
 
 				public static <S extends Annotation> OffsetMapping.Factory<S> of(Class<S> annotationType,
-						Serializable target, Class<?> targetType) {
+				                                                                 Serializable target, Class<?> targetType) {
 					if (!targetType.isInstance(targetType)) {
 						throw new IllegalArgumentException(target + " is no instance of " + targetType);
 					}
