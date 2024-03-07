@@ -28,11 +28,12 @@ public class MyAgent {
 	}
 
 	private static AgentBuilder.Transformer getTransformer() {
-		return (builder, typeDescription, classLoader, javaModule, protectionDomain) -> {
-			return builder
-					.method(ElementMatchers.any()) // 拦截任意方法
-					.intercept(MethodDelegation.to(TimeInterceptor.class)); // 委托
-		};
+//		return (builder, typeDescription, classLoader, javaModule, protectionDomain) -> {
+//			return builder
+//					.method(ElementMatchers.any()) // 拦截任意方法
+//					.intercept(MethodDelegation.to(TimeInterceptor.class)); // 委托
+//		};
+		return null;
 	}
 
 	private static AgentBuilder.Listener getListener() {
