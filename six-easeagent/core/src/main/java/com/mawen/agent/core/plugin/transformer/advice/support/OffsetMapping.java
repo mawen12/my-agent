@@ -64,7 +64,7 @@ public interface OffsetMapping {
 	Target resolve(TypeDescription instrumentedType,
 			MethodDescription instrumentedMethod,
 			Assigner assigner,
-			AgentAdvice.ArgumentHandler argumentHandler,
+			ArgumentHandler argumentHandler,
 			Sort sort);
 
 	interface Target {
@@ -86,11 +86,11 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.PROTECTED)
+		@AllArgsConstructor(access = AccessLevel.public)
 		@HashCodeAndEqualsPlugin.Enhance
 		abstract class ForDefaultValue implements Target {
-			protected final TypeDefinition typeDefinition;
-			protected final StackManipulation readAssignment;
+			public final TypeDefinition typeDefinition;
+			public final StackManipulation readAssignment;
 
 			@Override
 			public StackManipulation resolveRead() {
@@ -102,7 +102,7 @@ public interface OffsetMapping {
 					this(typeDefinition, StackManipulation.Trivial.INSTANCE);
 				}
 
-				protected ReadOnly(TypeDefinition typeDefinition, StackManipulation readAssignment) {
+				public ReadOnly(TypeDefinition typeDefinition, StackManipulation readAssignment) {
 					super(typeDefinition, readAssignment);
 				}
 
@@ -138,12 +138,12 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.PROTECTED)
+		@AllArgsConstructor(access = AccessLevel.public)
 		@HashCodeAndEqualsPlugin.Enhance
 		abstract class ForVariable implements Target {
-			protected final TypeDefinition typeDefinition;
-			protected final int offset;
-			protected final StackManipulation readAssignment;
+			public final TypeDefinition typeDefinition;
+			public final int offset;
+			public final StackManipulation readAssignment;
 
 			@Override
 			public StackManipulation resolveRead() {
@@ -197,11 +197,11 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.PROTECTED)
+		@AllArgsConstructor(access = AccessLevel.public)
 		@HashCodeAndEqualsPlugin.Enhance
 		abstract class ForArray implements Target {
-			protected final TypeDescription.Generic target;
-			protected final List<? extends StackManipulation> valueReads;
+			public final TypeDescription.Generic target;
+			public final List<? extends StackManipulation> valueReads;
 
 			@Override
 			public StackManipulation resolveRead() {
@@ -241,11 +241,11 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.PROTECTED)
+		@AllArgsConstructor(access = AccessLevel.public)
 		@HashCodeAndEqualsPlugin.Enhance
 		abstract class ForField implements Target {
-			protected final FieldDescription fieldDescription;
-			protected final StackManipulation readAssignment;
+			public final FieldDescription fieldDescription;
+			public final StackManipulation readAssignment;
 
 			@Override
 			public StackManipulation resolveRead() {
@@ -493,12 +493,12 @@ public interface OffsetMapping {
 	@AllArgsConstructor
 	@HashCodeAndEqualsPlugin.Enhance
 	abstract class ForArgument implements OffsetMapping {
-		protected final TypeDescription.Generic target;
-		protected final boolean readOnly;
+		public final TypeDescription.Generic target;
+		public final boolean readOnly;
 		private final Assigner.Typing typing;
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			ParameterDescription parameterDescription = resolve(instrumentedMethod);
 			StackManipulation read = assigner.assign(parameterDescription.getType(), target, typing);
 			if (!read.isValid()) {
@@ -516,14 +516,14 @@ public interface OffsetMapping {
 			}
 		}
 
-		protected abstract ParameterDescription resolve(MethodDescription methodDescription);
+		public abstract ParameterDescription resolve(MethodDescription methodDescription);
 
 		@HashCodeAndEqualsPlugin.Enhance
 		public static class Unresolved extends ForArgument {
 			private final int index;
 			private final boolean optional;
 
-			protected Unresolved(TypeDescription.Generic target, AnnotationDescription.Loadable<Argument> annotation) {
+			public Unresolved(TypeDescription.Generic target, AnnotationDescription.Loadable<Argument> annotation) {
 				this(target,
 						annotation.getValue(Factory.ARGUMENT_READ_ONLY).resolve(Boolean.class),
 						annotation.getValue(Factory.ARGUMENT_TYPING).load(Argument.class.getClassLoader()).resolve(Assigner.Typing.class),
@@ -531,22 +531,22 @@ public interface OffsetMapping {
 						annotation.getValue(Factory.ARGUMENT_OPTIONAL).resolve(Boolean.class));
 			}
 
-			protected Unresolved(ParameterDescription parameterDescription) {
+			public Unresolved(ParameterDescription parameterDescription) {
 				this(parameterDescription.getType(), true, Assigner.Typing.STATIC, parameterDescription.getIndex());
 			}
 
-			protected Unresolved(TypeDescription.Generic target, boolean readOnly, Assigner.Typing typing, int index) {
+			public Unresolved(TypeDescription.Generic target, boolean readOnly, Assigner.Typing typing, int index) {
 				this(target, readOnly, typing, index, false);
 			}
 
-			protected Unresolved(TypeDescription.Generic target, boolean readOnly, Assigner.Typing typing, int index, boolean optional) {
+			public Unresolved(TypeDescription.Generic target, boolean readOnly, Assigner.Typing typing, int index, boolean optional) {
 				super(target, readOnly, typing);
 				this.index = index;
 				this.optional = optional;
 			}
 
 			@Override
-			protected ParameterDescription resolve(MethodDescription methodDescription) {
+			public ParameterDescription resolve(MethodDescription methodDescription) {
 				ParameterList<?> parameters = methodDescription.getParameters();
 				if (parameters.size() < index) {
 					throw new IllegalStateException(methodDescription + " does not define an index " + index);
@@ -556,7 +556,7 @@ public interface OffsetMapping {
 			}
 
 			@Override
-			public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+			public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 				if (optional && instrumentedMethod.getParameters().size() <= index) {
 					return readOnly
 							? new Target.ForDefaultValue.ReadOnly(target)
@@ -607,7 +607,7 @@ public interface OffsetMapping {
 			}
 
 			@Override
-			protected ParameterDescription resolve(MethodDescription methodDescription) {
+			public ParameterDescription resolve(MethodDescription methodDescription) {
 				if (!parameterDescription.getDeclaringMethod().equals(methodDescription)) {
 					throw new IllegalStateException(parameterDescription + " is not a parameter of " + methodDescription);
 				}
@@ -647,7 +647,7 @@ public interface OffsetMapping {
 		private final Assigner.Typing typing;
 		private final boolean optional;
 
-		protected ForThisReference(TypeDescription.Generic target, AnnotationDescription.Loadable<Advice.This> annotation) {
+		public ForThisReference(TypeDescription.Generic target, AnnotationDescription.Loadable<Advice.This> annotation) {
 			this(target,
 					annotation.getValue(Factory.THIS_READ_ONLY).resolve(Boolean.class),
 					annotation.getValue(Factory.THIS_TYPING).load(Advice.This.class.getClassLoader()).resolve(Assigner.Typing.class),
@@ -655,7 +655,7 @@ public interface OffsetMapping {
 		}
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			if (instrumentedMethod.isStatic() || sort.isPremature(instrumentedMethod)) {
 				if (optional) {
 					return readOnly
@@ -673,7 +673,7 @@ public interface OffsetMapping {
 			}
 			else if (readOnly) {
 				return new Target.ForVariable.ReadOnly(instrumentedType.asGenericType(),
-						argumentHandler.argument(AgentAdvice.ArgumentHandler.THIS_REFERENCE), readAssignment);
+						argumentHandler.argument(ArgumentHandler.THIS_REFERENCE), readAssignment);
 			}
 			else {
 				StackManipulation writeAssignment = assigner.assign(target, instrumentedType.asGenericType(), typing);
@@ -681,7 +681,7 @@ public interface OffsetMapping {
 					throw new IllegalStateException("Cannot assign " + target + " to " + instrumentedType);
 				}
 				return new Target.ForVariable.ReadWrite(instrumentedType.asGenericType(),
-						argumentHandler.argument(AgentAdvice.ArgumentHandler.THIS_REFERENCE), readAssignment, writeAssignment);
+						argumentHandler.argument(ArgumentHandler.THIS_REFERENCE), readAssignment, writeAssignment);
 			}
 		}
 
@@ -724,7 +724,7 @@ public interface OffsetMapping {
 		private final Assigner.Typing typing;
 		private final boolean nullIfEmpty;
 
-		protected ForAllArguments(TypeDescription.Generic target,
+		public ForAllArguments(TypeDescription.Generic target,
 				AnnotationDescription.Loadable<Advice.AllArguments> annotation) {
 			this(target,
 					annotation.getValue(Factory.ALL_ARGUMENTS_READ_ONLY).resolve(Boolean.class),
@@ -734,7 +734,7 @@ public interface OffsetMapping {
 		}
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			if (nullIfEmpty && instrumentedMethod.getParameters().isEmpty()) {
 				return readOnly
 						? new Target.ForStackManipulation(NullConstant.INSTANCE)
@@ -809,7 +809,7 @@ public interface OffsetMapping {
 
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			return Target.ForStackManipulation.of(instrumentedType);
 		}
 	}
@@ -817,32 +817,32 @@ public interface OffsetMapping {
 	enum ForInstrumentedMethod implements OffsetMapping {
 		METHOD {
 			@Override
-			protected boolean isRepresentable(MethodDescription methodDescription) {
+			public boolean isRepresentable(MethodDescription methodDescription) {
 				return methodDescription.isMethod();
 			}
 		},
 		CONSTRUCTOR {
 			@Override
-			protected boolean isRepresentable(MethodDescription methodDescription) {
+			public boolean isRepresentable(MethodDescription methodDescription) {
 				return methodDescription.isConstructor();
 			}
 		},
 		EXECUTABLE {
 			@Override
-			protected boolean isRepresentable(MethodDescription methodDescription) {
+			public boolean isRepresentable(MethodDescription methodDescription) {
 				return true;
 			}
 		};
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			if (!isRepresentable(instrumentedMethod)) {
 				throw new IllegalStateException("Cannot represent " + instrumentedMethod + " as given method constant");
 			}
 			return Target.ForStackManipulation.of(instrumentedMethod.asDefined());
 		}
 
-		protected abstract boolean isRepresentable(MethodDescription methodDescription);
+		public abstract boolean isRepresentable(MethodDescription methodDescription);
 	}
 
 	@AllArgsConstructor
@@ -866,7 +866,7 @@ public interface OffsetMapping {
 		private final Assigner.Typing typing;
 
 		@Override
-		public Target resolve(TypeDescription type, MethodDescription method, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription type, MethodDescription method, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			FieldDescription field = resolve(type, method);
 			if (!field.isStatic() && method.isStatic()) {
 				throw new IllegalStateException("Cannot read non-static field " + field + " from static method " + method);
@@ -890,11 +890,11 @@ public interface OffsetMapping {
 			}
 		}
 
-		protected abstract FieldDescription resolve(TypeDescription typeDescription, MethodDescription methodDescription);
+		public abstract FieldDescription resolve(TypeDescription typeDescription, MethodDescription methodDescription);
 
 		@HashCodeAndEqualsPlugin.Enhance
 		public abstract static class Unresolved extends ForField {
-			protected static final String BEAN_PROPERTY = "";
+			public static final String BEAN_PROPERTY = "";
 			private final String name;
 
 			public Unresolved(TypeDescription.Generic target, boolean readOnly, Assigner.Typing typing, String name) {
@@ -903,7 +903,7 @@ public interface OffsetMapping {
 			}
 
 			@Override
-			protected FieldDescription resolve(TypeDescription typeDescription, MethodDescription methodDescription) {
+			public FieldDescription resolve(TypeDescription typeDescription, MethodDescription methodDescription) {
 				FieldLocator locator = fieldLocator(typeDescription);
 				FieldLocator.Resolution resolution = name.equals(BEAN_PROPERTY)
 						? resolveAccessor(locator, methodDescription)
@@ -930,9 +930,9 @@ public interface OffsetMapping {
 				return fieldLocator.locate(Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1));
 			}
 
-			protected abstract FieldLocator fieldLocator(TypeDescription typeDescription);
+			public abstract FieldLocator fieldLocator(TypeDescription typeDescription);
 
-			protected enum Factory implements OffsetMapping.Factory<Advice.FieldValue> {
+			public enum Factory implements OffsetMapping.Factory<Advice.FieldValue> {
 				INSTANCE;
 
 				@Override
@@ -941,7 +941,7 @@ public interface OffsetMapping {
 				}
 
 				public static class WithImplicitType extends Unresolved {
-					protected WithImplicitType(TypeDescription.Generic target, AnnotationDescription.Loadable<Advice.FieldValue> annotation) {
+					public WithImplicitType(TypeDescription.Generic target, AnnotationDescription.Loadable<Advice.FieldValue> annotation) {
 						this(target,
 								annotation.getValue(READ_ONLY).resolve(Boolean.class),
 								annotation.getValue(TYPING).load(Assigner.Typing.class.getClassLoader()).resolve(Assigner.Typing.class),
@@ -954,7 +954,7 @@ public interface OffsetMapping {
 					}
 
 					@Override
-					protected FieldLocator fieldLocator(TypeDescription typeDescription) {
+					public FieldLocator fieldLocator(TypeDescription typeDescription) {
 						return new FieldLocator.ForClassHierarchy(typeDescription);
 					}
 				}
@@ -963,7 +963,7 @@ public interface OffsetMapping {
 				public static class WithExplicitType extends Unresolved {
 					private final TypeDescription declaringType;
 
-					protected WithExplicitType(TypeDescription.Generic target,
+					public WithExplicitType(TypeDescription.Generic target,
 							AnnotationDescription.Loadable<Advice.FieldValue> annotation,
 							TypeDescription declaringType) {
 						this(target,
@@ -980,7 +980,7 @@ public interface OffsetMapping {
 					}
 
 					@Override
-					protected FieldLocator fieldLocator(TypeDescription typeDescription) {
+					public FieldLocator fieldLocator(TypeDescription typeDescription) {
 						if (!declaringType.represents(TargetType.class) && !typeDescription.isAssignableTo(declaringType)) {
 							throw new IllegalStateException(declaringType + " is no super type of " + typeDescription);
 						}
@@ -1013,7 +1013,7 @@ public interface OffsetMapping {
 			}
 
 			@Override
-			protected FieldDescription resolve(TypeDescription type, MethodDescription method) {
+			public FieldDescription resolve(TypeDescription type, MethodDescription method) {
 				if (!method.isStatic() && !field.getDeclaringType().asErasure().isAssignableFrom(type)) {
 					throw new IllegalStateException(field + " is no member of " + type);
 				}
@@ -1091,7 +1091,7 @@ public interface OffsetMapping {
 		}
 
 		@Override
-		public Target resolve(TypeDescription type, MethodDescription method, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription type, MethodDescription method, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			StringBuilder builder = new StringBuilder();
 			for (Renderer renderer : renderers) {
 				builder.append(renderer.apply(type, method));
@@ -1245,7 +1245,7 @@ public interface OffsetMapping {
 		private final TypeDefinition target;
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			return new Target.ForDefaultValue.ReadWrite(target);
 		}
 
@@ -1268,7 +1268,7 @@ public interface OffsetMapping {
 		INSTANCE;
 
 		@Override
-		public Target resolve(TypeDescription type, MethodDescription method, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription type, MethodDescription method, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			return new Target.ForDefaultValue.ReadOnly(method.getReturnType(),
 					assigner.assign(method.getReturnType(), TypeDescription.Generic.OBJECT, Assigner.Typing.DYNAMIC));
 		}
@@ -1295,14 +1295,14 @@ public interface OffsetMapping {
 		private final boolean readOnly;
 		private final Assigner.Typing typing;
 
-		protected ForEnterValue(TypeDescription.Generic target, TypeDescription.Generic enterType, AnnotationDescription.Loadable<Advice.Enter> annotation) {
+		public ForEnterValue(TypeDescription.Generic target, TypeDescription.Generic enterType, AnnotationDescription.Loadable<Advice.Enter> annotation) {
 			this(target, enterType,
 					annotation.getValue(Factory.ENTER_READ_ONLY).resolve(Boolean.class),
 					annotation.getValue(Factory.ENTER_TYPING).load(Advice.Enter.class.getClassLoader()).resolve(Assigner.Typing.class));
 		}
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			StackManipulation readAssignment = assigner.assign(enterType, target, typing);
 			if (!readAssignment.isValid()) {
 				throw new IllegalStateException("Cannot assign " + enterType + " to " + target);
@@ -1321,7 +1321,7 @@ public interface OffsetMapping {
 
 		@AllArgsConstructor
 		@HashCodeAndEqualsPlugin.Enhance
-		protected static class Factory implements OffsetMapping.Factory<Advice.Enter> {
+		public static class Factory implements OffsetMapping.Factory<Advice.Enter> {
 			private static final MethodDescription.InDefinedShape ENTER_READ_ONLY;
 			private static final MethodDescription.InDefinedShape ENTER_TYPING;
 
@@ -1333,7 +1333,7 @@ public interface OffsetMapping {
 
 			private final TypeDefinition enterType;
 
-			protected static OffsetMapping.Factory<Advice.Enter> of(TypeDefinition typeDefinition) {
+			public static OffsetMapping.Factory<Advice.Enter> of(TypeDefinition typeDefinition) {
 				return typeDefinition.represents(void.class)
 						? new Illegal<>(Advice.Enter.class)
 						: new Factory(typeDefinition);
@@ -1364,14 +1364,14 @@ public interface OffsetMapping {
 		private final boolean readOnly;
 		private final Assigner.Typing typing;
 
-		protected ForExitValue(TypeDescription.Generic target, TypeDescription.Generic exitType, AnnotationDescription.Loadable<Advice.Exit> annotation) {
+		public ForExitValue(TypeDescription.Generic target, TypeDescription.Generic exitType, AnnotationDescription.Loadable<Advice.Exit> annotation) {
 			this(target, exitType,
 					annotation.getValue(Factory.EXIT_READ_ONLY).resolve(Boolean.class),
 					annotation.getValue(Factory.EXIT_TYPING).load(Advice.Exit.class.getClassLoader()).resolve(Assigner.Typing.class));
 		}
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			StackManipulation readAssignment = assigner.assign(exitType, target, typing);
 			if (!readAssignment.isValid()) {
 				throw new IllegalStateException("Cannot assign " + exitType + " to " + target);
@@ -1388,7 +1388,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.PROTECTED)
+		@AllArgsConstructor(access = AccessLevel.public)
 		@HashCodeAndEqualsPlugin.Enhance
 		public static class Factory implements OffsetMapping.Factory<Advice.Exit> {
 			private static final MethodDescription.InDefinedShape EXIT_READ_ONLY;
@@ -1433,7 +1433,7 @@ public interface OffsetMapping {
 		private final String name;
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			StackManipulation readAssignment = assigner.assign(localType, target, Assigner.Typing.STATIC);
 			StackManipulation writeAssignment = assigner.assign(target, localType, Assigner.Typing.STATIC);
 			if (!readAssignment.isValid() || !writeAssignment.isValid()) {
@@ -1444,7 +1444,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.PROTECTED)
+		@AllArgsConstructor(access = AccessLevel.public)
 		@HashCodeAndEqualsPlugin.Enhance
 		public static class Factory implements OffsetMapping.Factory<Advice.Local> {
 			public static final MethodDescription.InDefinedShape LOCAL_VALUE = TypeDescription.ForLoadedType.of(Advice.Local.class)
@@ -1477,14 +1477,14 @@ public interface OffsetMapping {
 		private final boolean readOnly;
 		private final Assigner.Typing typing;
 
-		protected ForReturnValue(TypeDescription.Generic target, AnnotationDescription.Loadable<Advice.Return> annotation) {
+		public ForReturnValue(TypeDescription.Generic target, AnnotationDescription.Loadable<Advice.Return> annotation) {
 			this(target,
 					annotation.getValue(Factory.RETURN_READ_ONLY).resolve(Boolean.class),
 					annotation.getValue(Factory.RETURN_TYPING).load(Advice.Return.class.getClassLoader()).resolve(Assigner.Typing.class));
 		}
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			StackManipulation readAssignment = assigner.assign(instrumentedMethod.getReturnType(), target, typing);
 			if (!readAssignment.isValid()) {
 				throw new IllegalStateException("Cannot assign " + instrumentedMethod.getReturnType() + " to " + target);
@@ -1505,7 +1505,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		protected enum Factory implements OffsetMapping.Factory<Advice.Return> {
+		public enum Factory implements OffsetMapping.Factory<Advice.Return> {
 			INSTANCE;
 
 			private static final MethodDescription.InDefinedShape RETURN_READ_ONLY;
@@ -1541,14 +1541,14 @@ public interface OffsetMapping {
 		private final boolean readOnly;
 		private final Assigner.Typing typing;
 
-		protected ForThrowable(TypeDescription.Generic target, AnnotationDescription.Loadable<Advice.Thrown> annotation) {
+		public ForThrowable(TypeDescription.Generic target, AnnotationDescription.Loadable<Advice.Thrown> annotation) {
 			this(target,
 					annotation.getValue(Factory.THROWN_READ_ONLY).resolve(Boolean.class),
 					annotation.getValue(Factory.THROWN_TYPING).load(Advice.Thrown.class.getClassLoader()).resolve(Assigner.Typing.class));
 		}
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			StackManipulation readAssignment = assigner.assign(TypeDescription.THROWABLE.asGenericType(), target, typing);
 			if (!readAssignment.isValid()) {
 				throw new IllegalStateException("Cannot assign Throwable to " + target);
@@ -1565,7 +1565,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		protected enum Factory implements OffsetMapping.Factory<Advice.Thrown> {
+		public enum Factory implements OffsetMapping.Factory<Advice.Thrown> {
 			INSTANCE;
 
 			private static final MethodDescription.InDefinedShape THROWN_READ_ONLY;
@@ -1578,7 +1578,7 @@ public interface OffsetMapping {
 				THROWN_TYPING = methods.filter(named("typing")).getOnly();
 			}
 
-			protected static OffsetMapping.Factory<?> of(MethodDescription.InDefinedShape adviceMethod) {
+			public static OffsetMapping.Factory<?> of(MethodDescription.InDefinedShape adviceMethod) {
 				return isNoExceptionHandler(adviceMethod.getDeclaredAnnotations()
 						.ofType(Advice.OnMethodExit.class)
 						.getValue(ON_THROWABLE)
@@ -1613,7 +1613,7 @@ public interface OffsetMapping {
 		private final Assigner.Typing typing;
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			StackManipulation assignment = assigner.assign(typeDescription, targetType, typing);
 			if (!assignment.isValid()) {
 				throw new IllegalStateException("Cannot assign " + typeDescription + " to " + targetType);
@@ -1745,7 +1745,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.PROTECTED)
+		@AllArgsConstructor(access = AccessLevel.public)
 		@HashCodeAndEqualsPlugin.Enhance
 		public static class OfAnnotationProperty<T extends Annotation> implements OffsetMapping.Factory<T> {
 			private final Class<T> annotationType;
@@ -1833,7 +1833,7 @@ public interface OffsetMapping {
 		private final StackManipulation deserialization;
 
 		@Override
-		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, AgentAdvice.ArgumentHandler argumentHandler, Sort sort) {
+		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			StackManipulation assignment = assigner.assign(typeDescription.asGenericType(), target, Assigner.Typing.DYNAMIC);
 			if (!assignment.isValid()) {
 				throw new IllegalStateException("Cannot assign " + typeDescription + " to " + target);
@@ -1841,7 +1841,7 @@ public interface OffsetMapping {
 			return new Target.ForStackManipulation(new StackManipulation.Compound(deserialization, assignment));
 		}
 
-		@AllArgsConstructor(access = AccessLevel.PROTECTED)
+		@AllArgsConstructor(access = AccessLevel.public)
 		@HashCodeAndEqualsPlugin.Enhance
 		public static class Factory<T extends Annotation> implements OffsetMapping.Factory<T> {
 			private final Class<T> annotationType;

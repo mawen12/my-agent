@@ -37,7 +37,7 @@ public interface StackMapFrameHandler {
 
 		ForAdvice bindExit(MethodDescription.InDefinedShape adviceMethod);
 
-		int getHeaderHint();
+		int getReaderHint();
 
 		void injectInitializationFrame(MethodVisitor methodVisitor);
 
@@ -46,7 +46,7 @@ public interface StackMapFrameHandler {
 		void injectPostCompletionFrame(MethodVisitor methodVisitor);
 	}
 
-	interface ForAdvice extends StackMapFrameHandler, ForPostProcessor, Advice.StackMapFrameHandler {
+	interface ForAdvice extends StackMapFrameHandler, ForPostProcessor, Advice.StackMapFrameHandler.ForPostProcessor {
 		// marker interface
 	}
 
@@ -89,7 +89,7 @@ public interface StackMapFrameHandler {
 		}
 
 		@Override
-		public int getHeaderHint() {
+		public int getReaderHint() {
 			return ClassReader.SKIP_FRAMES;
 		}
 
@@ -183,7 +183,7 @@ public interface StackMapFrameHandler {
 		}
 
 		@Override
-		public int getHeaderHint() {
+		public int getReaderHint() {
 			return 0;
 		}
 
