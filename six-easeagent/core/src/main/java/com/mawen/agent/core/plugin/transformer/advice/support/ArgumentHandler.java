@@ -297,23 +297,23 @@ public interface ArgumentHandler {
 	public enum Factory {
 		SIMPLE {
 			@Override
-			protected ForInstrumentedMethod resolve(MethodDescription method, TypeDefinition enterType, TypeDescription exitType, SortedMap<String, TypeDefinition> namedTypes) {
+			public ForInstrumentedMethod resolve(MethodDescription method, TypeDefinition enterType, TypeDefinition exitType, SortedMap<String, TypeDefinition> namedTypes) {
 				return new ForInstrumentedMethod.Default.Simple(method,
 						exitType, namedTypes, enterType);
 			}
 		},
 		COPYING {
 			@Override
-			protected ForInstrumentedMethod resolve(MethodDescription instrumentMethod, TypeDefinition enterType, TypeDescription exitType, SortedMap<String, TypeDefinition> namedTypes) {
+			public ForInstrumentedMethod resolve(MethodDescription instrumentMethod, TypeDefinition enterType, TypeDefinition exitType, SortedMap<String, TypeDefinition> namedTypes) {
 				return new ForInstrumentedMethod.Default.Copying(instrumentMethod,
 						exitType, namedTypes, enterType);
 			}
 		},
 		;
 
-		protected abstract ForInstrumentedMethod resolve(MethodDescription instrumentMethod,
+		public abstract ForInstrumentedMethod resolve(MethodDescription instrumentMethod,
 				TypeDefinition enterType,
-				TypeDescription exitType,
+				TypeDefinition exitType,
 				SortedMap<String, TypeDefinition> namedTypes);
 	}
 }

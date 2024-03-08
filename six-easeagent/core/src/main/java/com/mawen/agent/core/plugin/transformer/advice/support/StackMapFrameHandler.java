@@ -137,7 +137,7 @@ public interface StackMapFrameHandler {
 			this.expandFrames = expandFrames;
 		}
 
-		protected static ForInstrumentedMethod of(TypeDescription type,
+		public static ForInstrumentedMethod of(TypeDescription type,
 				MethodDescription method,
 				List<? extends TypeDescription> initialTypes,
 				List<? extends TypeDescription> latentTypes,

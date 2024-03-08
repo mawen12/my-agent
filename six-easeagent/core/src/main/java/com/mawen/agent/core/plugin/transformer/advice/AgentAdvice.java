@@ -2,10 +2,6 @@ package com.mawen.agent.core.plugin.transformer.advice;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,16 +13,11 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.IntSupplier;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.mawen.agent.core.plugin.registry.AdviceRegistry;
-import com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler;
-import com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler;
 import com.mawen.agent.core.plugin.transformer.advice.support.NoExceptionHandler;
-import com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping;
 import com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory.Illegal;
-import com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import net.bytebuddy.asm.Advice;
@@ -108,14 +99,14 @@ public class AgentAdvice extends Advice {
 	}
 
 	protected AgentAdvice(Dispatcher.Resolved.ForMethodEnter methodEnter, Dispatcher.Resolved.ForMethodExit methodExitNonThrowable,
-	                      Dispatcher.Resolved.ForMethodExit methodExit) {
+			Dispatcher.Resolved.ForMethodExit methodExit) {
 		this(methodEnter, methodExit, methodExitNonThrowable, Assigner.DEFAULT,
 				ExceptionHandler.Default.SUPPRESSING, SuperMethodCall.INSTANCE);
 	}
 
 	private AgentAdvice(Dispatcher.Resolved.ForMethodEnter methodEnter, Dispatcher.Resolved.ForMethodExit methodExit,
-	                    Dispatcher.Resolved.ForMethodExit methodExitNonThrowable, Assigner assigner,
-	                    ExceptionHandler exceptionHandler, Implementation delegate) {
+			Dispatcher.Resolved.ForMethodExit methodExitNonThrowable, Assigner assigner,
+			ExceptionHandler exceptionHandler, Implementation delegate) {
 		super(null, null);
 		this.methodEnter = methodEnter;
 		this.methodExit = methodExit;
@@ -130,9 +121,9 @@ public class AgentAdvice extends Advice {
 	}
 
 	protected static AgentAdvice tto(TypeDescription advice, PostProcessor.Factory postProcessorFactory,
-	                                 ClassFileLocator classFileLocator,
-	                                 List<? extends OffsetMapping.Factory<?>> userFactories,
-	                                 Delegator delegator) {
+			ClassFileLocator classFileLocator,
+			List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
+			Delegator delegator) {
 		Dispatcher.Unresolved methodEnter = Dispatcher.Inactive.INSTANCE;
 		Dispatcher.Unresolved methodExit = Dispatcher.Inactive.INSTANCE;
 		Dispatcher.Unresolved methodExitNoException = Dispatcher.Inactive.INSTANCE;
@@ -175,10 +166,10 @@ public class AgentAdvice extends Advice {
 	}
 
 	private static Dispatcher.Unresolved locate(Class<? extends Annotation> type,
-	                                            MethodDescription.InDefinedShape property,
-	                                            Dispatcher.Unresolved dispatcher,
-	                                            MethodDescription.InDefinedShape methodDescription,
-	                                            Delegator delegator) {
+			MethodDescription.InDefinedShape property,
+			Dispatcher.Unresolved dispatcher,
+			MethodDescription.InDefinedShape methodDescription,
+			Delegator delegator) {
 		AnnotationDescription.Loadable<? extends Annotation> annotation = methodDescription.getDeclaredAnnotations().ofType(type);
 		if (annotation == null) {
 			return dispatcher;
@@ -225,10 +216,33 @@ public class AgentAdvice extends Advice {
 				: methodVisitor);
 
 		if (instrumentedMethod.isConstructor()) {
-			return new WithExitAdvice.WithoutExceptionHandling();
+			return new WithExitAdvice.WithoutExceptionHandling(
+					methodVisitor,
+					implementationContext,
+					assigner,
+					exceptionHandler.resolve(instrumentedMethod, instrumentedType),
+					instrumentedType,
+					instrumentedMethod,
+					methodEnter,
+					methodExitNonThrowable,
+					writerFlags,
+					readerFlags
+			);
 		}
 		else {
-
+			return new WithExitAdvice.WithExceptionHandling(
+					methodVisitor,
+					implementationContext,
+					assigner,
+					exceptionHandler.resolve(instrumentedMethod, instrumentedType),
+					instrumentedType,
+					instrumentedMethod,
+					methodEnter,
+					methodExit,
+					writerFlags,
+					readerFlags,
+					methodExit.getThrowable()
+			);
 		}
 	}
 
@@ -239,7 +253,7 @@ public class AgentAdvice extends Advice {
 	public static class WithCustomMapping extends Advice.WithCustomMapping {
 		private final PostProcessor.Factory postProcessorFactory;
 		private final Delegator delegator;
-		private final Map<Class<? extends Annotation>, OffsetMapping.Factory<?>> offsetMappings;
+		private final Map<Class<? extends Annotation>, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> offsetMappings;
 
 		public WithCustomMapping() {
 			this(PostProcessor.NoOp.INSTANCE, Delegator.ForStaticInvocation.INSTANCE, Collections.emptyMap());
@@ -247,11 +261,11 @@ public class AgentAdvice extends Advice {
 
 		@Override
 		public <T extends Annotation> WithCustomMapping bind(Class<T> type, Object value) {
-			return bind(OffsetMapping.ForStackManipulation.Factory.of(type, value));
+			return bind(com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.ForStackManipulation.Factory.of(type, value));
 		}
 
-		public WithCustomMapping bind(OffsetMapping.Factory<?> offsetMapping) {
-			Map<Class<? extends Annotation>, OffsetMapping.Factory<?>> offsetMappings = new HashMap<>(this.offsetMappings);
+		public WithCustomMapping bind(com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?> offsetMapping) {
+			Map<Class<? extends Annotation>, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> offsetMappings = new HashMap<>(this.offsetMappings);
 			if (!offsetMapping.getAnnotationType().isAnnotation()) {
 				throw new IllegalArgumentException("Not an annotation type: " + offsetMapping.getAnnotationType());
 			}
@@ -267,49 +281,489 @@ public class AgentAdvice extends Advice {
 		}
 	}
 
-	protected abstract static class WithExitAdvice extends AdviceVisitor {
-		protected final Label returnHandler;
+	protected abstract static class AdviceVisitor
+			extends ExceptionTableSensitiveMethodVisitor implements Dispatcher.RelocationHandler.Relocation {
+		private static final int THIS_VARIABLE_INDEX = 0;
+		private static final String THIS_VARIABLE_NAME = "this";
 
-		protected WithExitAdvice(MethodVisitor methodVisitor,
-		                         Implementation.Context implementationContext,
-		                         Assigner assigner,
-		                         StackManipulation exceptionHandler,
-		                         TypeDescription instrumentedType,
-		                         MethodDescription instrumentedMethod,
-		                         Dispatcher.Resolved.ForMethodEnter methodEnter,
-		                         Dispatcher.Resolved.ForMethodExit methodExit,
-		                         List<? extends TypeDescription> postMethodTypes,
-		                         int writerFlags,
-		                         int readerFlags) {
-			super(new StackAwareMethodVisitor(methodVisitor, instrumentedMethod),
-					implementationContext, assigner, exceptionHandler, instrumentedType, instrumentedMethod,
-					methodEnter, methodExit, postMethodTypes, writerFlags, readerFlags);
+		protected final MethodDescription instrumentedMethod;
+		protected final Label preparationStart;
+		protected final Dispatcher.Bound methodEnter;
+		protected final Dispatcher.Bound methodExit;
+		protected final com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler;
+		protected final com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler;
+		protected final com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler;
+
+
+		protected AdviceVisitor(MethodVisitor methodVisitor,
+				Context implementationContext,
+				Assigner assigner,
+				StackManipulation exceptionHandler,
+				TypeDescription instrumentationType,
+				MethodDescription instrumentedMethod,
+				Dispatcher.Resolved.ForMethodEnter methodEnter,
+				Dispatcher.Resolved.ForMethodExit methodExit,
+				List<TypeDescription> postMethodTypes,
+				int writerFlags,
+				int readFlags) {
+			super(OpenedClassReader.ASM_API, methodVisitor);
+			this.instrumentedMethod = instrumentedMethod;
+			preparationStart = new Label();
+			SortedMap<String, TypeDefinition> namedTypes = new TreeMap<>();
+			namedTypes.putAll(methodEnter.getNamedTypes());
+			namedTypes.putAll(methodExit.getNamedTypes());
+			argumentHandler = methodExit.getArgumentHandlerFactory()
+					.resolve(instrumentedMethod, methodEnter.getAdviceType(), methodExit.getAdviceType(), namedTypes);
+			List<TypeDescription> initialTypes = CompoundList.of(methodExit.getAdviceType().represents(void.class)
+					? Collections.emptyList()
+					: Collections.singletonList(methodExit.getAdviceType().asErasure()), argumentHandler.getNamedTypes());
+			List<TypeDescription> latentTypes = methodEnter.getActualAdviceType().represents(void.class)
+					? Collections.emptyList()
+					: Collections.singletonList(methodEnter.getActualAdviceType().asErasure());
+			List<TypeDescription> preMethodTypes = methodEnter.getAdviceType().represents(void.class)
+					? Collections.emptyList()
+					: Collections.singletonList(methodEnter.getAdviceType().asErasure());
+			methodSizeHandler = com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.Default.of(
+					instrumentedMethod,
+					initialTypes,
+					preMethodTypes,
+					postMethodTypes,
+					argumentHandler.isCopyingArguments(),
+					writerFlags
+			);
+			stackMapFrameHandler = com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.Default.of(
+					instrumentationType,
+					instrumentedMethod,
+					initialTypes,
+					latentTypes,
+					preMethodTypes,
+					postMethodTypes,
+					methodExit.isAlive(),
+					argumentHandler.isCopyingArguments(),
+					implementationContext.getClassFileVersion(),
+					writerFlags,
+					readFlags
+			);
+			this.methodEnter = methodEnter.bind(
+					instrumentationType,
+					instrumentedMethod,
+					methodVisitor,
+					implementationContext,
+					assigner,
+					argumentHandler,
+					methodSizeHandler,
+					stackMapFrameHandler,
+					exceptionHandler,
+					this
+			);
+			this.methodExit = methodExit.bind(
+					instrumentationType,
+					instrumentedMethod,
+					methodVisitor,
+					implementationContext,
+					assigner,
+					argumentHandler,
+					methodSizeHandler,
+					stackMapFrameHandler,
+					exceptionHandler,
+					new ForLabel(preparationStart)
+			);
 		}
 
 		@Override
-		protected void onUserPrepare() {
-
+		protected void onAfterExceptionTable() {
+			methodExit.prepare();
+			onUserPrepare();
+			methodExit.prepare();
+			methodEnter.initialize();
+			methodExit.initialize();
+			stackMapFrameHandler.injectInitializationFrame(mv);
+			methodEnter.apply();
+			mv.visitLabel(preparationStart);
+			methodSizeHandler.requireStackSize(argumentHandler.prepare(mv));
+			stackMapFrameHandler.injectStartFrame(mv);
+			onUserStart();
 		}
 
 		@Override
-		protected void onUserStart() {
-
+		protected void onVisitVarInsn(int opcode, int offset) {
+			mv.visitVarInsn(opcode, argumentHandler.argument(offset));
 		}
 
 		@Override
-		protected void onUserEnd() {
+		protected void onVisitIincInsn(int offset, int increment) {
+			mv.visitIincInsn(argumentHandler.argument(offset), increment);
+		}
 
+		@Override
+		protected void onVisitFrame(int type, int localVariableLength, Object[] localVariable, int stackSize, Object[] stack) {
+			stackMapFrameHandler.translateFrame(mv, type, localVariableLength, localVariable, stackSize, stack);
+		}
+
+		@Override
+		public void visitMaxs(int maxStack, int maxLocals) {
+			onUserEnd();
+			mv.visitMaxs(methodSizeHandler.compoundStackSize(maxStack), methodSizeHandler.compoundLocalVariableLength(maxLocals));
+		}
+
+		@Override
+		public void visitLocalVariable(String name, String descriptor, String signature, Label start, Label end, int index) {
+			mv.visitLocalVariable(name, descriptor, signature, start, end, index == THIS_VARIABLE_INDEX && THIS_VARIABLE_NAME.equals(name)
+					? index
+					: argumentHandler.variable(index));
+		}
+
+		@Override
+		public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String descriptor, boolean visible) {
+			int[] translated = new int[index.length];
+			for (int i = 0; i < index.length; i++) {
+				translated[i] = argumentHandler.variable(index[i]);
+			}
+			return mv.visitLocalVariableAnnotation(typeRef, typePath, start, end, translated, descriptor, visible);
+		}
+
+		protected abstract void onUserPrepare();
+
+		protected abstract void onUserStart();
+
+		protected abstract void onUserEnd();
+	}
+
+	protected static class WithoutExitAdvice extends AdviceVisitor {
+		protected WithoutExitAdvice(MethodVisitor methodVisitor, Context implementationContext, Assigner assigner, StackManipulation exceptionHandler, TypeDescription instrumentationType, MethodDescription instrumentedMethod, Dispatcher.Resolved.ForMethodEnter methodEnter, Dispatcher.Resolved.ForMethodExit methodExit, List<TypeDescription> postMethodTypes, int writerFlags, int readFlags) {
+			super(methodVisitor, implementationContext, assigner, exceptionHandler, instrumentationType, instrumentedMethod, methodEnter, methodExit, postMethodTypes, writerFlags, readFlags);
 		}
 
 		@Override
 		public void apply(MethodVisitor methodVisitor) {
+			TypeDescription.Generic returnType = instrumentedMethod.getReturnType();
+			if (returnType.represents(boolean.class)
+					|| returnType.represents(byte.class)
+					|| returnType.represents(short.class)
+					|| returnType.represents(char.class)
+					|| returnType.represents(int.class)) {
+				methodVisitor.visitInsn(Opcodes.ICONST_0);
+				methodVisitor.visitInsn(Opcodes.IRETURN);
+			}
+			else if (returnType.represents(long.class)) {
+				methodVisitor.visitInsn(Opcodes.LCONST_0);
+				methodVisitor.visitInsn(Opcodes.LRETURN);
+			}
+			else if (returnType.represents(float.class)) {
+				methodVisitor.visitInsn(Opcodes.FCONST_0);
+				methodVisitor.visitInsn(Opcodes.FRETURN);
+			}
+			else if (returnType.represents(double.class)) {
+				methodVisitor.visitInsn(Opcodes.DCONST_0);
+				methodVisitor.visitInsn(Opcodes.DRETURN);
+			}
+			else if (returnType.represents(void.class)) {
+				methodVisitor.visitInsn(Opcodes.RETURN);
+			}
+			else {
+				methodVisitor.visitInsn(Opcodes.ACONST_NULL);
+				methodVisitor.visitInsn(Opcodes.ARETURN);
+			}
 
+		}
+
+		@Override
+		protected void onUserPrepare() {
+			// ignored
+		}
+
+		@Override
+		protected void onUserStart() {
+			// ignored
+		}
+
+		@Override
+		protected void onUserEnd() {
+			// ignored
 		}
 	}
 
-	protected abstract static class AdviceVisitor
-			extends ExceptionTableSensitiveMethodVisitor implements Dispatcher.RelocationHandler.Relocation {
-		private static final int THIS_VARIABLE_INDEX = 0;
+	protected abstract static class WithExitAdvice extends AdviceVisitor {
+		protected final Label returnHandler;
+
+		protected WithExitAdvice(MethodVisitor methodVisitor, Context implementationContext, Assigner assigner, StackManipulation exceptionHandler, TypeDescription instrumentationType, MethodDescription instrumentedMethod, Dispatcher.Resolved.ForMethodEnter methodEnter, Dispatcher.Resolved.ForMethodExit methodExit, List<TypeDescription> postMethodTypes, int writerFlags, int readFlags) {
+			super(methodVisitor, implementationContext, assigner, exceptionHandler, instrumentationType, instrumentedMethod, methodEnter, methodExit, postMethodTypes, writerFlags, readFlags);
+			this.returnHandler = new Label();
+		}
+
+		@Override
+		public void apply(MethodVisitor methodVisitor) {
+			TypeDescription.Generic returnType = instrumentedMethod.getReturnType();
+			if (returnType.represents(boolean.class)
+					|| returnType.represents(byte.class)
+					|| returnType.represents(short.class)
+					|| returnType.represents(char.class)
+					|| returnType.represents(int.class)) {
+				methodVisitor.visitInsn(Opcodes.ICONST_0);
+			}
+			else if (returnType.represents(long.class)) {
+				methodVisitor.visitInsn(Opcodes.LCONST_0);
+			}
+			else if (returnType.represents(float.class)) {
+				methodVisitor.visitInsn(Opcodes.FCONST_0);
+			}
+			else if (returnType.represents(double.class)) {
+				methodVisitor.visitInsn(Opcodes.DCONST_0);
+			}
+			else if (!returnType.represents(void.class)) {
+				methodVisitor.visitInsn(Opcodes.ACONST_NULL);
+			}
+			methodVisitor.visitJumpInsn(Opcodes.GOTO, returnHandler);
+		}
+
+		@Override
+		protected void onUserEnd() {
+			mv.visitLabel(this.returnHandler);
+			onUserReturn();
+			stackMapFrameHandler.injectCompletionFrame(mv);
+			methodExit.apply();
+			onExitAdviceReturn();
+			TypeDescription.Generic returnType = instrumentedMethod.getReturnType();
+			if (returnType.represents(boolean.class)
+					|| returnType.represents(byte.class)
+					|| returnType.represents(short.class)
+					|| returnType.represents(char.class)
+					|| returnType.represents(int.class)) {
+				mv.visitVarInsn(Opcodes.ILOAD, argumentHandler.returned());
+				mv.visitInsn(Opcodes.IRETURN);
+			}
+			else if (returnType.represents(long.class)) {
+				mv.visitVarInsn(Opcodes.LLOAD, argumentHandler.returned());
+				mv.visitInsn(Opcodes.LRETURN);
+			}
+			else if (returnType.represents(float.class)) {
+				mv.visitVarInsn(Opcodes.FLOAD, argumentHandler.returned());
+				mv.visitInsn(Opcodes.FRETURN);
+			}
+			else if (returnType.represents(double.class)) {
+				mv.visitVarInsn(Opcodes.DLOAD, argumentHandler.returned());
+				mv.visitInsn(Opcodes.DRETURN);
+			}
+			else if (!returnType.represents(void.class)) {
+				mv.visitVarInsn(Opcodes.ALOAD, argumentHandler.returned());
+				mv.visitInsn(Opcodes.ARETURN);
+			}
+			else {
+				mv.visitInsn(Opcodes.RETURN);
+			}
+			methodSizeHandler.requireStackSize(instrumentedMethod.getReturnType().getStackSize().getSize());
+		}
+
+		@Override
+		protected void onVisitInsn(int opcode) {
+			if (mv instanceof StackAwareMethodVisitor visitor) {
+				switch (opcode) {
+					case Opcodes.RETURN:
+						visitor.drainStack();
+						break;
+					case Opcodes.IRETURN:
+						methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.ISTORE, Opcodes.ILOAD, StackSize.SINGLE));
+						break;
+					case Opcodes.FRETURN:
+						methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.FSTORE, Opcodes.FLOAD, StackSize.SINGLE));
+						break;
+					case Opcodes.DRETURN:
+						methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.DSTORE, Opcodes.DLOAD, StackSize.DOUBLE));
+						break;
+					case Opcodes.LRETURN:
+						methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.LSTORE, Opcodes.LLOAD, StackSize.DOUBLE));
+						break;
+					case Opcodes.ARETURN:
+						methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.ASTORE, Opcodes.ALOAD, StackSize.SINGLE));
+						break;
+					default:
+						mv.visitInsn(opcode);
+						return;
+				}
+				mv.visitJumpInsn(Opcodes.GOTO, returnHandler);
+			}
+		}
+
+		protected abstract void onUserReturn();
+
+		protected abstract void onExitAdviceReturn();
+
+		protected static class WithoutExceptionHandling extends WithExitAdvice {
+			protected WithoutExceptionHandling(MethodVisitor methodVisitor,
+					Context implementationContext,
+					Assigner assigner,
+					StackManipulation exceptionHandler,
+					TypeDescription instrumentationType,
+					MethodDescription instrumentedMethod,
+					Dispatcher.Resolved.ForMethodEnter methodEnter,
+					Dispatcher.Resolved.ForMethodExit methodExit,
+					int writerFlags,
+					int readFlags) {
+				super(methodVisitor,
+						implementationContext,
+						assigner,
+						exceptionHandler,
+						instrumentationType,
+						instrumentedMethod,
+						methodEnter,
+						methodExit,
+						instrumentedMethod.getReturnType().represents(void.class)
+								? List.of()
+								: List.of(instrumentedMethod.getReturnType().asErasure()),
+						writerFlags,
+						readFlags);
+			}
+
+			@Override
+			protected void onUserPrepare() {
+				// ignored
+			}
+
+			@Override
+			protected void onUserStart() {
+				// ignored
+			}
+
+			@Override
+			protected void onUserReturn() {
+				stackMapFrameHandler.injectReturnFrame(mv);
+				TypeDescription.Generic returnType = instrumentedMethod.getReturnType();
+				if (returnType.represents(boolean.class)
+						|| returnType.represents(byte.class)
+						|| returnType.represents(short.class)
+						|| returnType.represents(char.class)
+						|| returnType.represents(int.class)) {
+					mv.visitVarInsn(Opcodes.ISTORE, argumentHandler.returned());
+				}
+				else if (returnType.represents(long.class)) {
+					mv.visitVarInsn(Opcodes.LSTORE, argumentHandler.returned());
+				}
+				else if (returnType.represents(float.class)) {
+					mv.visitVarInsn(Opcodes.FSTORE, argumentHandler.returned());
+				}
+				else if (returnType.represents(double.class)) {
+					mv.visitVarInsn(Opcodes.DSTORE, argumentHandler.returned());
+				}
+				else if (!returnType.represents(void.class)) {
+					mv.visitVarInsn(Opcodes.ASTORE, argumentHandler.returned());
+				}
+			}
+
+			@Override
+			protected void onExitAdviceReturn() {
+				// ignored
+			}
+		}
+
+		protected static class WithExceptionHandling extends WithExitAdvice {
+			private final TypeDescription throwable;
+			private final Label exceptionHandler;
+			private final Label userStart;
+
+			protected WithExceptionHandling(MethodVisitor methodVisitor,
+					Context implementationContext,
+					Assigner assigner,
+					StackManipulation exceptionHandler,
+					TypeDescription instrumentationType,
+					MethodDescription instrumentedMethod,
+					Dispatcher.Resolved.ForMethodEnter methodEnter,
+					Dispatcher.Resolved.ForMethodExit methodExit,
+					int writerFlags,
+					int readFlags,
+					TypeDescription throwable) {
+				super(methodVisitor, implementationContext, assigner, exceptionHandler,
+						instrumentationType, instrumentedMethod, methodEnter, methodExit,
+						instrumentedMethod.getReturnType().represents(void.class)
+								? List.of()
+								: List.of(instrumentedMethod.getReturnType().asErasure(), TypeDescription.THROWABLE),
+						writerFlags, readFlags);
+				this.throwable = throwable;
+				this.exceptionHandler = new Label();
+				this.userStart = new Label();
+			}
+
+			@Override
+			protected void onUserPrepare() {
+				mv.visitTryCatchBlock(userStart, returnHandler, exceptionHandler, throwable.getInternalName());
+			}
+
+			@Override
+			protected void onUserStart() {
+				mv.visitLabel(userStart);
+			}
+
+			@Override
+			protected void onUserReturn() {
+				stackMapFrameHandler.injectReturnFrame(mv);
+				TypeDescription.Generic returnType = instrumentedMethod.getReturnType();
+				if (returnType.represents(boolean.class)
+						|| returnType.represents(byte.class)
+						|| returnType.represents(short.class)
+						|| returnType.represents(char.class)
+						|| returnType.represents(int.class)) {
+					mv.visitVarInsn(Opcodes.ISTORE, argumentHandler.returned());
+				}
+				else if (returnType.represents(long.class)) {
+					mv.visitVarInsn(Opcodes.LSTORE, argumentHandler.returned());
+				}
+				else if (returnType.represents(float.class)) {
+					mv.visitVarInsn(Opcodes.FSTORE, argumentHandler.returned());
+				}
+				else if (returnType.represents(double.class)) {
+					mv.visitVarInsn(Opcodes.DSTORE, argumentHandler.returned());
+				}
+				else if (!returnType.represents(void.class)) {
+					mv.visitVarInsn(Opcodes.ASTORE, argumentHandler.returned());
+				}
+
+				mv.visitInsn(Opcodes.ACONST_NULL);
+				mv.visitVarInsn(Opcodes.ASTORE, argumentHandler.thrown());
+				Label endOfHandler = new Label();
+				mv.visitJumpInsn(Opcodes.GOTO, endOfHandler);
+				mv.visitLabel(exceptionHandler);
+				stackMapFrameHandler.injectExceptionFrame(mv);
+				mv.visitVarInsn(Opcodes.ASTORE, argumentHandler.thrown());
+
+				if (returnType.represents(boolean.class)
+						|| returnType.represents(byte.class)
+						|| returnType.represents(short.class)
+						|| returnType.represents(char.class)
+						|| returnType.represents(int.class)) {
+					mv.visitInsn(Opcodes.ICONST_0);
+					mv.visitVarInsn(Opcodes.ISTORE, argumentHandler.returned());
+				}
+				else if (returnType.represents(long.class)) {
+					mv.visitInsn(Opcodes.LCONST_0);
+					mv.visitVarInsn(Opcodes.LSTORE, argumentHandler.returned());
+				}
+				else if (returnType.represents(float.class)) {
+					mv.visitInsn(Opcodes.FCONST_0);
+					mv.visitVarInsn(Opcodes.FSTORE, argumentHandler.returned());
+				}
+				else if (returnType.represents(double.class)) {
+					mv.visitInsn(Opcodes.DCONST_0);
+					mv.visitVarInsn(Opcodes.DSTORE, argumentHandler.returned());
+				}
+				else if (!returnType.represents(void.class)) {
+					mv.visitInsn(Opcodes.ACONST_NULL);
+					mv.visitVarInsn(Opcodes.ASTORE, argumentHandler.thrown());
+				}
+
+				mv.visitLabel(endOfHandler);
+				methodSizeHandler.requireStackSize(StackSize.SINGLE.getSize());
+			}
+
+			@Override
+			protected void onExitAdviceReturn() {
+				mv.visitVarInsn(Opcodes.ALOAD, argumentHandler.thrown());
+				Label endOfHandler = new Label();
+				mv.visitJumpInsn(Opcodes.IFNULL, endOfHandler);
+				mv.visitVarInsn(Opcodes.ALOAD, argumentHandler.thrown());
+				mv.visitInsn(Opcodes.ATHROW);
+				mv.visitLabel(endOfHandler);
+				stackMapFrameHandler.injectPostCompletionFrame(mv);
+			}
+		}
 	}
 
 	public interface Dispatcher {
@@ -326,14 +780,14 @@ public class AgentAdvice extends Advice {
 			Map<String, TypeDefinition> getNamedTypes();
 
 			Resolved.ForMethodEnter asMethodEnter(List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
-			                                      ClassReader classReader,
-			                                      Unresolved methodExit,
-			                                      Advice.PostProcessor.Factory postProcessorFactory);
+					ClassReader classReader,
+					Unresolved methodExit,
+					Advice.PostProcessor.Factory postProcessorFactory);
 
 			Resolved.ForMethodExit asMethodExit(List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
-			                                    ClassReader classReader,
-			                                    Unresolved methodEnter,
-			                                    Advice.PostProcessor.Factory postProcessorFactory);
+					ClassReader classReader,
+					Unresolved methodEnter,
+					Advice.PostProcessor.Factory postProcessorFactory);
 		}
 
 		interface SuppressionHandler {
@@ -346,16 +800,16 @@ public class AgentAdvice extends Advice {
 				void onStart(MethodVisitor methodVisitor);
 
 				void onEnd(MethodVisitor methodVisitor,
-				           Implementation.Context implementationContext,
-				           com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
-				           com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
-				           TypeDefinition returnType);
+						Implementation.Context implementationContext,
+						com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
+						com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
+						TypeDefinition returnType);
 
 				void onEndWithSkip(MethodVisitor methodVisitor,
-				                   Implementation.Context implementationContext,
-				                   com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
-				                   com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
-				                   TypeDefinition returnType);
+						Implementation.Context implementationContext,
+						com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
+						com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
+						TypeDefinition returnType);
 			}
 
 			enum NoOp implements SuppressionHandler, Bound {
@@ -646,10 +1100,10 @@ public class AgentAdvice extends Advice {
 						if (method.isConstructor()) {
 							throw new IllegalStateException("Cannot skip code execution from constructor: " + method);
 						}
-						methodVisitor.visitVarInsn(Opcodes.ALOAD,offset);
+						methodVisitor.visitVarInsn(Opcodes.ALOAD, offset);
 						methodVisitor.visitTypeInsn(Opcodes.INSTANCEOF, typeDescription.getInternalName());
 						Label noSkip = new Label();
-						methodVisitor.visitJumpInsn(Opcodes.IFEQ,noSkip);
+						methodVisitor.visitJumpInsn(Opcodes.IFEQ, noSkip);
 						relocation.apply(methodVisitor);
 						methodVisitor.visitLabel(noSkip);
 						return NO_REQUIRED_SIZE;
@@ -662,15 +1116,15 @@ public class AgentAdvice extends Advice {
 			Map<String, TypeDefinition> getNamedTypes();
 
 			Bound bind(TypeDescription instrumentedType,
-			           MethodDescription instrumentedMethod,
-			           MethodVisitor methodVisitor,
-			           Implementation.Context implementationContext,
-			           Assigner assigner,
-			           com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
-			           com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
-			           com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
-			           StackManipulation exceptionHandler,
-			           Dispatcher.RelocationHandler.Relocation relocation);
+					MethodDescription instrumentedMethod,
+					MethodVisitor methodVisitor,
+					Implementation.Context implementationContext,
+					Assigner assigner,
+					com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
+					com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
+					com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
+					StackManipulation exceptionHandler,
+					Dispatcher.RelocationHandler.Relocation relocation);
 
 			Map<Integer, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping> getOffsetMapping();
 
@@ -695,11 +1149,11 @@ public class AgentAdvice extends Advice {
 				protected final RelocationHandler relocationHandler;
 
 				protected AbstractBase(MethodDescription.InDefinedShape adviceMethod,
-				                       Advice.PostProcessor postProcessor,
-				                       List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> factories,
-				                       TypeDescription throwableType,
-				                       TypeDescription relocatableType,
-				                       com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory.AdviceType adviceType) {
+						Advice.PostProcessor postProcessor,
+						List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> factories,
+						TypeDescription throwableType,
+						TypeDescription relocatableType,
+						com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory.AdviceType adviceType) {
 					this.adviceMethod = adviceMethod;
 					this.postProcessor = postProcessor;
 					Map<TypeDescription, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> offsetMappings = new HashMap<>();
@@ -785,11 +1239,11 @@ public class AgentAdvice extends Advice {
 
 			@Override
 			public Bound bind(TypeDescription instrumentedType, MethodDescription instrumentedMethod, MethodVisitor methodVisitor, Context implementationContext, Assigner assigner,
-			                  com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
-			                  com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
-			                  com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
-			                  StackManipulation exceptionHandler,
-			                  RelocationHandler.Relocation relocation) {
+					com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
+					com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
+					com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
+					StackManipulation exceptionHandler,
+					RelocationHandler.Relocation relocation) {
 				return null;
 			}
 
@@ -898,7 +1352,7 @@ public class AgentAdvice extends Advice {
 						throw new IllegalStateException("Local variable for " + entry.getKey() + " is defined with inconsistent types");
 					}
 				}
-				return Resolved.ForMethodExit.of(adviceMethod, postProcessorFactory.make(adviceMethod,true),
+				return Resolved.ForMethodExit.of(adviceMethod, postProcessorFactory.make(adviceMethod, true),
 						namedTypes, uninitializedNamedTypes, userFactories,
 						classReader, methodEnter.getAdviceType());
 			}
@@ -907,11 +1361,11 @@ public class AgentAdvice extends Advice {
 				protected final ClassReader classReader;
 
 				protected Resolved(MethodDescription.InDefinedShape adviceMethod,
-				                   Advice.PostProcessor postProcessor,
-				                   List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> factories,
-				                   TypeDescription throwableType,
-				                   TypeDescription relocatableType,
-				                   ClassReader classReader) {
+						Advice.PostProcessor postProcessor,
+						List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> factories,
+						TypeDescription throwableType,
+						TypeDescription relocatableType,
+						ClassReader classReader) {
 					super(adviceMethod, postProcessor, factories, throwableType, relocatableType, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory.AdviceType.INLINING);
 					this.classReader = classReader;
 				}
@@ -919,16 +1373,16 @@ public class AgentAdvice extends Advice {
 				protected abstract Map<Integer, TypeDefinition> resolveInitializationTypes(com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler argumentHandler);
 
 				protected abstract MethodVisitor apply(MethodVisitor methodVisitor,
-				                                       Implementation.Context implementationContext,
-				                                       Assigner assigner,
-				                                       com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
-				                                       com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
-				                                       com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
-				                                       TypeDescription instrumentedType,
-				                                       MethodDescription instrumentedMethod,
-				                                       Dispatcher.SuppressionHandler.Bound suppressionHandler,
-				                                       Dispatcher.RelocationHandler.Bound relocationHandler,
-				                                       StackManipulation exceptionHandler);
+						Implementation.Context implementationContext,
+						Assigner assigner,
+						com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
+						com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
+						com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
+						TypeDescription instrumentedType,
+						MethodDescription instrumentedMethod,
+						Dispatcher.SuppressionHandler.Bound suppressionHandler,
+						Dispatcher.RelocationHandler.Bound relocationHandler,
+						StackManipulation exceptionHandler);
 
 
 				protected class AdviceMethodInliner extends ClassVisitor implements Dispatcher.Bound {
@@ -947,10 +1401,10 @@ public class AgentAdvice extends Advice {
 					private final List<Label> labels = new ArrayList<>();
 
 					public AdviceMethodInliner(ClassReader classReader, StackManipulation exceptionHandler, Dispatcher.RelocationHandler.Bound relocationHandler, Dispatcher.SuppressionHandler.Bound suppressionHandler,
-					                           com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
-					                           com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
-					                           com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
-					                           Assigner assigner, Implementation.Context implementationContext, MethodVisitor methodVisitor, MethodDescription instrumentedMethod, TypeDescription instrumentedType) {
+							com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
+							Assigner assigner, Implementation.Context implementationContext, MethodVisitor methodVisitor, MethodDescription instrumentedMethod, TypeDescription instrumentedType) {
 						super(OpenedClassReader.ASM_API);
 						this.classReader = classReader;
 						this.exceptionHandler = exceptionHandler;
@@ -1111,11 +1565,11 @@ public class AgentAdvice extends Advice {
 					private final boolean prependLineNumber;
 
 					public ForMethodEnter(MethodDescription.InDefinedShape adviceMethod,
-					                      Advice.PostProcessor postProcessor,
-					                      Map<String, TypeDefinition> namedTypes,
-					                      List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
-					                      TypeDefinition exitType,
-					                      ClassReader classReader) {
+							Advice.PostProcessor postProcessor,
+							Map<String, TypeDefinition> namedTypes,
+							List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
+							TypeDefinition exitType,
+							ClassReader classReader) {
 						super(adviceMethod, postProcessor,
 								CompoundList.of(Arrays.asList(
 										com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.ForArgument.Unresolved.Factory.INSTANCE,
@@ -1139,12 +1593,12 @@ public class AgentAdvice extends Advice {
 					}
 
 					protected static Resolved.ForMethodEnter of(MethodDescription.InDefinedShape adviceMethod,
-					                                            PostProcessor postProcessor,
-					                                            Map<String, TypeDefinition> namedTypes,
-					                                            List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
-					                                            TypeDefinition exitType,
-					                                            ClassReader classReader,
-					                                            boolean methodExit) {
+							PostProcessor postProcessor,
+							Map<String, TypeDefinition> namedTypes,
+							List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
+							TypeDefinition exitType,
+							ClassReader classReader,
+							boolean methodExit) {
 						return methodExit
 								? new WithRetainedEnterType(adviceMethod, postProcessor, namedTypes, userFactories, exitType, classReader)
 								: new WithDiscardedEnterType(adviceMethod, postProcessor, namedTypes, userFactories, exitType, classReader);
@@ -1160,15 +1614,15 @@ public class AgentAdvice extends Advice {
 					}
 
 					public Bound bind(TypeDescription type,
-					                  MethodDescription method,
-					                  MethodVisitor methodVisitor,
-					                  Implementation.Context implementationContext,
-					                  Assigner assigner,
-					                  com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
-					                  com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
-					                  com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
-					                  StackManipulation exceptionHandler,
-					                  RelocationHandler.Relocation relocation) {
+							MethodDescription method,
+							MethodVisitor methodVisitor,
+							Implementation.Context implementationContext,
+							Assigner assigner,
+							com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
+							StackManipulation exceptionHandler,
+							RelocationHandler.Relocation relocation) {
 						return new AdviceMethodInliner(classReader, exceptionHandler, relocationHandler.bind(method, relocation),
 								suppressionHandler.bind(exceptionHandler), argumentHandler, methodSizeHandler, stackMapFrameHandler,
 								assigner, implementationContext, methodVisitor, method, type);
@@ -1202,13 +1656,13 @@ public class AgentAdvice extends Advice {
 					}
 
 					protected MethodVisitor doApply(MethodVisitor methodVisitor, Implementation.Context implementationContext, Assigner assigner,
-					                                com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForAdvice argumentHandler,
-					                                com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
-					                                com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
-					                                TypeDescription type, MethodDescription method,
-					                                SuppressionHandler.Bound suppressionHandler,
-					                                RelocationHandler.Bound relocationHandler,
-					                                StackManipulation exceptionHandler) {
+							com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForAdvice argumentHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
+							TypeDescription type, MethodDescription method,
+							SuppressionHandler.Bound suppressionHandler,
+							RelocationHandler.Bound relocationHandler,
+							StackManipulation exceptionHandler) {
 						Map<Integer, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Target> offsetMappings = new HashMap<>(this.offsetMappings.size());
 						for (Map.Entry<Integer, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping> entry : this.offsetMappings.entrySet()) {
 							offsetMappings.put(entry.getKey(), entry.getValue().resolve(type, method, assigner, argumentHandler, Sort.ENTER));
@@ -1253,12 +1707,12 @@ public class AgentAdvice extends Advice {
 					private final boolean backupArguments;
 
 					protected ForMethodExit(MethodDescription.InDefinedShape adviceMethod,
-					                        PostProcessor postProcessor,
-					                        Map<String, TypeDefinition> namedTypes,
-					                        Map<String, TypeDefinition> uninitializedNamedTypes,
-					                        List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
-					                        ClassReader classReader,
-					                        TypeDefinition enterType) {
+							PostProcessor postProcessor,
+							Map<String, TypeDefinition> namedTypes,
+							Map<String, TypeDefinition> uninitializedNamedTypes,
+							List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
+							ClassReader classReader,
+							TypeDefinition enterType) {
 						super(adviceMethod,
 								postProcessor,
 								CompoundList.of(List.of(
@@ -1283,29 +1737,29 @@ public class AgentAdvice extends Advice {
 					}
 
 					protected static Resolved.ForMethodExit of(MethodDescription.InDefinedShape adviceMethod,
-					                                           PostProcessor postProcessor,
-					                                           Map<String, TypeDefinition> namedTypes,
-					                                           Map<String, TypeDefinition> uninitializedNamedTypes,
-					                                           List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
-					                                           ClassReader classReader,
-					                                           TypeDefinition enterType) {
+							PostProcessor postProcessor,
+							Map<String, TypeDefinition> namedTypes,
+							Map<String, TypeDefinition> uninitializedNamedTypes,
+							List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
+							ClassReader classReader,
+							TypeDefinition enterType) {
 						TypeDescription throwable = adviceMethod.getDeclaredAnnotations()
 								.ofType(OnMethodExit.class)
 								.getValue(ON_THROWABLE).resolve(TypeDescription.class);
 						return isNoExceptionHandler(throwable)
-								? new WithoutExceptionHandler(adviceMethod,postProcessor,namedTypes,uninitializedNamedTypes,userFactories,classReader , enterType)
-								: new WithExceptionHandler(adviceMethod,postProcessor,namedTypes,uninitializedNamedTypes,userFactories,classReader,enterType,throwable);
+								? new WithoutExceptionHandler(adviceMethod, postProcessor, namedTypes, uninitializedNamedTypes, userFactories, classReader, enterType)
+								: new WithExceptionHandler(adviceMethod, postProcessor, namedTypes, uninitializedNamedTypes, userFactories, classReader, enterType, throwable);
 					}
 
 					protected static Resolved.ForMethodExit ofNonThrowable(MethodDescription.InDefinedShape adviceMethod,
-					                                           PostProcessor postProcessor,
-					                                           Map<String, TypeDefinition> namedTypes,
-					                                           Map<String, TypeDefinition> uninitializedNamedTypes,
-					                                           List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
-					                                           ClassReader classReader,
-					                                           TypeDefinition enterType) {
+							PostProcessor postProcessor,
+							Map<String, TypeDefinition> namedTypes,
+							Map<String, TypeDefinition> uninitializedNamedTypes,
+							List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
+							ClassReader classReader,
+							TypeDefinition enterType) {
 						return new WithoutExceptionHandler(adviceMethod, postProcessor, namedTypes,
-								uninitializedNamedTypes,userFactories,classReader,enterType);
+								uninitializedNamedTypes, userFactories, classReader, enterType);
 					}
 
 					@Override
@@ -1341,13 +1795,13 @@ public class AgentAdvice extends Advice {
 					}
 
 					private MethodVisitor doApply(MethodVisitor methodVisitor,
-					                              Implementation.Context implementationContext,
-					                              Assigner assigner,
-					                              com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForAdvice argumentHandler,
-					                              com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
-					                              com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
-					                              TypeDescription type, MethodDescription method, SuppressionHandler.Bound suppressionHandler,
-					                              RelocationHandler.Bound relocationHandler, StackManipulation exceptionHandler) {
+							Implementation.Context implementationContext,
+							Assigner assigner,
+							com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForAdvice argumentHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
+							TypeDescription type, MethodDescription method, SuppressionHandler.Bound suppressionHandler,
+							RelocationHandler.Bound relocationHandler, StackManipulation exceptionHandler) {
 						Map<Integer, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Target> offsetMappings = new HashMap<>();
 						for (Map.Entry<Integer, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping> entry : this.offsetMappings.entrySet()) {
 							offsetMappings.put(entry.getKey(), entry.getValue().resolve(type, method, assigner, argumentHandler, Sort.EXIT));
@@ -1385,7 +1839,7 @@ public class AgentAdvice extends Advice {
 					public Bound bind(TypeDescription instrumentedType, MethodDescription instrumentedMethod, MethodVisitor methodVisitor, Context implementationContext, Assigner assigner, com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler, com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler, com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler, StackManipulation exceptionHandler, RelocationHandler.Relocation relocation) {
 						return new AdviceMethodInliner(classReader,
 								exceptionHandler,
-								relocationHandler.bind(instrumentedMethod,relocation),
+								relocationHandler.bind(instrumentedMethod, relocation),
 								suppressionHandler.bind(exceptionHandler),
 								argumentHandler,
 								methodSizeHandler,
@@ -1444,13 +1898,13 @@ public class AgentAdvice extends Advice {
 				protected final Label endOfMethod;
 
 				public CodeTranslationVisitor(MethodVisitor methodVisitor, Context implementationContext,
-				                              com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForAdvice argumentHandler,
-				                              com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
-				                              com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
-				                              TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, InDefinedShape adviceMethod,
-				                              Map<Integer, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Target> offsetMappings,
-				                              SuppressionHandler.Bound suppressionHandler, RelocationHandler.Bound relocationHandler, StackManipulation exceptionHandler,
-				                              PostProcessor postProcessor, boolean exit) {
+						com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForAdvice argumentHandler,
+						com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
+						com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
+						TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, InDefinedShape adviceMethod,
+						Map<Integer, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Target> offsetMappings,
+						SuppressionHandler.Bound suppressionHandler, RelocationHandler.Bound relocationHandler, StackManipulation exceptionHandler,
+						PostProcessor postProcessor, boolean exit) {
 					super(OpenedClassReader.ASM_API, new StackAwareMethodVisitor(methodVisitor, instrumentedMethod));
 					this.methodVisitor = methodVisitor;
 					this.implementationContext = implementationContext;
@@ -1614,10 +2068,10 @@ public class AgentAdvice extends Advice {
 
 				@Override
 				public Bound bind(TypeDescription instrumentedType, MethodDescription instrumentedMethod, MethodVisitor methodVisitor, Context implementationContext, Assigner assigner,
-				                  com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
-				                  com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
-				                  com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
-				                  StackManipulation exceptionHandler, RelocationHandler.Relocation relocation) {
+						com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
+						com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
+						com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
+						StackManipulation exceptionHandler, RelocationHandler.Relocation relocation) {
 					if (!adviceMethod.isVisibleTo(instrumentedType)) {
 						throw new IllegalStateException(adviceMethod + " is not visible to " + instrumentedMethod.getDeclaringType());
 					}
@@ -1627,15 +2081,15 @@ public class AgentAdvice extends Advice {
 				}
 
 				protected abstract Bound resolve(TypeDescription type,
-				                                 MethodDescription method,
-				                                 MethodVisitor methodVisitor,
-				                                 Implementation.Context implementationContext,
-				                                 Assigner assigner,
-				                                 com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
-				                                 com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
-				                                 com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
-				                                 StackManipulation exceptionHandler,
-				                                 RelocationHandler.Relocation relocation
+						MethodDescription method,
+						MethodVisitor methodVisitor,
+						Implementation.Context implementationContext,
+						Assigner assigner,
+						com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
+						com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
+						com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
+						StackManipulation exceptionHandler,
+						RelocationHandler.Relocation relocation
 				);
 
 				@AllArgsConstructor
@@ -1781,10 +2235,10 @@ public class AgentAdvice extends Advice {
 					private final boolean prependLineNumber;
 
 					protected ForMethodEnter(MethodDescription.InDefinedShape adviceMethod,
-					                         PostProcessor postProcessor,
-					                         List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
-					                         TypeDefinition exitType,
-					                         Delegator delegator) {
+							PostProcessor postProcessor,
+							List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
+							TypeDefinition exitType,
+							Delegator delegator) {
 						super(adviceMethod,
 								postProcessor,
 								CompoundList.of(List.of(
@@ -1807,11 +2261,11 @@ public class AgentAdvice extends Advice {
 					}
 
 					protected static Dispatcher.Resolved.ForMethodEnter of(MethodDescription.InDefinedShape adviceMethod,
-					                                                       PostProcessor postProcessor,
-					                                                       Delegator delegator,
-					                                                       List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
-					                                                       TypeDefinition exitType,
-					                                                       boolean methodExit) {
+							PostProcessor postProcessor,
+							Delegator delegator,
+							List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
+							TypeDefinition exitType,
+							boolean methodExit) {
 						return methodExit
 								? new WithRetainedEnterType(adviceMethod, postProcessor, userFactories, exitType, delegator)
 								: new WithDiscardedEnterType(adviceMethod, postProcessor, userFactories, exitType, delegator);
@@ -1827,11 +2281,11 @@ public class AgentAdvice extends Advice {
 
 					@Override
 					protected Bound resolve(TypeDescription type, MethodDescription method, MethodVisitor methodVisitor, Context implementationContext,
-					                        Assigner assigner,
-					                        com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
-					                        com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
-					                        com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
-					                        StackManipulation exceptionHandler, RelocationHandler.Relocation relocation) {
+							Assigner assigner,
+							com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForInstrumentedMethod argumentHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForInstrumentedMethod methodSizeHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForInstrumentedMethod stackMapFrameHandler,
+							StackManipulation exceptionHandler, RelocationHandler.Relocation relocation) {
 						return doResolve(type, method, methodVisitor, implementationContext, assigner,
 								argumentHandler.bindEnter(adviceMethod),
 								methodSizeHandler.bindEnter(adviceMethod),
@@ -1842,13 +2296,13 @@ public class AgentAdvice extends Advice {
 					}
 
 					protected Bound doResolve(TypeDescription type, MethodDescription method, MethodVisitor methodVisitor, Context implementationContext,
-					                          Assigner assigner,
-					                          com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForAdvice argumentHandler,
-					                          com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
-					                          com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
-					                          SuppressionHandler.Bound suppressionHandler,
-					                          RelocationHandler.Bound relocationHandler,
-					                          StackManipulation exceptionHandler) {
+							Assigner assigner,
+							com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForAdvice argumentHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
+							SuppressionHandler.Bound suppressionHandler,
+							RelocationHandler.Bound relocationHandler,
+							StackManipulation exceptionHandler) {
 						List<com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Target> offsetMappings = new ArrayList<>(this.offsetMappings.size());
 						for (com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping offsetMapping : this.offsetMappings.values()) {
 							offsetMappings.add(offsetMapping.resolve(type, method, assigner, argumentHandler, Sort.ENTER));
@@ -1907,11 +2361,11 @@ public class AgentAdvice extends Advice {
 					private final boolean backupArguments;
 
 					protected ForMethodExit(MethodDescription.InDefinedShape adviceMethod,
-					                        PostProcessor postProcessor,
-					                        Map<String, TypeDefinition> namedTypes,
-					                        List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
-					                        TypeDefinition enterType,
-					                        Delegator delegator) {
+							PostProcessor postProcessor,
+							Map<String, TypeDefinition> namedTypes,
+							List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
+							TypeDefinition enterType,
+							Delegator delegator) {
 						super(adviceMethod, postProcessor,
 								CompoundList.of(List.of(
 										com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.ForArgument.Unresolved.Factory.INSTANCE,
@@ -1932,11 +2386,11 @@ public class AgentAdvice extends Advice {
 					}
 
 					protected static Resolved.ForMethodExit of(MethodDescription.InDefinedShape adviceMethod,
-					                                           PostProcessor postProcessor,
-					                                           Delegator delegator,
-					                                           Map<String, TypeDefinition> namedTypes,
-					                                           List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
-					                                           TypeDefinition enterType) {
+							PostProcessor postProcessor,
+							Delegator delegator,
+							Map<String, TypeDefinition> namedTypes,
+							List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> userFactories,
+							TypeDefinition enterType) {
 						TypeDescription throwable = adviceMethod.getDeclaredAnnotations()
 								.ofType(OnMethodExit.class)
 								.getValue(ON_THROWABLE)
@@ -1959,13 +2413,13 @@ public class AgentAdvice extends Advice {
 					}
 
 					private Bound doResolve(TypeDescription type, MethodDescription method, MethodVisitor methodVisitor, Context implementationContext,
-					                        Assigner assigner,
-					                        com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForAdvice argumentHandler,
-					                        com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
-					                        com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
-					                        SuppressionHandler.Bound suppressionHandler,
-					                        RelocationHandler.Bound relocationHandler,
-					                        StackManipulation exceptionHandler) {
+							Assigner assigner,
+							com.mawen.agent.core.plugin.transformer.advice.support.ArgumentHandler.ForAdvice argumentHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.MethodSizeHandler.ForAdvice methodSizeHandler,
+							com.mawen.agent.core.plugin.transformer.advice.support.StackMapFrameHandler.ForAdvice stackMapFrameHandler,
+							SuppressionHandler.Bound suppressionHandler,
+							RelocationHandler.Bound relocationHandler,
+							StackManipulation exceptionHandler) {
 						List<com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Target> offsetMappings = new ArrayList<>(this.offsetMappings.size());
 						for (com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping offsetMapping : this.offsetMappings.values()) {
 							offsetMappings.add(offsetMapping.resolve(type, method, assigner, argumentHandler, Sort.EXIT));

@@ -103,7 +103,7 @@ public interface MethodSizeHandler {
 			this.postMethodTypes = postMethodTypes;
 		}
 
-		protected static ForInstrumentedMethod of(MethodDescription instrumentedMethod,
+		public static ForInstrumentedMethod of(MethodDescription instrumentedMethod,
 				List<? extends TypeDescription> initialTypes,
 				List<? extends TypeDescription> preMethodTypes,
 				List<? extends TypeDescription> postMethodTypes,
