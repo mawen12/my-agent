@@ -1,7 +1,7 @@
 package com.mawen.agent.core.utils;
 
 import com.google.auto.service.AutoService;
-import com.mawen.agent.core.AppendBootstrapClassLoaderSearch;
+import com.mawen.agent.plugin.AppendBootstrapLoader;
 import com.mawen.agent.plugin.api.Context;
 import com.mawen.agent.plugin.utils.SystemClock;
 
@@ -9,8 +9,8 @@ import com.mawen.agent.plugin.utils.SystemClock;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/5
  */
-@AutoService(AppendBootstrapClassLoaderSearch.class)
-public class ContextUtils {
+@AutoService(AppendBootstrapLoader.class)
+public class ContextUtils implements AppendBootstrapLoader {
 
 	private static final String BEGIN_TIME = com.mawen.agent.plugin.api.context.ContextUtils.class.getSimpleName() + ".beginTime";
 	private static final String END_TIME = com.mawen.agent.plugin.api.context.ContextUtils.class.getSimpleName() + ".endTime";
@@ -48,8 +48,8 @@ public class ContextUtils {
 	 * Get data from context
 	 *
 	 * @param context Store data
-	 * @param key key is the type of data. Like {@code value.getClass()}
-	 * @param <T> The type of data
+	 * @param key     key is the type of data. Like {@code value.getClass()}
+	 * @param <T>     The type of data
 	 * @return data
 	 */
 	public static <T> T getFormContext(Context context, Object key) {
@@ -60,13 +60,14 @@ public class ContextUtils {
 	 * Remove data from context
 	 *
 	 * @param context data store
-	 * @param key key is the type of data.
-	 * @param <T> The type of data
+	 * @param key     key is the type of data.
+	 * @param <T>     The type of data
 	 * @return data
 	 */
 	public static <T> T removeFromContext(Context context, Object key) {
 		return context.remove(key);
 	}
 
-	private ContextUtils(){}
+	private ContextUtils() {
+	}
 }

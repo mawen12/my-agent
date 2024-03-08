@@ -5,9 +5,6 @@ import java.net.URLClassLoader;
 import com.mawen.agent.config.WrappedConfigManager;
 import com.mawen.agent.httpserver.nano.AgentHttpServer;
 import com.mawen.agent.plugin.report.AgentReport;
-import com.mawen.agent.report.async.log.ApplicationLogReporter;
-import lombok.Getter;
-import lombok.Setter;
 
 
 public class GlobalAgentHolder {

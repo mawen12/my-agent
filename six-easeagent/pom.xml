@@ -23,6 +23,7 @@
         <module>plugins</module>
         <module>context</module>
         <module>metrics</module>
+        <module>build</module>
     </modules>
 
     <dependencies>

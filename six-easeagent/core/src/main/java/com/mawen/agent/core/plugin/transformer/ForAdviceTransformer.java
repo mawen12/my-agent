@@ -1,7 +1,5 @@
 package com.mawen.agent.core.plugin.transformer;
 
-import java.lang.annotation.Annotation;
-
 import com.mawen.agent.core.plugin.CommonInlineAdvice;
 import com.mawen.agent.core.plugin.annotation.Index;
 import com.mawen.agent.core.plugin.matcher.MethodTransformation;
@@ -10,6 +8,7 @@ import com.mawen.agent.core.plugin.transformer.advice.AgentAdvice;
 import com.mawen.agent.core.plugin.transformer.advice.AgentForAdvice;
 import com.mawen.agent.core.plugin.transformer.advice.AgentJavaConstantValue;
 import com.mawen.agent.core.plugin.transformer.advice.MethodIdentityJavaConstant;
+import com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping;
 import com.mawen.agent.core.plugin.transformer.classloader.CompoundClassLoader;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.description.type.TypeDescription;
@@ -33,11 +32,11 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
 		StackManipulation stackManipulation = new AgentJavaConstantValue(value, methodTransformation.getIndex());
 		TypeDescription typeDescription = value.getTypeDescription();
 
-		AgentAdvice.OffsetMapping.Factory<Index> factory = new AgentAdvice.OffsetMapping.ForStackManipulation.Factory<>(Index.class,
+		OffsetMapping.Factory<Index> factory = new OffsetMapping.ForStackManipulation.Factory<>(Index.class,
 				stackManipulation, typeDescription.asGenericType());
 
-		this.transformer = new AgentForAdvice(AgentAdvice.withCustomMapping()
-				.bind(factory))
+		AgentForAdvice agentForAdvice = new AgentForAdvice(AgentAdvice.withCustomMapping().bind(factory));
+		this.transformer = agentForAdvice
 				.include(getClass().getClassLoader())
 				.advice(methodTransformation.getMatcher(),
 						CommonInlineAdvice.class.getCanonicalName());

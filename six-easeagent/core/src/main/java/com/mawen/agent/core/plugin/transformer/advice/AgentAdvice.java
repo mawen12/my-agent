@@ -276,7 +276,7 @@ public class AgentAdvice extends Advice {
 		}
 
 		@Override
-		public Advice to(TypeDescription advice, ClassFileLocator classFileLocator) {
+		public AgentAdvice to(TypeDescription advice, ClassFileLocator classFileLocator) {
 			return AgentAdvice.tto(advice, postProcessorFactory, classFileLocator, new ArrayList<>(offsetMappings.values()), delegator);
 		}
 	}
@@ -1147,7 +1147,7 @@ public class AgentAdvice extends Advice {
 				protected final Map<Integer, com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping> offsetMappings;
 				protected final SuppressionHandler suppressionHandler;
 				protected final RelocationHandler relocationHandler;
-
+				@SuppressWarnings("unchecked")
 				protected AbstractBase(MethodDescription.InDefinedShape adviceMethod,
 						Advice.PostProcessor postProcessor,
 						List<? extends com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory<?>> factories,

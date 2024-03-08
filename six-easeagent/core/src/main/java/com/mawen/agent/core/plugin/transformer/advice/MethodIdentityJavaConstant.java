@@ -23,6 +23,7 @@ public class MethodIdentityJavaConstant implements JavaConstant {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> T accept(Visitor<T> visitor) {
 		return (T) this.identify;
 	}

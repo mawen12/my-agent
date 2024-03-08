@@ -6,16 +6,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.mawen.agent.core.plugin.Dispatcher;
 import com.mawen.agent.core.plugin.matcher.MethodTransformation;
 import com.mawen.agent.core.plugin.transformer.advice.AgentAdvice;
 import com.mawen.agent.core.plugin.transformer.advice.AgentJavaConstantValue;
 import com.mawen.agent.core.plugin.transformer.advice.MethodIdentityJavaConstant;
+import com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.interceptor.AgentInterceptorChain;
 import com.mawen.agent.plugin.utils.common.WeakConcurrentMap;
 import lombok.Getter;
-import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
@@ -72,16 +73,34 @@ public class AdviceRegistry {
 		int uniqueId = pointcutsUniqueId.getUniqueId();
 		AgentInterceptorChain chain = methodTransformation.getAgentInterceptorChain(uniqueId, clazz, method, methodDescriptor);
 
-		pointcutsUniqueId.lock();
-		Dispatcher
+		try {
+			pointcutsUniqueId.lock();
+			AgentInterceptorChain previousChain = Dispatcher.getChain(uniqueId);
+			if (previousChain == null) {
+				Dispatcher.register(uniqueId, chain);
+			}
+			else {
+				chain.merge(previousChain);
+				Dispatcher.updateChain(uniqueId, chain);
+			}
+		}
+		finally {
+			pointcutsUniqueId.unlock();
+		}
+
+		if (merge) {
+			return 0;
+		}
+
+		return uniqueId;
 	}
 
 	static Integer getPointcutIndex(AgentAdvice.Dispatcher.Resolved resolved) {
 		int index = 0;
-		Map<Integer, AgentAdvice.OffsetMapping> map = resolved.getOffsetMapping();
-		for (Map.Entry<Integer, AgentAdvice.OffsetMapping> entry : map.entrySet()) {
-			AgentAdvice.OffsetMapping om = entry.getValue();
-			if (!(om instanceof AgentAdvice.OffsetMapping.ForStackManipulation f)) {
+		Map<Integer, OffsetMapping> map = resolved.getOffsetMapping();
+		for (Map.Entry<Integer, OffsetMapping> entry : map.entrySet()) {
+			OffsetMapping om = entry.getValue();
+			if (!(om instanceof OffsetMapping.ForStackManipulation f)) {
 				continue;
 			}
 
@@ -97,11 +116,11 @@ public class AdviceRegistry {
 
 	static Integer updateStackManipulation(AgentAdvice.Dispatcher.Resolved resolved, Integer value) {
 		int index = 0;
-		Map<Integer, AgentAdvice.OffsetMapping> map = resolved.getOffsetMapping();
+		Map<Integer, OffsetMapping> map = resolved.getOffsetMapping();
 
-		for (Map.Entry<Integer, AgentAdvice.OffsetMapping> entry : map.entrySet()) {
-			AgentAdvice.OffsetMapping om = entry.getValue();
-			if (!(om instanceof AgentAdvice.OffsetMapping.ForStackManipulation f)) {
+		for (Map.Entry<Integer, OffsetMapping> entry : map.entrySet()) {
+			OffsetMapping om = entry.getValue();
+			if (!(om instanceof OffsetMapping.ForStackManipulation f)) {
 				continue;
 			}
 

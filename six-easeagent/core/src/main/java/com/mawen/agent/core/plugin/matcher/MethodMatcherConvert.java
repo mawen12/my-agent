@@ -1,7 +1,5 @@
 package com.mawen.agent.core.plugin.matcher;
 
-import java.lang.invoke.TypeDescriptor;
-
 import com.mawen.agent.plugin.asm.Modifier;
 import com.mawen.agent.plugin.matcher.ClassMatcher;
 import com.mawen.agent.plugin.matcher.IMethodMatcher;

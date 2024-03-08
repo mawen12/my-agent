@@ -9,14 +9,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import com.google.auto.service.AutoService;
-import com.mawen.agent.core.AppendBootstrapClassLoaderSearch;
+import com.mawen.agent.plugin.AppendBootstrapLoader;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/5
  */
-@AutoService(AppendBootstrapClassLoaderSearch.class)
-public class AgentArray<E> {
+@AutoService(AppendBootstrapLoader.class)
+@SuppressWarnings("unchecked")
+public class AgentArray<E> implements AppendBootstrapLoader {
 
 	private static final int DEFAULT_INIT_SIZE = 256;
 	private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;

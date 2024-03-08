@@ -1,0 +1,2 @@
+com.mawen.agent.metrics.MetricBeanProviderImpl
+com.mawen.agent.metrics.jvm.JvmBeanProvider

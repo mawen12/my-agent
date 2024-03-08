@@ -12,6 +12,9 @@ import com.mawen.agent.config.Configs;
 import com.mawen.agent.core.plugin.matcher.ClassTransformation;
 import com.mawen.agent.core.plugin.matcher.MethodTransformation;
 import com.mawen.agent.core.plugin.registry.PluginRegistry;
+import com.mawen.agent.core.plugin.transformer.CompoundPluginTransformer;
+import com.mawen.agent.core.plugin.transformer.DynamicFieldTransformer;
+import com.mawen.agent.core.plugin.transformer.ForAdviceTransformer;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.AgentPlugin;
@@ -39,8 +42,9 @@ public class PluginLoader {
 
 		for (ClassTransformation transformation : sortedTransformations) {
 			ab = ab.type(transformation.getClassMatcher(), transformation.getClassLoaderMatcher())
-					.transform(compound())
+					.transform(compound(transformation.isHasDynamicField(), transformation.getMethodTransformations()));
 		}
+		return ab;
 	}
 
 	public static void providerLoad() {

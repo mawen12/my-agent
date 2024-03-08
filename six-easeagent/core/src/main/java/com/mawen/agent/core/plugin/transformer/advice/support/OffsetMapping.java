@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.mawen.agent.core.plugin.transformer.advice.AgentAdvice;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.bytebuddy.asm.Advice;
@@ -86,7 +84,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.public)
+		@AllArgsConstructor
 		@HashCodeAndEqualsPlugin.Enhance
 		abstract class ForDefaultValue implements Target {
 			public final TypeDefinition typeDefinition;
@@ -138,7 +136,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.public)
+		@AllArgsConstructor
 		@HashCodeAndEqualsPlugin.Enhance
 		abstract class ForVariable implements Target {
 			public final TypeDefinition typeDefinition;
@@ -197,7 +195,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.public)
+		@AllArgsConstructor
 		@HashCodeAndEqualsPlugin.Enhance
 		abstract class ForArray implements Target {
 			public final TypeDescription.Generic target;
@@ -241,7 +239,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.public)
+		@AllArgsConstructor
 		@HashCodeAndEqualsPlugin.Enhance
 		abstract class ForField implements Target {
 			public final FieldDescription fieldDescription;
@@ -1388,7 +1386,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.public)
+		@AllArgsConstructor
 		@HashCodeAndEqualsPlugin.Enhance
 		public static class Factory implements OffsetMapping.Factory<Advice.Exit> {
 			private static final MethodDescription.InDefinedShape EXIT_READ_ONLY;
@@ -1444,7 +1442,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.public)
+		@AllArgsConstructor
 		@HashCodeAndEqualsPlugin.Enhance
 		public static class Factory implements OffsetMapping.Factory<Advice.Local> {
 			public static final MethodDescription.InDefinedShape LOCAL_VALUE = TypeDescription.ForLoadedType.of(Advice.Local.class)
@@ -1745,7 +1743,7 @@ public interface OffsetMapping {
 			}
 		}
 
-		@AllArgsConstructor(access = AccessLevel.public)
+		@AllArgsConstructor
 		@HashCodeAndEqualsPlugin.Enhance
 		public static class OfAnnotationProperty<T extends Annotation> implements OffsetMapping.Factory<T> {
 			private final Class<T> annotationType;
@@ -1841,7 +1839,7 @@ public interface OffsetMapping {
 			return new Target.ForStackManipulation(new StackManipulation.Compound(deserialization, assignment));
 		}
 
-		@AllArgsConstructor(access = AccessLevel.public)
+		@AllArgsConstructor
 		@HashCodeAndEqualsPlugin.Enhance
 		public static class Factory<T extends Annotation> implements OffsetMapping.Factory<T> {
 			private final Class<T> annotationType;

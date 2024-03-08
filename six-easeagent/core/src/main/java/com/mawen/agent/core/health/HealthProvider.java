@@ -3,9 +3,7 @@ package com.mawen.agent.core.health;
 import java.util.List;
 import java.util.Map;
 
-import com.google.auto.service.AutoService;
 import com.mawen.agent.config.ConfigAware;
-import com.mawen.agent.core.AppendBootstrapClassLoaderSearch;
 import com.mawen.agent.httpserver.nano.AgentHttpHandler;
 import com.mawen.agent.httpserver.nano.AgentHttpHandlerProvider;
 import com.mawen.agent.httpserver.nano.AgentHttpServer;

@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AutoService(AppendBootstrapLoader.class)
-public final class Dispatcher {
+public final class Dispatcher implements AppendBootstrapLoader {
 
 	static AgentArray<AgentInterceptorChain> chains = new AgentArray<>();
 
@@ -35,6 +35,10 @@ public final class Dispatcher {
 	}
 
 	public static AgentInterceptorChain exit(int index, AgentInterceptorChain chain) {
+		return chains.putIfAbsent(index, chain);
+	}
+
+	public static AgentInterceptorChain register(int index, AgentInterceptorChain chain) {
 		return chains.putIfAbsent(index, chain);
 	}
 
