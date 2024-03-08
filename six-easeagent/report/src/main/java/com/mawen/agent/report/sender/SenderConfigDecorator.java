@@ -40,6 +40,7 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 		this.encoderKey = getEncoderKey(prefix);
 		config.addChangeListener(this);
 		this.senderConfig = new Configs(extractSenderConfig(this.prefix, config));
+		this.packerConfig = new Configs(extractSenderConfig(encoderKey, config));
 	}
 
 	@Override

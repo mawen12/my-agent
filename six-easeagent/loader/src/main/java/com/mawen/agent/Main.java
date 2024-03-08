@@ -46,7 +46,7 @@ public class Main {
 	private static final String DEFAULT_T_AGENT_LOG_CONF = "agent-log4j2.xml";
 	private static ClassLoader loader;
 
-	public static void permain(final String args, final Instrumentation inst) throws Exception {
+	public static void premain(final String args, final Instrumentation inst) throws Exception {
 		File jar = getArchiveFileContains();
 		final JarFileArchive archive = new JarFileArchive(jar);
 
@@ -160,7 +160,7 @@ public class Main {
 	private static void initAgentSlf4j2Dir(JarFileArchive archive, final ClassLoader bootstrapLoader) throws Exception {
 		final URL[] slf4j2Urls = nestArchiveUrls(archive, SLf4j2).toArray(new URL[0]);
 		final ClassLoader slf4j2Loader = new URLClassLoader(slf4j2Urls, null);
-		Class<?> classLoaderSupplier = bootstrapLoader.loadClass("com.mawen.agent.log4j2.FinalClassloaderSupplier");
+		Class<?> classLoaderSupplier = bootstrapLoader.loadClass("com.mawen.agent.log4j2.FinalClassLoaderSupplier");
 		Field field = classLoaderSupplier.getDeclaredField("CLASSLOADER");
 		field.set(null, slf4j2Loader);
 	}

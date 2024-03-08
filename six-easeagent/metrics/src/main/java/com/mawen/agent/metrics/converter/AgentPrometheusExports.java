@@ -48,12 +48,18 @@ public class AgentPrometheusExports extends Collector implements Collector.Descr
 
 	@Override
 	public List<MetricFamilySamples> collect() {
-		return null;
+		Map<String, MetricFamilySamples> mfSampleMap = new HashMap<>();
+		gaugeExports.addToMap(mfSampleMap);
+		counterExports.addToMap(mfSampleMap);
+		meterExports.addToMap(mfSampleMap);
+		timerExports.addToMap(mfSampleMap);
+		histogramExports.addToMap(mfSampleMap);
+		return new ArrayList<>(mfSampleMap.values());
 	}
 
 	@Override
 	public List<MetricFamilySamples> describe() {
-		return null;
+		return new ArrayList<>();
 	}
 
 	protected void addToMap(Map<String, MetricFamilySamples> mfSamplesMap, MetricFamilySamples newMfSamples) {

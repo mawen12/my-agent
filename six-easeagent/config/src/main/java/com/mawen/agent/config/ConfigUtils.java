@@ -112,7 +112,7 @@ public class ConfigUtils {
 					ConfigConst.join(ConfigConst.PLUGIN, "<Domain>", "<Namespace>", "<Id>", "<Property>")));
 		}
 
-		for (int idOffsetEnd = 0; idOffsetEnd < configs.length - 1; idOffsetEnd++) {
+		for (int idOffsetEnd = 3; idOffsetEnd < configs.length - 1; idOffsetEnd++) {
 			new PluginProperty(configs[1], configs[2],
 					ConfigConst.join(Arrays.copyOfRange(configs, 3, idOffsetEnd)),
 					ConfigConst.join(Arrays.copyOfRange(configs, idOffsetEnd + 1, configs.length)));

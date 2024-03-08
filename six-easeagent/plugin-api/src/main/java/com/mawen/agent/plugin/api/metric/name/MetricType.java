@@ -6,6 +6,7 @@ import com.mawen.agent.plugin.api.metric.Counter;
 import com.mawen.agent.plugin.api.metric.Gauge;
 import com.mawen.agent.plugin.api.metric.Histogram;
 import com.mawen.agent.plugin.api.metric.Meter;
+import com.mawen.agent.plugin.api.metric.Timer;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -13,7 +14,7 @@ import com.mawen.agent.plugin.api.metric.Meter;
  */
 public enum MetricType {
 
-	TimerType(Time.class),
+	TimerType(Timer.class),
 	HistogramType(Histogram.class),
 	MeterType(Meter.class),
 	CounterType(Counter.class),

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
 
+import com.mawen.agent.plugin.report.Encoder;
 import com.mawen.agent.plugin.report.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +23,29 @@ public class ReporterLoader {
 	private ReporterLoader(){}
 
 	public static void load() {
-
+		encoderLoad();
+		senderLoad();
 	}
 
 	public static void encoderLoad() {
-
+		for (Encoder<?> encoder : load(Encoder.class)) {
+			try {
+				Constructor<? extends Encoder> constructor = encoder.getClass().getConstructor();
+				Supplier<Encoder<?>> encoderSupplier = () -> {
+					try {
+						return constructor.newInstance();
+					}
+					catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+						logger.warn("unable to load sender: {}", encoder.name());
+						return null;
+					}
+				};
+				ReporterRegistry.registryEncoder(encoder.name(),encoderSupplier);
+			}
+			catch (NoSuchMethodException e) {
+				logger.warn("Sender load fail:{}", e.getMessage());
+			}
+		}
 	}
 
 	public static void senderLoad() {
@@ -42,12 +61,11 @@ public class ReporterLoader {
 						return null;
 					}
 				};
-
+				ReporterRegistry.registrySender(sender.name(),senderSupplier);
 			}
 			catch (NoSuchMethodException e) {
-				throw new RuntimeException(e);
+				logger.warn("Sender load fail: {}", e.getMessage());
 			}
-
 		}
 	}
 

@@ -56,7 +56,7 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigC
 			return reporter;
 		}
 
-		synchronized (reporter) {
+		synchronized (reporters) {
 			reporter = reporters.get(pluginConfig.namespace());
 			if (reporter != null) {
 				return reporter;

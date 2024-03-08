@@ -45,7 +45,7 @@
                     <configuration>
                         <archive>
                             <manifest>
-                                <addDefaultImplementatedEntries>true</addDefaultImplementatedEntries>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>
                         </archive>

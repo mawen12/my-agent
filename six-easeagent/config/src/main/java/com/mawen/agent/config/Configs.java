@@ -76,7 +76,7 @@ public class Configs implements Config {
 	public Boolean getBoolean(String name) {
 		String value = this.source.get(name);
 		if (value == null) {
-			return null;
+			return false;
 		}
 		return value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("true");
 	}

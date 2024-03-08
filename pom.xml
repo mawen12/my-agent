@@ -21,6 +21,7 @@
         <module>six-easeagent/loader</module>
         <module>six-easeagent/log4j2</module>
         <module>six-easeagent/log4j2/log4j2-api</module>
+        <module>demo</module>
     </modules>
 
     <dependencyManagement>

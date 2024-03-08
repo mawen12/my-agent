@@ -58,7 +58,7 @@ public class ConfigFactory {
 		Map<String, String> envCfg = new TreeMap<>();
 
 		String configEnv = SystemEnv.get(AGENT_ENV_CONFIG);
-		if (StringUtils.isEmpty(configEnv)) {
+		if (StringUtils.isNotEmpty(configEnv)) {
 			Map<String, Object> map = JsonUtil.toMap(configEnv);
 			Map<String, String> strMap = new HashMap<>();
 			if (!map.isEmpty()) {
@@ -72,7 +72,7 @@ public class ConfigFactory {
 		// override by environment variables, eg: export AGENT_NAME=xxx
 		for (Map.Entry<String, String> entry : AGENT_ENV_KEY_TO_PROPS.entrySet()) {
 			String value = SystemEnv.get(entry.getKey());
-			if (!StringUtils.isEmpty(value)) {
+			if (StringUtils.isNotEmpty(value)) {
 				envCfg.put(entry.getValue(), value);
 			}
 		}
@@ -80,7 +80,7 @@ public class ConfigFactory {
 		// override by java properties; eg: java -Dagent-name=xxx
 		for (Map.Entry<String, String> entry : AGENT_CONFIG_KEYS_TO_PROPS.entrySet()) {
 			String value = System.getProperty(entry.getKey());
-			if (!StringUtils.isEmpty(value)) {
+			if (StringUtils.isNotEmpty(value)) {
 				envCfg.put(entry.getValue(), value);
 			}
 		}

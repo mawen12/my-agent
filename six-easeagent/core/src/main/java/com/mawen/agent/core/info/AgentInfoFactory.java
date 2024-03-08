@@ -15,15 +15,18 @@ import com.mawen.agent.plugin.bridge.AgentInfo;
  */
 public class AgentInfoFactory {
 	private static final Logger logger = LoggerFactory.getLogger(AgentInfoFactory.class);
-
 	private static final String AGENT_TYPE = "Agent";
 	private static final String VERSION_FILE = "version.txt";
-	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AgentInfoFactory.class);
 
 	public static AgentInfo loadAgentInfo(ClassLoader loader) {
 		return new AgentInfo(AGENT_TYPE, loadVersion(loader, VERSION_FILE));
 	}
 
+	/**
+	 * load from core src/main/resource version.txt
+	 *
+	 * @return return version in file
+	 */
 	private static String loadVersion(ClassLoader loader, String file) {
 		try (InputStream in = loader.getResourceAsStream(file)) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));

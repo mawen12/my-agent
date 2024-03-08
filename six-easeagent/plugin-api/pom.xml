@@ -70,23 +70,23 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>${maven-shade.version}</version>
-<!--                <configuration>-->
-<!--                    <minimizeJar>true</minimizeJar>-->
-<!--                    <relocations>-->
-<!--                        <relocation>-->
-<!--                            <pattern>com.fasterxml</pattern>-->
-<!--                            <shadePattern>com.mawen.agent.plugin.utils</shadePattern>-->
-<!--                        </relocation>-->
-<!--                    </relocations>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>shade</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
+                <configuration>
+                    <minimizeJar>true</minimizeJar>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.fasterxml</pattern>
+                            <shadedPattern>com.mawen.agent.plugin.utils</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

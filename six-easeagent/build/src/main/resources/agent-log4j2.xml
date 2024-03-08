@@ -7,14 +7,15 @@
             <PatternLayout>
                 <Pattern>%d [%10.10t] %5p %10.10c{1} - %msg%n</Pattern>
             </PatternLayout>
+            <TimeBasedTriggeringPolicy />
         </RollingFile>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d [%10.10t] %5p %10.10c{1} - [%X{traceId}/%X{spanId} %msg%n]"/>
+            <PatternLayout pattern="%d [%10.10t] %5p %10.10c{1} - [%X{traceId}/%X{spanId}] %msg%n"/>
         </Console>
     </Appenders>
     <Loggers>
         <Root level="info">
-            <AppenderRef ref="console"/>
+            <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
 </Configuration>

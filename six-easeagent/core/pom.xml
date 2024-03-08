@@ -114,12 +114,6 @@
         </dependency>
 
         <dependency>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy-agent</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.mawen</groupId>
             <artifactId>log4j2-mock</artifactId>
             <version>${project.version}</version>
