@@ -5,7 +5,6 @@ package com.mawen.agent.plugin.api.trace;
  * @since 2024/2/22
  */
 public interface Getter {
-
 	/**
 	 * @param name header name
 	 * @return header value

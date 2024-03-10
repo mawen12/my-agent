@@ -29,10 +29,7 @@ public class ContextUtils implements AppendBootstrapLoader {
 
 	public static Long getEndTime(Context context) {
 		Long endTime = context.remove(END_TIME);
-		if (endTime == null) {
-			return SystemClock.now();
-		}
-		return endTime;
+		return endTime != null ? endTime : SystemClock.now();
 	}
 
 	public static Long getDuration(Context context) {

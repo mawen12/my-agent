@@ -9,5 +9,6 @@ import com.mawen.agent.plugin.api.InitializeContext;
  * @since 2024/2/24
  */
 public interface TracingSupplier {
+
 	ITracing get(Supplier<InitializeContext> contextSupplier);
 }

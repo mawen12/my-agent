@@ -18,6 +18,7 @@ import java.util.stream.IntStream;
 import com.mawen.agent.core.plugin.registry.AdviceRegistry;
 import com.mawen.agent.core.plugin.transformer.advice.support.NoExceptionHandler;
 import com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping.Factory.Illegal;
+import com.mawen.agent.core.utils.AdviceUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import net.bytebuddy.asm.Advice;
@@ -59,7 +60,6 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 public class AgentAdvice extends Advice {
 
 	private static final ClassReader UNDEFINED = null;
-
 	private static final InDefinedShape SKIP_ON;
 	private static final InDefinedShape PREPEND_LINE_NUMBER;
 	private static final InDefinedShape INLINE_ENTER;
@@ -436,34 +436,15 @@ public class AgentAdvice extends Advice {
 		@Override
 		public void apply(MethodVisitor methodVisitor) {
 			TypeDescription.Generic returnType = instrumentedMethod.getReturnType();
-			if (returnType.represents(boolean.class)
-					|| returnType.represents(byte.class)
-					|| returnType.represents(short.class)
-					|| returnType.represents(char.class)
-					|| returnType.represents(int.class)) {
-				methodVisitor.visitInsn(Opcodes.ICONST_0);
-				methodVisitor.visitInsn(Opcodes.IRETURN);
-			}
-			else if (returnType.represents(long.class)) {
-				methodVisitor.visitInsn(Opcodes.LCONST_0);
-				methodVisitor.visitInsn(Opcodes.LRETURN);
-			}
-			else if (returnType.represents(float.class)) {
-				methodVisitor.visitInsn(Opcodes.FCONST_0);
-				methodVisitor.visitInsn(Opcodes.FRETURN);
-			}
-			else if (returnType.represents(double.class)) {
-				methodVisitor.visitInsn(Opcodes.DCONST_0);
-				methodVisitor.visitInsn(Opcodes.DRETURN);
-			}
-			else if (returnType.represents(void.class)) {
-				methodVisitor.visitInsn(Opcodes.RETURN);
-			}
-			else {
-				methodVisitor.visitInsn(Opcodes.ACONST_NULL);
-				methodVisitor.visitInsn(Opcodes.ARETURN);
-			}
+			int pushConstant = AdviceUtils.getPushConstant(returnType);
+			int returnConstant = AdviceUtils.getReturnConstant(returnType);
 
+			if (pushConstant == returnConstant) {
+				methodVisitor.visitInsn(pushConstant);
+			} else {
+				methodVisitor.visitInsn(pushConstant);
+				methodVisitor.visitInsn(returnConstant);
+			}
 		}
 
 		@Override
@@ -493,25 +474,11 @@ public class AgentAdvice extends Advice {
 		@Override
 		public void apply(MethodVisitor methodVisitor) {
 			TypeDescription.Generic returnType = instrumentedMethod.getReturnType();
-			if (returnType.represents(boolean.class)
-					|| returnType.represents(byte.class)
-					|| returnType.represents(short.class)
-					|| returnType.represents(char.class)
-					|| returnType.represents(int.class)) {
-				methodVisitor.visitInsn(Opcodes.ICONST_0);
+			int pushConstant = AdviceUtils.getPushConstant(returnType);
+			if (pushConstant != Opcodes.RETURN) {
+				methodVisitor.visitInsn(pushConstant);
 			}
-			else if (returnType.represents(long.class)) {
-				methodVisitor.visitInsn(Opcodes.LCONST_0);
-			}
-			else if (returnType.represents(float.class)) {
-				methodVisitor.visitInsn(Opcodes.FCONST_0);
-			}
-			else if (returnType.represents(double.class)) {
-				methodVisitor.visitInsn(Opcodes.DCONST_0);
-			}
-			else if (!returnType.represents(void.class)) {
-				methodVisitor.visitInsn(Opcodes.ACONST_NULL);
-			}
+
 			methodVisitor.visitJumpInsn(Opcodes.GOTO, returnHandler);
 		}
 
@@ -522,6 +489,7 @@ public class AgentAdvice extends Advice {
 			stackMapFrameHandler.injectCompletionFrame(mv);
 			methodExit.apply();
 			onExitAdviceReturn();
+
 			TypeDescription.Generic returnType = instrumentedMethod.getReturnType();
 			if (returnType.represents(boolean.class)
 					|| returnType.represents(byte.class)
@@ -1413,24 +1381,25 @@ public class AgentAdvice extends Advice {
 
 					@Override
 					public void initialize() {
-						for (Map.Entry<Integer, TypeDefinition> entry : resolveInitializationTypes(argumentHandler).entrySet()) {
-							if (entry.getValue().represents(boolean.class)
-									|| entry.getValue().represents(byte.class)
-									|| entry.getValue().represents(short.class)
-									|| entry.getValue().represents(char.class)
-									|| entry.getValue().represents(int.class)) {
+						for (var entry : resolveInitializationTypes(argumentHandler).entrySet()) {
+							TypeDefinition value = entry.getValue();
+							if (value.represents(boolean.class)
+									|| value.represents(byte.class)
+									|| value.represents(short.class)
+									|| value.represents(char.class)
+									|| value.represents(int.class)) {
 								methodVisitor.visitInsn(Opcodes.ICONST_0);
 								methodVisitor.visitVarInsn(Opcodes.ISTORE, entry.getKey());
 							}
-							else if (entry.getValue().represents(long.class)) {
+							else if (value.represents(long.class)) {
 								methodVisitor.visitInsn(Opcodes.LCONST_0);
 								methodVisitor.visitVarInsn(Opcodes.LSTORE, entry.getKey());
 							}
-							else if (entry.getValue().represents(float.class)) {
+							else if (value.represents(float.class)) {
 								methodVisitor.visitInsn(Opcodes.FCONST_0);
 								methodVisitor.visitVarInsn(Opcodes.FSTORE, entry.getKey());
 							}
-							else if (entry.getValue().represents(double.class)) {
+							else if (value.represents(double.class)) {
 								methodVisitor.visitInsn(Opcodes.DCONST_0);
 								methodVisitor.visitVarInsn(Opcodes.DSTORE, entry.getKey());
 							}
@@ -2465,5 +2434,4 @@ public class AgentAdvice extends Advice {
 			}
 		}
 	}
-
 }

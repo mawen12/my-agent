@@ -38,7 +38,7 @@ public class ConfigUtils {
 		};
 		process.run();
 		configs.addChangeListener(list -> {
-			boolean hasChange = list.stream().map(ChangeItem::getFullName).anyMatch(fn -> fn.equals(name));
+			boolean hasChange = list.stream().map(ChangeItem::fullName).anyMatch(fn -> fn.equals(name));
 			if (hasChange) {
 				process.run();
 			}

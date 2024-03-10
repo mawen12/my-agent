@@ -9,6 +9,5 @@ package com.mawen.agent.httpserver.nanohttpd.util;
  * @since 2024/2/27
  */
 public interface IFactoryThrowing<T, E extends Throwable> {
-
 	T create() throws E;
 }

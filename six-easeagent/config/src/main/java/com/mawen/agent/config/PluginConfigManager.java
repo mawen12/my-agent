@@ -179,7 +179,7 @@ public class PluginConfigManager implements IConfigFactory {
 		public void onChange(List<ChangeItem> list) {
 			var sources = new HashMap<String, String>();
 			for (var item : list) {
-				sources.put(item.getFullName(), item.getNewValue());
+				sources.put(item.fullName(), item.newValue());
 			}
 			PluginConfigManager.this.onChange(sources);
 		}

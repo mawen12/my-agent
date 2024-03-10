@@ -7,5 +7,6 @@ import com.mawen.agent.plugin.api.config.Config;
  * @since 2024/2/25
  */
 public interface ConfigAware {
+
 	void setConfig(Config config);
 }

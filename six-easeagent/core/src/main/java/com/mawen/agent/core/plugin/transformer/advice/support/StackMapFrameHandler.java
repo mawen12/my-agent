@@ -3,6 +3,9 @@ package com.mawen.agent.core.plugin.transformer.advice.support;
 import java.util.Collections;
 import java.util.List;
 
+import com.mawen.agent.core.utils.AdviceUtils;
+import lombok.AllArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import net.bytebuddy.ClassFileVersion;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
@@ -109,6 +112,8 @@ public interface StackMapFrameHandler {
 		}
 	}
 
+	@SuperBuilder
+	@AllArgsConstructor
 	abstract class Default implements ForInstrumentedMethod {
 		protected static final Object[] EMPTY = new Object[0];
 
@@ -121,33 +126,17 @@ public interface StackMapFrameHandler {
 		protected final boolean expandFrames;
 		protected int currentFrameDivergence;
 
-		public Default(TypeDescription type,
-				MethodDescription method,
-				List<? extends TypeDescription> initialTypes,
-				List<? extends TypeDescription> latentTypes,
-				List<? extends TypeDescription> preMethodTypes,
-				List<? extends TypeDescription> postMethodTypes,
-				boolean expandFrames) {
-			this.type = type;
-			this.method = method;
-			this.initialTypes = initialTypes;
-			this.latentTypes = latentTypes;
-			this.preMethodTypes = preMethodTypes;
-			this.postMethodTypes = postMethodTypes;
-			this.expandFrames = expandFrames;
-		}
-
 		public static ForInstrumentedMethod of(TypeDescription type,
-				MethodDescription method,
-				List<? extends TypeDescription> initialTypes,
-				List<? extends TypeDescription> latentTypes,
-				List<? extends TypeDescription> preMethodTypes,
-				List<? extends TypeDescription> postMethodTypes,
-				boolean exitAdvice,
-				boolean copyArguments,
-				ClassFileVersion classFileVersion,
-				int writeFlags,
-				int readerFlags) {
+		                                       MethodDescription method,
+		                                       List<? extends TypeDescription> initialTypes,
+		                                       List<? extends TypeDescription> latentTypes,
+		                                       List<? extends TypeDescription> preMethodTypes,
+		                                       List<? extends TypeDescription> postMethodTypes,
+		                                       boolean exitAdvice,
+		                                       boolean copyArguments,
+		                                       ClassFileVersion classFileVersion,
+		                                       int writeFlags,
+		                                       int readerFlags) {
 			if ((writeFlags & ClassWriter.COMPUTE_FRAMES) != 0
 					|| classFileVersion.isLessThan(ClassFileVersion.JAVA_V6)) {
 				return NoOp.INSTANCE;
@@ -188,21 +177,21 @@ public interface StackMapFrameHandler {
 		}
 
 		protected void translateFrame(MethodVisitor methodVisitor,
-				TranslationMode translationMode,
-				MethodDescription methodDescription,
-				List<? extends TypeDescription> additionalTypes,
-				int type,
-				int localVariableLength,
-				Object[] localVariable,
-				int stackSize,
-				Object[] stack) {
+		                              TranslationMode translationMode,
+		                              MethodDescription methodDescription,
+		                              List<? extends TypeDescription> additionalTypes,
+		                              int type,
+		                              int localVariableLength,
+		                              Object[] localVariable,
+		                              int stackSize,
+		                              Object[] stack) {
 
 		}
 
 		protected void injectFullFrame(MethodVisitor methodVisitor,
-				Initialization initialization,
-				List<? extends TypeDescription> typesInArray,
-				List<? extends TypeDescription> typesOnStack) {
+		                               Initialization initialization,
+		                               List<? extends TypeDescription> typesInArray,
+		                               List<? extends TypeDescription> typesOnStack) {
 
 		}
 
@@ -255,7 +244,7 @@ public interface StackMapFrameHandler {
 					if (!instrumentedMethod.isStatic()) {
 						translated[index++] = Initialization.INITIALIZED.toFrame(type);
 					}
-					for (TypeDescription typeDescription : instrumentedMethod.getParameters().asTypeList().asErasures()) {
+					for (var typeDescription : instrumentedMethod.getParameters().asTypeList().asErasures()) {
 						translated[index++] = Initialization.INITIALIZED.toFrame(typeDescription);
 					}
 					return index;
@@ -269,13 +258,13 @@ public interface StackMapFrameHandler {
 			;
 
 			protected abstract int copy(TypeDescription type,
-					MethodDescription instrumentedMethod,
-					MethodDescription methodDescription,
-					Object[] localVariable,
-					Object[] translated);
+			                            MethodDescription instrumentedMethod,
+			                            MethodDescription methodDescription,
+			                            Object[] localVariable,
+			                            Object[] translated);
 
 			protected abstract boolean isPossibleThisFrameValue(TypeDescription instrumentedType,
-					MethodDescription instrumentedMethod, Object frame);
+			                                                    MethodDescription instrumentedMethod, Object frame);
 		}
 
 		protected enum Initialization {
@@ -291,25 +280,7 @@ public interface StackMapFrameHandler {
 			INITIALIZED {
 				@Override
 				protected Object toFrame(TypeDescription typeDescription) {
-					if (typeDescription.represents(boolean.class)
-							|| typeDescription.represents(byte.class)
-							|| typeDescription.represents(short.class)
-							|| typeDescription.represents(char.class)
-							|| typeDescription.represents(int.class)) {
-						return Opcodes.INTEGER;
-					}
-					else if (typeDescription.represents(long.class)) {
-						return Opcodes.LONG;
-					}
-					else if (typeDescription.represents(float.class)) {
-						return Opcodes.FLOAT;
-					}
-					else if (typeDescription.represents(double.class)) {
-						return Opcodes.DOUBLE;
-					}
-					else {
-						return typeDescription.getInternalName();
-					}
+					return AdviceUtils.getFrameElementType(typeDescription);
 				}
 			},
 			;
@@ -319,7 +290,7 @@ public interface StackMapFrameHandler {
 
 		protected static class Trivial extends Default {
 			protected Trivial(TypeDescription type, MethodDescription method, List<? extends TypeDescription> latentTypes, boolean expandFrames) {
-				super(type, method, Collections.emptyList(), latentTypes, Collections.emptyList(), Collections.emptyList(), expandFrames);
+				super(type, method, Collections.emptyList(), latentTypes, Collections.emptyList(), Collections.emptyList(), expandFrames, 0);
 			}
 
 			@Override
@@ -367,7 +338,7 @@ public interface StackMapFrameHandler {
 			protected boolean allowCompactCompletionFrame;
 
 			public WithPreservedArguments(TypeDescription type, MethodDescription method, List<? extends TypeDescription> initialTypes, List<? extends TypeDescription> latentTypes, List<? extends TypeDescription> preMethodTypes, List<? extends TypeDescription> postMethodTypes, boolean expandFrames, boolean allowCompactCompletionFrame) {
-				super(type, method, initialTypes, latentTypes, preMethodTypes, postMethodTypes, expandFrames);
+				super(type, method, initialTypes, latentTypes, preMethodTypes, postMethodTypes, expandFrames, 0);
 				this.allowCompactCompletionFrame = allowCompactCompletionFrame;
 			}
 
@@ -396,7 +367,7 @@ public interface StackMapFrameHandler {
 						methodVisitor.visitFrame(Opcodes.F_SAME, EMPTY.length, EMPTY, EMPTY.length, EMPTY);
 					}
 					else {
-						methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[]{Initialization.INITIALIZED.toFrame(method.getReturnType().asErasure())});
+						methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[] {Initialization.INITIALIZED.toFrame(method.getReturnType().asErasure())});
 					}
 				}
 				else {
@@ -410,7 +381,7 @@ public interface StackMapFrameHandler {
 			@Override
 			public void injectExceptionFrame(MethodVisitor methodVisitor) {
 				if (!expandFrames && currentFrameDivergence == 0) {
-					methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[]{Type.getInternalName(Throwable.class)});
+					methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[] {Type.getInternalName(Throwable.class)});
 				}
 				else {
 					injectFullFrame(methodVisitor, Initialization.INITIALIZED, CompoundList.of(initialTypes, preMethodTypes), List.of(TypeDescription.THROWABLE));
@@ -614,7 +585,8 @@ public interface StackMapFrameHandler {
 
 			@Override
 			public void translateFrame(MethodVisitor methodVisitor, int type, int localVariableLength, Object[] localVariable, int stackSize, Object[] stack) {
-				StackMapFrameHandler.Default.this.translateFrame(methodVisitor,
+				StackMapFrameHandler.Default.this.translateFrame(
+						methodVisitor,
 						translationMode,
 						adviceMethod,
 						startTypes,
@@ -622,7 +594,8 @@ public interface StackMapFrameHandler {
 						localVariableLength,
 						localVariable,
 						stackSize,
-						stack);
+						stack
+				);
 			}
 
 			@Override
@@ -632,7 +605,7 @@ public interface StackMapFrameHandler {
 						methodVisitor.visitFrame(Opcodes.F_SAME, EMPTY.length, EMPTY, EMPTY.length, EMPTY);
 					}
 					else {
-						methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[]{Initialization.INITIALIZED.toFrame(adviceMethod.getReturnType().asErasure())});
+						methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[] {Initialization.INITIALIZED.toFrame(adviceMethod.getReturnType().asErasure())});
 					}
 				}
 				else {
@@ -646,7 +619,7 @@ public interface StackMapFrameHandler {
 			@Override
 			public void injectExceptionFrame(MethodVisitor methodVisitor) {
 				if (!expandFrames && currentFrameDivergence == 0) {
-					methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[]{Type.getInternalName(Throwable.class)});
+					methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[] {Type.getInternalName(Throwable.class)});
 				}
 				else {
 					injectFullFrame(methodVisitor, initialization, startTypes, Collections.singletonList(TypeDescription.THROWABLE));
@@ -663,9 +636,9 @@ public interface StackMapFrameHandler {
 						methodVisitor.visitFrame(Opcodes.F_SAME, EMPTY.length, EMPTY, EMPTY.length, EMPTY);
 					}
 					else {
-						Object[] local = new Object[endTypes.size()];
-						int index = 0;
-						for (TypeDescription typeDescription : endTypes) {
+						var local = new Object[endTypes.size()];
+						var index = 0;
+						for (var typeDescription : endTypes) {
 							local[index++] = Initialization.INITIALIZED.toFrame(typeDescription);
 						}
 						methodVisitor.visitFrame(Opcodes.F_APPEND, local.length, local, EMPTY.length, EMPTY);
@@ -690,7 +663,7 @@ public interface StackMapFrameHandler {
 						methodVisitor.visitFrame(Opcodes.F_SAME, EMPTY.length, EMPTY, EMPTY.length, EMPTY);
 					}
 					else {
-						methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[]{Initialization.INITIALIZED.toFrame(stack.get(0))});
+						methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[] {Initialization.INITIALIZED.toFrame(stack.get(0))});
 					}
 				}
 				else if (currentFrameDivergence == 0 && intermediateTypes.size() < 4
@@ -700,13 +673,13 @@ public interface StackMapFrameHandler {
 							methodVisitor.visitFrame(Opcodes.F_SAME, EMPTY.length, EMPTY, EMPTY.length, EMPTY);
 						}
 						else {
-							methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[]{Initialization.INITIALIZED.toFrame(stack.get(0))});
+							methodVisitor.visitFrame(Opcodes.F_SAME1, EMPTY.length, EMPTY, 1, new Object[] {Initialization.INITIALIZED.toFrame(stack.get(0))});
 						}
 					}
 					else {
-						Object[] local = new Object[intermediateTypes.size()];
-						int index = 0;
-						for (TypeDescription typeDescription : intermediateTypes) {
+						var local = new Object[intermediateTypes.size()];
+						var index = 0;
+						for (var typeDescription : intermediateTypes) {
 							local[index++] = Initialization.INITIALIZED.toFrame(typeDescription);
 						}
 						methodVisitor.visitFrame(Opcodes.F_APPEND, local.length, local, EMPTY.length, EMPTY);

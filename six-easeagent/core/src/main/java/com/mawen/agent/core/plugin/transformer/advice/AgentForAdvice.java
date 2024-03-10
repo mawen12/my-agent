@@ -8,6 +8,10 @@ import java.util.stream.Collectors;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.asm.AsmVisitorWrapper;
@@ -27,6 +31,7 @@ import net.bytebuddy.utility.JavaModule;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 
 	private final AgentAdvice.WithCustomMapping advice;
@@ -37,26 +42,19 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 	private final AgentBuilder.LocationStrategy locationStrategy;
 	private final List<Entry> entries;
 
-	public AgentForAdvice(){
+	public AgentForAdvice() {
 		this(new AgentAdvice.WithCustomMapping());
 	}
 
 	public AgentForAdvice(AgentAdvice.WithCustomMapping advice) {
-		this(advice, Advice.ExceptionHandler.Default.SUPPRESSING, Assigner.DEFAULT,
+		this(
+				advice,
+				Advice.ExceptionHandler.Default.SUPPRESSING, Assigner.DEFAULT,
 				ClassFileLocator.NoOp.INSTANCE,
 				AgentBuilder.PoolStrategy.Default.FAST,
 				AgentBuilder.LocationStrategy.ForClassLoader.STRONG,
-				List.of());
-	}
-
-	protected AgentForAdvice(AgentAdvice.WithCustomMapping advice, Advice.ExceptionHandler exceptionHandler, Assigner assigner, ClassFileLocator classFileLocator, AgentBuilder.PoolStrategy poolStrategy, AgentBuilder.LocationStrategy locationStrategy, List<Entry> entries) {
-		this.advice = advice;
-		this.exceptionHandler = exceptionHandler;
-		this.assigner = assigner;
-		this.classFileLocator = classFileLocator;
-		this.poolStrategy = poolStrategy;
-		this.locationStrategy = locationStrategy;
-		this.entries = entries;
+				List.of()
+		);
 	}
 
 	@Override
@@ -97,46 +95,40 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 				classFileLocator,
 				poolStrategy,
 				locationStrategy,
-				CompoundList.of(entries, new ForUnifiedAdvice(matcher, name)));
+				CompoundList.of(entries, ForUnifiedAdvice.builder().name(name).matcher(matcher).build()));
 	}
 
 	@Override
 	public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader, JavaModule module) {
 		var classFileLocator = new ClassFileLocator.Compound(this.classFileLocator, locationStrategy.classFileLocator(classLoader, module));
-
 		var typePool = poolStrategy.typePool(classFileLocator, classLoader);
-
 		var asmVisitorWrapper = new AsmVisitorWrapper.ForDeclaredMethods();
+
 		for (var entry : entries) {
-			asmVisitorWrapper = asmVisitorWrapper.invokable(entry.getMatcher().resolve(typeDescription),
+			asmVisitorWrapper = asmVisitorWrapper.invokable(
+					entry.getMatcher().resolve(typeDescription),
 					entry.resolve(advice, typePool, classFileLocator)
 							.withAssigner(assigner)
-							.withExceptionHandler(exceptionHandler));
+							.withExceptionHandler(exceptionHandler)
+			);
 		}
 		return builder.visit(asmVisitorWrapper);
 	}
 
-	@AllArgsConstructor(access = AccessLevel.PROTECTED)
+	@Getter
+	@SuperBuilder
 	@HashCodeAndEqualsPlugin.Enhance
 	protected abstract static class Entry {
 		private final LatentMatcher<? super MethodDescription> matcher;
 
-		protected abstract AgentAdvice resolve(AgentAdvice.WithCustomMapping advice,
-				TypePool typePool, ClassFileLocator classFileLocator);
-
-		protected LatentMatcher<? super MethodDescription> getMatcher() {
-			return matcher;
-		}
+		protected abstract AgentAdvice resolve(AgentAdvice.WithCustomMapping advice, TypePool typePool, ClassFileLocator classFileLocator);
 	}
 
+	@Getter
+	@SuperBuilder
 	@HashCodeAndEqualsPlugin.Enhance
 	protected static class ForUnifiedAdvice extends Entry {
 		protected final String name;
-
-		protected ForUnifiedAdvice(LatentMatcher<? super MethodDescription> matcher, String name) {
-			super(matcher);
-			this.name = name;
-		}
 
 		@Override
 		protected AgentAdvice resolve(AgentAdvice.WithCustomMapping advice, TypePool typePool, ClassFileLocator classFileLocator) {

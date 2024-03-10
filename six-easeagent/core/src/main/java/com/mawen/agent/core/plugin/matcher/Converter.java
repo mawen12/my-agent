@@ -5,6 +5,5 @@ package com.mawen.agent.core.plugin.matcher;
  * @since 2024/3/6
  */
 public interface Converter<S, T> {
-
 	T convert(S source);
 }

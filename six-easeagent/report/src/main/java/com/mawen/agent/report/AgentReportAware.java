@@ -7,5 +7,6 @@ import com.mawen.agent.plugin.report.AgentReport;
  * @since 2024/2/26
  */
 public interface AgentReportAware {
+
 	void setAgentReport(AgentReport report);
 }

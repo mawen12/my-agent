@@ -5,5 +5,6 @@ package com.mawen.agent.plugin.api.trace;
  * @since 2024/2/24
  */
 public interface Message<M> {
+
 	M get();
 }

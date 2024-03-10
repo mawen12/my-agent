@@ -119,8 +119,8 @@ public class Bootstrap {
 		wrapConfig(cfg);
 
 		// loader check
-		GlobalAgentHolder.setAgentClassLoader((URLClassLoader) Bootstrap.class.getClassLoader());
-		Agent.agentClassLoader = GlobalAgentHolder::getAgentClassLoader;
+		GlobalAgentHolder.setAgentLoader((URLClassLoader) Bootstrap.class.getClassLoader());
+		Agent.agentClassLoader = GlobalAgentHolder::getAgentLoader;
 
 		// init context/api
 		contextManager = ContextManager.build(cfg);

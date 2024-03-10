@@ -270,7 +270,7 @@ public class ReportConfigAdapter {
 			}
 			var namespaceWithSeparator = key.substring(prefix.length(), idx);
 			var suffix = key.substring(idx + typeKeyLength + 1);
-			var newKey;
+			String newKey;
 
 			if (namespaceWithSeparator.equals(globalKey)) {
 				continue;

@@ -5,5 +5,6 @@ package com.mawen.agent.plugin.api.config;
  * @since 2024/2/23
  */
 public interface PluginConfigChangeListener {
+
 	void onChange(IPluginConfig oldConfig, IPluginConfig newConfig);
 }

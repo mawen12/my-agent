@@ -48,8 +48,8 @@ public class ConfigNotifier {
 	}
 
 	private List<ChangeItem> filterChange(List<ChangeItem> list) {
-		return list.stream().filter(one -> one.getFullName().startsWith(prefix))
-				.map(e -> new ChangeItem(e.getFullName().substring(prefix.length()), e.getFullName(), e.getOldValue(), e.getNewValue()))
+		return list.stream().filter(one -> one.fullName().startsWith(prefix))
+				.map(e -> new ChangeItem(e.fullName().substring(prefix.length()), e.fullName(), e.oldValue(), e.newValue()))
 				.collect(Collectors.toList());
 	}
 }

@@ -10,5 +10,6 @@ package com.mawen.agent.plugin;
  * @since 2024/2/22
  */
 public interface Ordered {
+
 	int order();
 }

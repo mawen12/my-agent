@@ -5,5 +5,6 @@ package com.mawen.agent.plugin.api.metric;
  * @since 2024/2/23
  */
 public interface MetricSupplier<M extends Metric> {
+
 	M newMetric();
 }

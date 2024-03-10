@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -91,7 +92,7 @@ public class Main {
 		return root;
 	}
 
-	private static ArrayList<URL> nestArchiveUrls(JarFileArchive archive, String prefix) throws IOException {
+	private static List<URL> nestArchiveUrls(JarFileArchive archive, String prefix) throws IOException {
 		var archives = Lists.newArrayList(
 				archive.getNestedArchives(entry -> !entry.isDirectory() && entry.getName().startsWith(prefix),
 						entry -> true
@@ -111,7 +112,7 @@ public class Main {
 		return urls;
 	}
 
-	private static ArrayList<URL> directoryPluginUrls(File directory) {
+	private static List<URL> directoryPluginUrls(File directory) {
 		if (!directory.isDirectory()) {
 			return new ArrayList<>();
 		}

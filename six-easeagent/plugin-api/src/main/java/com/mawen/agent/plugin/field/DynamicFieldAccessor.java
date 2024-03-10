@@ -9,5 +9,4 @@ public interface DynamicFieldAccessor {
 	void setAgent$$DynamicField$$Data(Object data);
 
 	Object getAgent$$DynamicField$$Data();
-
 }

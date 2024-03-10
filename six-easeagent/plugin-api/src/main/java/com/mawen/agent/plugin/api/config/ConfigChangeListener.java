@@ -7,5 +7,6 @@ import java.util.List;
  * @since 2024/2/23
  */
 public interface ConfigChangeListener {
+
 	void onChange(List<ChangeItem> list);
 }

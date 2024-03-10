@@ -14,5 +14,4 @@ public interface IContextManager {
 	 * @return context
 	 */
 	InitializeContext getContext();
-
 }

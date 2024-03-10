@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.mawen.agent.core.utils.AdviceUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.bytebuddy.asm.Advice;
@@ -57,7 +58,6 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * @since 2024/3/7
  */
 public interface OffsetMapping {
-
 
 	Target resolve(TypeDescription instrumentedType,
 			MethodDescription instrumentedMethod,
@@ -330,55 +330,13 @@ public interface OffsetMapping {
 				if (value == null) {
 					return new ForStackManipulation(NullConstant.INSTANCE);
 				}
-				else if (value instanceof Boolean b) {
-					return new ForStackManipulation(IntegerConstant.forValue(b));
-				}
-				else if (value instanceof Byte b) {
-					return new ForStackManipulation(IntegerConstant.forValue(b));
-				}
-				else if (value instanceof Short s) {
-					return new ForStackManipulation(IntegerConstant.forValue(s));
-				}
-				else if (value instanceof Character c) {
-					return new ForStackManipulation(IntegerConstant.forValue(c));
-				}
-				else if (value instanceof Integer i) {
-					return new ForStackManipulation(IntegerConstant.forValue(i));
-				}
-				else if (value instanceof Long l) {
-					return new ForStackManipulation(LongConstant.forValue(l));
-				}
-				else if (value instanceof Float f) {
-					return new ForStackManipulation(FloatConstant.forValue(f));
-				}
-				else if (value instanceof Double d) {
-					return new ForStackManipulation(DoubleConstant.forValue(d));
-				}
-				else if (value instanceof String s) {
-					return new ForStackManipulation(new TextConstant(s));
-				}
-				else if (value instanceof Enum<?> e) {
-					return new ForStackManipulation(
-							FieldAccess.forEnumeration(new EnumerationDescription.ForLoadedEnumeration(e)));
-				}
-				else if (value instanceof Class<?> c) {
-					return new ForStackManipulation(ClassConstant.of(TypeDescription.ForLoadedType.of(c)));
-				}
-				else if (value instanceof TypeDescription t) {
-					return new ForStackManipulation(ClassConstant.of(t));
-				}
-				else if (JavaType.METHOD_HANDLE.isInstance(value)) {
-					return new ForStackManipulation(new JavaConstantValue(JavaConstant.MethodHandle.ofLoaded(value)));
-				}
-				else if (JavaType.METHOD_TYPE.isInstance(value)) {
-					return new ForStackManipulation(new JavaConstantValue(JavaConstant.MethodType.ofLoaded(value)));
-				}
-				else if (value instanceof JavaConstant j) {
-					return new ForStackManipulation(new JavaConstantValue(j));
-				}
-				else {
+
+				StackManipulation stackManipulation = AdviceUtils.getStackManipulation(value);
+				if (stackManipulation == null) {
 					throw new IllegalArgumentException("Not a constant value: " + value);
 				}
+
+				return new ForStackManipulation(stackManipulation);
 			}
 
 			@Override
@@ -1448,6 +1406,7 @@ public interface OffsetMapping {
 					.getDeclaredMethods()
 					.filter(named("value"))
 					.getOnly();
+
 			private final Map<String, TypeDefinition> namedTypes;
 
 			@Override
@@ -1638,80 +1597,17 @@ public interface OffsetMapping {
 			}
 
 			public static <S extends Annotation> OffsetMapping.Factory<S> of(Class<S> annotationType, Object value) {
-				StackManipulation stackManipulation;
-				TypeDescription typeDescription;
 				if (value == null) {
 					return new OfDefaultValue<>(annotationType);
 				}
-				else if (value instanceof Boolean b) {
-					stackManipulation = IntegerConstant.forValue(b);
-					typeDescription = TypeDescription.ForLoadedType.of(boolean.class);
-				}
-				else if (value instanceof Byte b) {
-					stackManipulation = IntegerConstant.forValue(b);
-					typeDescription = TypeDescription.ForLoadedType.of(byte.class);
-				}
-				else if (value instanceof Short s) {
-					stackManipulation = IntegerConstant.forValue(s);
-					typeDescription = TypeDescription.ForLoadedType.of(short.class);
-				}
-				else if (value instanceof Character c) {
-					stackManipulation = IntegerConstant.forValue(c);
-					typeDescription = TypeDescription.ForLoadedType.of(char.class);
-				}
-				else if (value instanceof Integer i) {
-					stackManipulation = IntegerConstant.forValue(i);
-					typeDescription = TypeDescription.ForLoadedType.of(int.class);
-				}
-				else if (value instanceof Long l) {
-					stackManipulation = LongConstant.forValue(l);
-					typeDescription = TypeDescription.ForLoadedType.of(long.class);
-				}
-				else if (value instanceof Float f) {
-					stackManipulation = FloatConstant.forValue(f);
-					typeDescription = TypeDescription.ForLoadedType.of(float.class);
-				}
-				else if (value instanceof Double d) {
-					stackManipulation = DoubleConstant.forValue(d);
-					typeDescription = TypeDescription.ForLoadedType.of(double.class);
-				}
-				else if (value instanceof String s) {
-					stackManipulation = new TextConstant(s);
-					typeDescription = TypeDescription.ForLoadedType.of(String.class);
-				}
-				else if (value instanceof Class<?> c) {
-					stackManipulation = ClassConstant.of(TypeDescription.ForLoadedType.of(c));
-					typeDescription = TypeDescription.ForLoadedType.of(Class.class);
-				}
-				else if (value instanceof TypeDescription t) {
-					stackManipulation = ClassConstant.of(t);
-					typeDescription = TypeDescription.ForLoadedType.of(TypeDescription.class);
-				}
-				else if (value instanceof Enum<?> e) {
-					stackManipulation = FieldAccess.forEnumeration(new EnumerationDescription.ForLoadedEnumeration(e));
-					typeDescription = TypeDescription.ForLoadedType.of(e.getDeclaringClass());
-				}
-				else if (value instanceof EnumerationDescription e) {
-					stackManipulation = FieldAccess.forEnumeration(e);
-					typeDescription = e.getEnumerationType();
-				}
-				else if (JavaType.METHOD_HANDLE.isInstance(value)) {
-					JavaConstant constant = JavaConstant.MethodHandle.ofLoaded(value);
-					stackManipulation = new JavaConstantValue(constant);
-					typeDescription = constant.getTypeDescription();
-				}
-				else if (JavaType.METHOD_TYPE.isInstance(value)) {
-					JavaConstant constant = JavaConstant.MethodType.ofLoaded(value);
-					stackManipulation = new JavaConstantValue(constant);
-					typeDescription = constant.getTypeDescription();
-				}
-				else if (value instanceof JavaConstant j) {
-					stackManipulation = new JavaConstantValue(j);
-					typeDescription = j.getTypeDescription();
-				}
-				else {
+
+				StackManipulation stackManipulation = AdviceUtils.getStackManipulation(value);
+				TypeDescription typeDescription = AdviceUtils.getTypeDescription(value);
+
+				if (stackManipulation == null) {
 					throw new IllegalStateException("Not a constant value: " + value);
 				}
+
 				return new Factory<>(annotationType, stackManipulation, typeDescription.asGenericType());
 			}
 
@@ -1799,25 +1695,33 @@ public interface OffsetMapping {
 
 			@Override
 			public OffsetMapping make(ParameterDescription.InDefinedShape target, AnnotationDescription.Loadable<T> annotation, AdviceType adviceType) {
-				if (!target.getType().isInterface()) {
-					throw new IllegalArgumentException(target.getType() + " is not an interface");
+				TypeDescription.Generic targetType = target.getType();
+				String suffixMsg = null;
+
+				if (!targetType.isInterface()) {
+					suffixMsg = "is not an inteface";
 				}
-				else if (!target.getType().getInterfaces().isEmpty()) {
-					throw new IllegalArgumentException(target.getType() + " must not extend other interfaces");
+				else if (!targetType.getInterfaces().isEmpty()) {
+					suffixMsg = "must not extend other interfaces";
 				}
 				else if (!target.getType().isPublic()) {
-					throw new IllegalArgumentException(target.getType() + " is not public");
+					suffixMsg = "is not public";
+				}
+				if (suffixMsg != null) {
+					throw new IllegalArgumentException(targetType + suffixMsg);
+				}
+				else {
+					var methodCandidates = target.getType().getDeclaredMethods().filter(isAbstract());
+					if (methodCandidates.size() != 1) {
+						throw new IllegalArgumentException(target.getType() + " must declare exactly one abstract method");
+					}
+					return new ForStackManipulation(
+							MethodInvocation.invoke(bootstrapMethod).dynamic(methodCandidates.getOnly().getInternalName(),
+									target.getType().asErasure(),
+									methodCandidates.getOnly().getParameters().asTypeList().asErasures(),
+									arguments), target.getType(), target.getType(), Assigner.Typing.STATIC);
 				}
 
-				MethodList<MethodDescription.InGenericShape> methodCandidates = target.getType().getDeclaredMethods().filter(isAbstract());
-				if (methodCandidates.size() != 1) {
-					throw new IllegalArgumentException(target.getType() + " must declare exactly one abstract method");
-				}
-				return new ForStackManipulation(
-						MethodInvocation.invoke(bootstrapMethod).dynamic(methodCandidates.getOnly().getInternalName(),
-								target.getType().asErasure(),
-								methodCandidates.getOnly().getParameters().asTypeList().asErasures(),
-								arguments), target.getType(), target.getType(), Assigner.Typing.STATIC);
 			}
 		}
 	}
@@ -1832,12 +1736,13 @@ public interface OffsetMapping {
 		@Override
 		public Target resolve(TypeDescription instrumentedType, MethodDescription instrumentedMethod, Assigner assigner, ArgumentHandler argumentHandler, Sort sort) {
 			StackManipulation assignment = assigner.assign(typeDescription.asGenericType(), target, Assigner.Typing.DYNAMIC);
-			if (!assignment.isValid()) {
-				throw new IllegalStateException("Cannot assign " + typeDescription + " to " + target);
+			if (assignment.isValid()) {
+				return new Target.ForStackManipulation(new StackManipulation.Compound(deserialization, assignment));
 			}
-			return new Target.ForStackManipulation(new StackManipulation.Compound(deserialization, assignment));
+			throw new IllegalStateException("Cannot assign " + typeDescription + " to " + target);
 		}
 
+		@Getter
 		@AllArgsConstructor
 		@HashCodeAndEqualsPlugin.Enhance
 		public static class Factory<T extends Annotation> implements OffsetMapping.Factory<T> {
@@ -1845,17 +1750,11 @@ public interface OffsetMapping {
 			private final TypeDescription typeDescription;
 			private final StackManipulation deserialization;
 
-			public static <S extends Annotation> OffsetMapping.Factory<S> of(Class<S> annotationType,
-					Serializable target, Class<?> targetType) {
-				if (!targetType.isInstance(targetType)) {
-					throw new IllegalArgumentException(target + " is no instance of " + targetType);
+			public static <S extends Annotation> OffsetMapping.Factory<S> of(Class<S> annotationType, Serializable target, Class<?> targetType) {
+				if (targetType.isInstance(targetType)) {
+					return new Factory<>(annotationType, TypeDescription.ForLoadedType.of(targetType), SerializedConstant.of(target));
 				}
-				return new Factory<>(annotationType, TypeDescription.ForLoadedType.of(targetType), SerializedConstant.of(target));
-			}
-
-			@Override
-			public Class<T> getAnnotationType() {
-				return annotationType;
+				throw new IllegalArgumentException(target + " is no instance of " + targetType);
 			}
 
 			@Override

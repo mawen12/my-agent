@@ -7,5 +7,6 @@ import java.util.Map;
  * @since 2024/2/26
  */
 public interface ReportConfigChange {
+
 	void updateConfigs(Map<String, String> outputProperties);
 }

@@ -20,6 +20,7 @@ public interface MutableObject<T> {
 
 	void setValue(T value);
 
+
 	@Data
 	class DefaultMutableObject<T> implements MutableObject<T> {
 		private T value;

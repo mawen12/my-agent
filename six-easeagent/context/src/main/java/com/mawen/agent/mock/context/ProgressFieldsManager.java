@@ -19,9 +19,9 @@ public class ProgressFieldsManager {
 		configs.addChangeListener(list -> {
 			var map = new HashMap<String, String>();
 			for (var changeItem : list) {
-				var key = changeItem.getFullName();
+				var key = changeItem.fullName();
 				if (ProgressFields.isProgressFields(key)) {
-					map.put(key, changeItem.getNewValue());
+					map.put(key, changeItem.fullName());
 				}
 				changeListener.accept(map);
 			}

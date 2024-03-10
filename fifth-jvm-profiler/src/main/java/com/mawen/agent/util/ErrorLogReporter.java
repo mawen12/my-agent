@@ -9,5 +9,4 @@ public interface ErrorLogReporter {
 	void report(String message, Throwable exception);
 
 	void close();
-
 }
