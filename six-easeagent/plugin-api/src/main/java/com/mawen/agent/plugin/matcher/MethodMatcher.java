@@ -339,7 +339,7 @@ public class MethodMatcher implements IMethodMatcher {
 		}
 
 		private MethodMatcherBuilder operate(Operator opt) {
-			MethodMatcherBuilder builder = new MethodMatcherBuilder();
+			var builder = new MethodMatcherBuilder();
 			builder.left = this.build();
 			builder.operator = opt;
 

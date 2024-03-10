@@ -58,8 +58,8 @@ public class LogDataPatternFormatter extends LogDataPatternConverter {
 		}
 
 		// xxx: can convert to name-INSTANCE map
-		if (converter instanceof DatePatternConverter) {
-			return new LogDataDatePatternConverterDelegate((DatePatternConverter) converter);
+		if (converter instanceof DatePatternConverter datePatternConverter) {
+			return new LogDataDatePatternConverterDelegate(datePatternConverter);
 		}
 		else if (converter instanceof LoggerPatternConverter) {
 			return new LogDataLoggerPatternConverter(getOptions(pattern, patternOffset));

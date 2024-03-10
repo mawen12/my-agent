@@ -1,7 +1,6 @@
 package com.mawen.agent.report;
 
 import java.util.List;
-import java.util.Map;
 
 import com.mawen.agent.config.Configs;
 import com.mawen.agent.config.report.ReportConfigAdapter;
@@ -50,7 +49,7 @@ public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
 
 	@Override
 	public void onChange(List<ChangeItem> list) {
-		Map<String, String> changes = ReportConfigAdapter.extractReporterConfig(config);
+		var changes = ReportConfigAdapter.extractReporterConfig(config);
 		this.reportConfig.updateConfigs(changes);
 	}
 

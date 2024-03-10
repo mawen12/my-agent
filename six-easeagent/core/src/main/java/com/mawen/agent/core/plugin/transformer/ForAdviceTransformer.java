@@ -13,7 +13,6 @@ import com.mawen.agent.core.plugin.transformer.classloader.CompoundClassLoader;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.utility.JavaModule;
 
 /**
@@ -28,14 +27,14 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
 	public ForAdviceTransformer(MethodTransformation methodTransformation) {
 		this.methodTransformation = methodTransformation;
 
-		MethodIdentityJavaConstant value = new MethodIdentityJavaConstant(methodTransformation.getIndex());
-		StackManipulation stackManipulation = new AgentJavaConstantValue(value, methodTransformation.getIndex());
-		TypeDescription typeDescription = value.getTypeDescription();
+		var value = new MethodIdentityJavaConstant(methodTransformation.getIndex());
+		var stackManipulation = new AgentJavaConstantValue(value, methodTransformation.getIndex());
+		var typeDescription = value.getTypeDescription();
 
-		OffsetMapping.Factory<Index> factory = new OffsetMapping.ForStackManipulation.Factory<>(Index.class,
+		var factory = new OffsetMapping.ForStackManipulation.Factory<>(Index.class,
 				stackManipulation, typeDescription.asGenericType());
 
-		AgentForAdvice agentForAdvice = new AgentForAdvice(AgentAdvice.withCustomMapping().bind(factory));
+		var agentForAdvice = new AgentForAdvice(AgentAdvice.withCustomMapping().bind(factory));
 		this.transformer = agentForAdvice
 				.include(getClass().getClassLoader())
 				.advice(methodTransformation.getMatcher(),
@@ -47,7 +46,7 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
 		CompoundClassLoader.compound(this.getClass().getClassLoader(), classLoader);
 
 		AdviceRegistry.setCurrentClassLoader(classLoader);
-		DynamicType.Builder<?> bd = transformer.transform(builder, typeDescription, classLoader, javaModule);
+		var bd = transformer.transform(builder, typeDescription, classLoader, javaModule);
 		AdviceRegistry.clearCurrentClassLoader();
 		return bd;
 	}

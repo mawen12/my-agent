@@ -9,7 +9,6 @@ import com.mawen.agent.plugin.api.trace.Span;
 import com.mawen.agent.plugin.interceptor.MethodInfo;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 import lombok.SneakyThrows;
-import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
@@ -25,9 +24,9 @@ public class ElasticsearchCtxUtils {
 
 	@SneakyThrows
 	public static void initSpan(MethodInfo methodInfo, Context context) {
-		Request request = (Request) methodInfo.getArgs()[0];
-		HttpEntity entity = request.getEntity();
-		Span span = context.nextSpan();
+		var request = (Request) methodInfo.getArgs()[0];
+		var entity = request.getEntity();
+		var span = context.nextSpan();
 		span.kind(Span.Kind.CLIENT);
 		span.remoteServiceName("elasticsearch");
 		span.tag(MiddlewareConstants.TYPE_TAG_NAME, Type.ELASTICSEARCH.getRemoteType());
@@ -46,11 +45,11 @@ public class ElasticsearchCtxUtils {
 		if (StringUtils.isEmpty(endpoint)) {
 			return "";
 		}
-		String tmp = endpoint;
+		var tmp = endpoint;
 		if (!tmp.startsWith("/")) {
 			tmp = "/" + tmp;
 		}
-		int end = tmp.indexOf("/", 1);
+		var end = tmp.indexOf("/", 1);
 		String index;
 		if (end < 0) {
 			index = tmp.substring(1);

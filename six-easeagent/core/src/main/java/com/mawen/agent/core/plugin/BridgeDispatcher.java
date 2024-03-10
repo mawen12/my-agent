@@ -14,7 +14,7 @@ public class BridgeDispatcher implements IDispatcher {
 
 	@Override
 	public void enter(int chainIndex, MethodInfo info) {
-		InitializeContext context = Agent.initializeContextSupplier.getContext();
+		var context = Agent.initializeContextSupplier.getContext();
 		if (context.isNoop()) {
 			return;
 		}

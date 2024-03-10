@@ -114,7 +114,7 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 
 	@Override
 	public void updateConfigs(Map<String, String> changes) {
-		String name = changes.get(join(this.prefix, APPEND_TYPE_KEY));
+		var name = changes.get(join(this.prefix, APPEND_TYPE_KEY));
 		if (name == null || name.equals(name())) {
 			this.sender.updateConfigs(changes);
 		} else {
@@ -133,7 +133,7 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 	}
 
 	protected void updateEncoder(Map<String, String> changes) {
-		String name = changes.get(this.encoderKey);
+		var name = changes.get(this.encoderKey);
 		if (name == null || name.equals(this.packer.name())) {
 			return;
 		}
@@ -142,7 +142,7 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 	}
 
 	private static String getEncoderKey(String prefix) {
-		int idx = prefix.lastIndexOf(".");
+		var idx = prefix.lastIndexOf(".");
 		if (idx == 0) {
 			return ENCODER_KEY;
 		} else {
@@ -151,8 +151,8 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 	}
 
 	private static Map<String, String> extractSenderConfig(String cfgPrefix, Config config) {
-		Map<String, String> extract = extractByPrefix(config, cfgPrefix);
-		Map<String, String> cfg = new HashMap<>(extract);
+		var extract = extractByPrefix(config, cfgPrefix);
+		var cfg = new HashMap<>(extract);
 
 		// outputServer config
 		cfg.putAll(extractByPrefix(config, REPORT));
@@ -163,11 +163,11 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 	private Map<String, String> filterChanges(List<ChangeItem> list) {
 		Map<String, String> cfg = new HashMap<>();
 		list.stream().filter(one -> {
-			String name = one.getFullName();
+			var name = one.fullName();
 			return name.startsWith(REPORT)
 					|| name.startsWith(encoderKey)
 					|| name.startsWith(prefix);
-		}).forEach(one -> cfg.put(one.getFullName(), one.getNewValue()));
+		}).forEach(one -> cfg.put(one.fullName(), one.newValue()));
 
 		return cfg;
 	}

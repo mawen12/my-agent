@@ -31,7 +31,7 @@ public class ZipkinCallWrapper<V> implements Call<V> {
 
 	@Override
 	public void enqueue(Callback<V> cb) {
-		zipkin2.Callback<V> zCb = new ZipkinCallbackWrapper<>(cb);
+		var zCb = new ZipkinCallbackWrapper<>(cb);
 		this.call.enqueue(zCb);
 	}
 

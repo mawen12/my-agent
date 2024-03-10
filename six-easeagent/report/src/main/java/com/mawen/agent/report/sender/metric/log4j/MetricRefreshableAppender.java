@@ -47,12 +47,11 @@ public class MetricRefreshableAppender extends AbstractAppender implements Testa
 	}
 
 	private Appender getAppender() {
-		switch (metricProps.getSenderName()) {
-			case "mock": return getMockAppender();
-			default: {
-				return getKafkaAppender(metricProps.getTopic());
-			}
+		var senderName = metricProps.getSenderName();
+		if ("mock".equals(senderName)) {
+			return getMockAppender();
 		}
+		return getKafkaAppender(metricProps.getTopic());
 	}
 
 	private Appender getMockAppender() {

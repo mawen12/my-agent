@@ -59,8 +59,8 @@ public class AgentScheduledReporter extends ScheduledReporter {
 		this.converter = converter;
 		this.dataConsumer = dataConsumer;
 		this.enabled = enabled;
-		Map<String, String> reporterCfg = ReportConfigAdapter.extractReporterConfig(Agent.getConfig());
-		String name = NoNull.of(reporterCfg.get(ReportConfigConst.METRIC_ENCODER), MetricJsonEncoder.ENCODER_NAME);
+		var reporterCfg = ReportConfigAdapter.extractReporterConfig(Agent.getConfig());
+		var name = NoNull.of(reporterCfg.get(ReportConfigConst.METRIC_ENCODER), MetricJsonEncoder.ENCODER_NAME);
 		this.encoder = ReporterRegistry.getEncoder(name);
 		this.encoder.init(new Configs(reporterCfg));
 	}

@@ -1,7 +1,6 @@
 package com.mawen.agent.metrics.impl;
 
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
 import com.mawen.agent.plugin.api.metric.Counter;
 import com.mawen.agent.plugin.api.metric.Gauge;
@@ -54,15 +53,15 @@ public abstract class MetricInstance<T extends Metric> {
 	private final Class<?> type;
 
 	private MetricInstance() {
-		Type superclass = getClass().getGenericSuperclass();
+		var superclass = getClass().getGenericSuperclass();
 		if (superclass instanceof Class<?>) {
 			throw new IllegalArgumentException("Internal error: MetricInstance constructed without actual type information");
 		}
-		Type t = ((ParameterizedType) superclass).getActualTypeArguments()[0];
-		if (!(t instanceof Class<?>)) {
+		var t = ((ParameterizedType) superclass).getActualTypeArguments()[0];
+		if (!(t instanceof Class<?> clazz)) {
 			throw new IllegalArgumentException();
 		}
-		type = (Class<?>) t;
+		type = clazz;
 	}
 
 	protected T to(String name, Metric metric) {

@@ -5,11 +5,9 @@ import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -62,24 +60,24 @@ public class ConfigUtils {
 	}
 
 	public static Map<String, String> json2KVMap(String json) throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode node = mapper.readTree(json);
-		List<Map.Entry<String, String>> list = extractKVs(null, node);
+		var mapper = new ObjectMapper();
+		var node = mapper.readTree(json);
+		var list = extractKVs(null, node);
 		return list.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	public static List<Map.Entry<String, String>> extractKVs(String prefix, JsonNode node) {
-		List<Map.Entry<String, String>> rst = new LinkedList<>();
+		var rst = new LinkedList<Map.Entry<String, String>>();
 		if (node.isObject()) {
-			Iterator<String> names = node.fieldNames();
+			var names = node.fieldNames();
 			while (names.hasNext()) {
-				String current = names.next();
+				var current = names.next();
 				rst.addAll(extractKVs(join(prefix, current), node.path(current)));
 			}
 		}
 		else if (node.isArray()) {
-			int len = node.size();
-			for (int i = 0; i < len; i++) {
+			var len = node.size();
+			for (var i = 0; i < len; i++) {
 				rst.addAll(extractKVs(join(prefix, i + ""), node.path(i)));
 			}
 		}
@@ -106,13 +104,13 @@ public class ConfigUtils {
 	}
 
 	public static PluginProperty pluginProperty(String path) {
-		String[] configs = path.split("\\" + ConfigConst.DELIMITER);
+		var configs = path.split("\\" + ConfigConst.DELIMITER);
 		if (configs.length < 5) {
 			throw new ValidateUtils.ValidException(String.format("Property[%s] must be format: %s", path,
 					ConfigConst.join(ConfigConst.PLUGIN, "<Domain>", "<Namespace>", "<Id>", "<Property>")));
 		}
 
-		for (int idOffsetEnd = 3; idOffsetEnd < configs.length - 1; idOffsetEnd++) {
+		for (var idOffsetEnd = 3; idOffsetEnd < configs.length - 1; idOffsetEnd++) {
 			new PluginProperty(configs[1], configs[2],
 					ConfigConst.join(Arrays.copyOfRange(configs, 3, idOffsetEnd)),
 					ConfigConst.join(Arrays.copyOfRange(configs, idOffsetEnd + 1, configs.length)));
@@ -142,9 +140,9 @@ public class ConfigUtils {
 	 * @return Extracted and converted KV map
 	 */
 	public static Map<String, String> extractAndConvertPrefix(Map<String, String> cfg, String fromPrefix, String toPrefix) {
-		Map<String, String> convert = new HashMap<>();
+		var convert = new HashMap<String, String>();
 
-		Set<String> keys = new HashSet<>();
+		var keys = new HashSet<>();
 		cfg.forEach((key, value) -> {
 			if (key.startsWith(fromPrefix)) {
 				keys.add(key);
@@ -171,7 +169,7 @@ public class ConfigUtils {
 	}
 
 	public static Map<String, String> extractByPrefix(Map<String, String> cfg, String prefix) {
-		Map<String, String> extract = new TreeMap<>();
+		var extract = new TreeMap<String, String>();
 
 		// override, new configuration KV override previous KV
 		cfg.forEach((key, value) -> {

@@ -15,6 +15,8 @@ import com.mawen.agent.plugin.api.config.Const;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.api.config.PluginConfigChangeListener;
 import com.mawen.agent.plugin.utils.common.StringUtils;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -24,8 +26,14 @@ public class PluginConfig implements IPluginConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PluginConfig.class);
 
 	private final Set<PluginConfigChangeListener> listeners;
+	@Accessors(fluent = true)
+	@Getter
 	private final String domain;
+	@Accessors(fluent = true)
+	@Getter
 	private final String namespace;
+	@Accessors(fluent = true)
+	@Getter
 	private final String id;
 	private final Map<String, String> global;
 	private final Map<String, String> cover;
@@ -39,7 +47,7 @@ public class PluginConfig implements IPluginConfig {
 		this.id = id;
 		this.global = global;
 		this.cover = cover;
-		Boolean b = getBoolean(Const.ENABLED_CONFIG);
+		var b = getBoolean(Const.ENABLED_CONFIG);
 		if (b == null) {
 			enabled = false;
 		} else {
@@ -59,28 +67,13 @@ public class PluginConfig implements IPluginConfig {
 	}
 
 	@Override
-	public String domain() {
-		return domain;
-	}
-
-	@Override
-	public String namespace() {
-		return namespace;
-	}
-
-	@Override
-	public String id() {
-		return id;
-	}
-
-	@Override
 	public boolean hasProperty(String property) {
 		return global.containsKey(property) || cover.containsKey(property);
 	}
 
 	@Override
 	public String getString(String property) {
-		String value = cover.get(property);
+		var value = cover.get(property);
 		if (value != null) {
 			return value;
 		}
@@ -89,7 +82,7 @@ public class PluginConfig implements IPluginConfig {
 
 	@Override
 	public Integer getInt(String property) {
-		String value = this.getString(property);
+		var value = this.getString(property);
 		if (value == null) {
 			return null;
 		}
@@ -103,13 +96,13 @@ public class PluginConfig implements IPluginConfig {
 
 	@Override
 	public Boolean getBoolean(String property) {
-		String value = cover.get(property);
-		boolean implB = true;
+		var value = cover.get(property);
+		var implB = true;
 		if (value != null) {
 			implB = isTrue(value);
 		}
 		value = global.get(property);
-		boolean globalB = false;
+		var globalB = false;
 		if (value != null) {
 			globalB = isTrue(value);
 		}
@@ -118,7 +111,7 @@ public class PluginConfig implements IPluginConfig {
 
 	@Override
 	public Double getDouble(String property) {
-		String value = this.getString(property);
+		var value = this.getString(property);
 		if (value == null) {
 			return null;
 		}
@@ -132,7 +125,7 @@ public class PluginConfig implements IPluginConfig {
 
 	@Override
 	public Long getLong(String property) {
-		String value = this.getString(property);
+		var value = this.getString(property);
 		if (value == null) {
 			return null;
 		}
@@ -146,7 +139,7 @@ public class PluginConfig implements IPluginConfig {
 
 	@Override
 	public List<String> getStringList(String property) {
-		String value = this.getString(property);
+		var value = this.getString(property);
 		if (StringUtils.isEmpty(value)) {
 			return Collections.emptyList();
 		}

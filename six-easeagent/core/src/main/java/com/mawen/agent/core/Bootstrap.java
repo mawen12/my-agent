@@ -3,12 +3,8 @@ package com.mawen.agent.core;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.net.URLClassLoader;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
-import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import com.mawen.agent.config.ConfigAware;
@@ -38,7 +34,6 @@ import com.mawen.agent.plugin.api.trace.TracingProvider;
 import com.mawen.agent.plugin.bean.AgentInitializingBean;
 import com.mawen.agent.plugin.bean.BeanProvider;
 import com.mawen.agent.plugin.bridge.Agent;
-import com.mawen.agent.plugin.bridge.AgentInfo;
 import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 import com.mawen.agent.report.AgentReportAware;
@@ -102,25 +97,25 @@ public class Bootstrap {
 
 	@SneakyThrows
 	public static void start(String args, Instrumentation inst, String javaAgentJarPath) {
-		long begin = System.nanoTime();
+		var begin = System.nanoTime();
 		System.setProperty(ConfigConst.AGENT_JAR_PATH, javaAgentJarPath);
 
 		// add bootstrap classes
-		Set<String> bootstrapClassSet = AppendBootstrapClassLoaderSearch.by(inst, ClassInjector.UsingInstrumentation.Target.BOOTSTRAP);
+		var bootstrapClassSet = AppendBootstrapClassLoaderSearch.by(inst, ClassInjector.UsingInstrumentation.Target.BOOTSTRAP);
 		if (log.isDebugEnabled()) {
 			log.debug("Injected class: {}",bootstrapClassSet);
 		}
 
 		// initiate configuration
-		String configPath = ConfigFactory.getConfigPath();
+		var configPath = ConfigFactory.getConfigPath();
 		if (StringUtils.isEmpty(configPath)) {
 			configPath = args;
 		}
 
-		ClassLoader classLoader = Bootstrap.class.getClassLoader();
-		AgentInfo agentInfo = AgentInfoFactory.loadAgentInfo(classLoader);
+		var classLoader = Bootstrap.class.getClassLoader();
+		var agentInfo = AgentInfoFactory.loadAgentInfo(classLoader);
 		Agent.agentInfo = agentInfo;
-		GlobalConfigs cfg = ConfigFactory.loadConfigs(configPath, classLoader);
+		var cfg = ConfigFactory.loadConfigs(configPath, classLoader);
 		wrapConfig(cfg);
 
 		// loader check
@@ -138,18 +133,18 @@ public class Bootstrap {
 		RedirectProcessor.INSTANCE.init();
 
 		// reporter
-		AgentReport agentReport = DefaultAgentReport.create(cfg);
+		var agentReport = DefaultAgentReport.create(cfg);
 		GlobalAgentHolder.setAgentReport(agentReport);
 		Agent.agentReport = agentReport;
 
 		// load plugins
-		AgentBuilder builder = getAgentBuilder(cfg, false);
+		var builder = getAgentBuilder(cfg, false);
 		builder = PluginLoader.load(builder, cfg);
 
 		// provider & beans
 		loadProvider(cfg, agentReport);
 
-		long installBegin = System.currentTimeMillis();
+		var installBegin = System.currentTimeMillis();
 		builder.installOn(inst);
 		log.info("installBegin use time: {}ms", (System.currentTimeMillis() - installBegin));
 		log.info("Initialization has took: {}ms", TimeUnit.MILLISECONDS.toMillis(System.nanoTime() - begin));
@@ -157,16 +152,16 @@ public class Bootstrap {
 
 	private static void initHttpServer(Configs cfg) {
 		// inner httpserver
-		Integer port = cfg.getInt(AGENT_SERVER_PORT_KEY);
+		var port = cfg.getInt(AGENT_SERVER_PORT_KEY);
 		if (port == null) {
 			port = DEF_AGENT_SERVER_PORT;
 		}
-		String portStr = System.getProperty(AGENT_SERVER_PORT_KEY, String.valueOf(port));
+		var portStr = System.getProperty(AGENT_SERVER_PORT_KEY, String.valueOf(port));
 		port = Integer.parseInt(portStr);
 
-		AgentHttpServer agentHttpServer = new AgentHttpServer(port);
+		var agentHttpServer = new AgentHttpServer(port);
 
-		Boolean httpServerEnabled = cfg.getBoolean(AGENT_SERVER_ENABLED_KEY);
+		var httpServerEnabled = cfg.getBoolean(AGENT_SERVER_ENABLED_KEY);
 		if (httpServerEnabled) {
 			agentHttpServer.startServer();
 			log.info("start agent http server on port:{}", port);
@@ -182,7 +177,7 @@ public class Bootstrap {
 	}
 
 	private static void loadProvider(Configs cfg, AgentReport report) {
-		List<BeanProvider> providers = BaseLoader.loadOrdered(BeanProvider.class);
+		var providers = BaseLoader.loadOrdered(BeanProvider.class);
 		providers.forEach(it -> provider(it, cfg, report));
 	}
 
@@ -210,8 +205,8 @@ public class Bootstrap {
 
 	public static AgentBuilder getAgentBuilder(Configs cfg, boolean test) {
 		// config may use to add some classes to be ignored in future
-		long buildBegin = System.currentTimeMillis();
-		AgentBuilder builder = new AgentBuilder.Default()
+		var buildBegin = System.currentTimeMillis();
+		var builder = new AgentBuilder.Default()
 				.with(LISTENER)
 				.with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
 				.with(AgentBuilder.InitializationStrategy.NoOp.INSTANCE)
@@ -219,7 +214,7 @@ public class Bootstrap {
 				.with(AgentBuilder.LocationStrategy.ForClassLoader.STRONG
 						.withFallbackTo(ClassFileLocator.ForClassLoader.ofSystemLoader()));
 
-		AgentBuilder.Ignored ignored = builder.ignore(isSynthetic())
+		var ignored = builder.ignore(isSynthetic())
 				.or(nameStartsWith("sun."))
 				.or(nameStartsWith("com.sun."))
 				.or(nameStartsWith("brave."))
@@ -249,10 +244,9 @@ public class Bootstrap {
 
 	@SneakyThrows
 	static void registerMBeans(ConfigManagerMXBean conf) {
-		long begin = System.currentTimeMillis();
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-		ObjectName mxBeanName = new ObjectName(MX_BEAN_OBJECT_NAME);
-		ClassLoader customClassLoader = Thread.currentThread().getContextClassLoader();
+		var begin = System.currentTimeMillis();
+		var mbs = ManagementFactory.getPlatformMBeanServer();
+		var mxBeanName = new ObjectName(MX_BEAN_OBJECT_NAME);
 		mbs.registerMBean(conf, mxBeanName);
 		log.info("Register {} as MBean {}, use time: {}",
 				conf.getClass().getName(), mxBeanName, (System.currentTimeMillis() - begin));
@@ -263,7 +257,7 @@ public class Bootstrap {
 	}
 
 	private static void wrapConfig(GlobalConfigs conf) {
-		WrappedConfigManager wrappedConfigManager = new WrappedConfigManager(Bootstrap.class.getClassLoader(), conf);
+		var wrappedConfigManager = new WrappedConfigManager(Bootstrap.class.getClassLoader(), conf);
 		registerMBeans(wrappedConfigManager);
 		GlobalAgentHolder.setWrappedConfigManager(wrappedConfigManager);
 	}

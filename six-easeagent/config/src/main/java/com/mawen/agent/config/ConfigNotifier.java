@@ -33,7 +33,7 @@ public class ConfigNotifier {
 	}
 
 	public void handleChanges(List<ChangeItem> list) {
-		final List<ChangeItem> changes = this.prefix.isEmpty() ? list : filterChange(list);
+		final var changes = this.prefix.isEmpty() ? list : filterChange(list);
 		if (changes.isEmpty()) {
 			return;
 		}

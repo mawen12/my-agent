@@ -10,7 +10,6 @@ import com.mawen.agent.plugin.api.middleware.Redirect;
 import com.mawen.agent.plugin.api.middleware.RedirectProcessor;
 import com.mawen.agent.plugin.api.middleware.ResourceConfig;
 import com.mawen.agent.plugin.bridge.Agent;
-import com.mawen.agent.plugin.elasticsearch.ElasticsearchPlugin;
 import com.mawen.agent.plugin.elasticsearch.ElasticsearchRedirectPlugin;
 import com.mawen.agent.plugin.elasticsearch.advice.SpringElasticsearchAdvice;
 import com.mawen.agent.plugin.enums.Order;

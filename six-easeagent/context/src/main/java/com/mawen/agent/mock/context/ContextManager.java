@@ -63,10 +63,10 @@ public class ContextManager implements IContextManager {
 			mdc = new LoggerMdc(loggerFactory.factory().mdc());
 		}
 		ContextManager contextManager = new ContextManager(configs, pluginConfigManager, iLoggerFactory, mdc);
-		Agent.loggerFactory = contextManager.globalContext.getLoggerFactory();
-		Agent.loggerMdc = contextManager.globalContext.getMdc();
+		Agent.loggerFactory = contextManager.globalContext.loggerFactory();
+		Agent.loggerMdc = contextManager.globalContext.mdc();
 		Agent.initializeContextSupplier = contextManager;
-		Agent.metricRegistrySupplier = contextManager.globalContext.getMetric();
+		Agent.metricRegistrySupplier = contextManager.globalContext.metric();
 		Agent.configFactory = contextManager.pluginConfigManager;
 		return contextManager;
 	}

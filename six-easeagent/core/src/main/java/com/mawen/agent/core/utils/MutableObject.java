@@ -1,6 +1,6 @@
 package com.mawen.agent.core.utils;
 
-import java.util.Objects;
+import lombok.Data;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -20,34 +20,12 @@ public interface MutableObject<T> {
 
 	void setValue(T value);
 
+	@Data
 	class DefaultMutableObject<T> implements MutableObject<T> {
 		private T value;
 
 		protected DefaultMutableObject(T value) {
 			this.value = value;
-		}
-
-		@Override
-		public T getValue() {
-			return value;
-		}
-
-		@Override
-		public void setValue(T value) {
-			this.value = value;
-		}
-
-		@Override
-		public final boolean equals(Object o) {
-			if (this == o) return true;
-			if (!(o instanceof DefaultMutableObject<?> that)) return false;
-
-			return Objects.equals(value, that.value);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hashCode(value);
 		}
 
 		@Override

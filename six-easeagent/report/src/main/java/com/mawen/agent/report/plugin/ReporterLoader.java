@@ -1,9 +1,7 @@
 package com.mawen.agent.report.plugin;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
@@ -28,9 +26,9 @@ public class ReporterLoader {
 	}
 
 	public static void encoderLoad() {
-		for (Encoder<?> encoder : load(Encoder.class)) {
+		for (var encoder : load(Encoder.class)) {
 			try {
-				Constructor<? extends Encoder> constructor = encoder.getClass().getConstructor();
+				var constructor = encoder.getClass().getConstructor();
 				Supplier<Encoder<?>> encoderSupplier = () -> {
 					try {
 						return constructor.newInstance();
@@ -49,9 +47,9 @@ public class ReporterLoader {
 	}
 
 	public static void senderLoad() {
-		for (Sender sender : load(Sender.class)) {
+		for (var sender : load(Sender.class)) {
 			try {
-				Constructor<? extends Sender> constructor = sender.getClass().getConstructor();
+				var constructor = sender.getClass().getConstructor();
 				Supplier<Sender> senderSupplier = () -> {
 					try {
 						return constructor.newInstance();
@@ -70,9 +68,9 @@ public class ReporterLoader {
 	}
 
 	private static <T> List<T> load(Class<T> serviceClass) {
-		List<T> result = new ArrayList<>();
-		ServiceLoader<T> services = ServiceLoader.load(serviceClass);
-		for (Iterator<T> it = services.iterator(); it.hasNext(); ) {
+		var result = new ArrayList<T>();
+		var services = ServiceLoader.load(serviceClass);
+		for (var it = services.iterator(); it.hasNext(); ) {
 			try {
 				result.add(it.next());
 			}

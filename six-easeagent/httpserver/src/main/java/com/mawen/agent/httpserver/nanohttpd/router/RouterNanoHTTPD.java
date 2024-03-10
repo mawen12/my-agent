@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -185,7 +184,7 @@ public class RouterNanoHTTPD extends NanoHTTPD {
 
 		@Override
 		public Response get(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
-			StringBuilder text = new StringBuilder("<html><body>");
+			var text = new StringBuilder("<html><body>");
 
 			text.append("<h1>Url: ");
 			text.append(cleanXSS(session.getUri()));
@@ -255,16 +254,16 @@ public class RouterNanoHTTPD extends NanoHTTPD {
 
 		@Override
 		public Response get(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
-			String baseUri = uriResource.getUri();
-			String realUri = normalizeUri(session.getUri());
-			for (int index = 0; index < Math.min(baseUri.length(), realUri.length()); index++) {
+			var baseUri = uriResource.getUri();
+			var realUri = normalizeUri(session.getUri());
+			for (var index = 0; index < Math.min(baseUri.length(), realUri.length()); index++) {
 				if (baseUri.charAt(index) != realUri.charAt(index)) {
 					realUri = normalizeUri(realUri.substring(index));
 					break;
 				}
 			}
-			File fileOrDir = uriResource.initParameter(File.class);
-			for (String pathPart : getPathArray(realUri)) {
+			var fileOrDir = uriResource.initParameter(File.class);
+			for (var pathPart : getPathArray(realUri)) {
 				fileOrDir = new File(fileOrDir, pathPart);
 			}
 			if (fileOrDir.isDirectory()) {
@@ -291,8 +290,8 @@ public class RouterNanoHTTPD extends NanoHTTPD {
 		}
 
 		private static String[] getPathArray(String uri) {
-			String[] array = uri.split("/");
-			List<String> pathArray = new ArrayList<>();
+			var array = uri.split("/");
+			var pathArray = new ArrayList<String>();
 
 			for (String s : array) {
 				if (s.length() > 0) {
@@ -422,10 +421,10 @@ public class RouterNanoHTTPD extends NanoHTTPD {
 		}
 
 		public Response process(Map<String, String> urlParams, IHTTPSession session) {
-			String error = "General error!";
+			var error = "General error!";
 			if (handler != null) {
 				try {
-					Object object = handler.newInstance();
+					var object = handler.newInstance();
 					if (object instanceof UriResponder responder) {
 						switch (session.getMethod()) {
 							case GET -> responder.get(this, urlParams, session);
@@ -467,7 +466,7 @@ public class RouterNanoHTTPD extends NanoHTTPD {
 			Matcher matcher = uriPattern.matcher(url);
 			if (matcher.matches()) {
 				if (uriParams.size() > 0) {
-					Map<String, String> result = new HashMap<>();
+					var result = new HashMap<String, String>();
 					for (int i = 0; i <= matcher.groupCount(); i++) {
 						result.put(uriParams.get(i - 1), matcher.group(i));
 					}
@@ -496,9 +495,9 @@ public class RouterNanoHTTPD extends NanoHTTPD {
 		private void parse(){}
 
 		private Pattern createUriPattern() {
-			String patternUri = uri;
-			Matcher matcher = PARAM_PATTERN.matcher(patternUri);
-			int start = 0;
+			var patternUri = uri;
+			var matcher = PARAM_PATTERN.matcher(patternUri);
+			var start = 0;
 			while (matcher.find(start)) {
 				uriParams.add(patternUri.substring(matcher.start() + 1, matcher.end()));
 				patternUri = new StringBuilder(patternUri.substring(0, matcher.start()))
@@ -546,10 +545,10 @@ public class RouterNanoHTTPD extends NanoHTTPD {
 
 		@Override
 		public void remoteRoute(String url) {
-			String uriToDelete = normalizeUri(url);
-			Iterator<UriResource> iter = mappings.iterator();
+			var uriToDelete = normalizeUri(url);
+			var iter = mappings.iterator();
 			while (iter.hasNext()) {
-				UriResource uriResource = iter.next();
+				var uriResource = iter.next();
 				if (uriToDelete.equals(uriResource.getUri())) {
 					iter.remove();
 					break;
@@ -624,10 +623,10 @@ public class RouterNanoHTTPD extends NanoHTTPD {
 		 * uri is www.example.com/user/3232 - mapping 1 is returned.
 		 */
 		public Response process(IHTTPSession session) {
-			String work = normalizeUri(session.getUri());
+			var work = normalizeUri(session.getUri());
 			Map<String, String> params = null;
-			UriResource uriResource = error404Url;
-			for (UriResource u : routePrioritizer.getPrioritizedRoutes()) {
+			var uriResource = error404Url;
+			for (var u : routePrioritizer.getPrioritizedRoutes()) {
 				params = u.match(work);
 				if (params != null) {
 					uriResource = u;

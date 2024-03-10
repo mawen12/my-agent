@@ -81,12 +81,12 @@ public class AgentLogDataImpl implements AgentLogData {
 
 	@Override
 	public void completeAttributes() {
-		AttributesBuilder attrsBuilder = this.attributes.toBuilder();
+		var attrsBuilder = this.attributes.toBuilder();
 		if (this.throwable != null) {
 			attrsBuilder.put(SemanticKey.EXCEPTION_TYPE, throwable.getClass().getName());
 			attrsBuilder.put(SemanticKey.EXCEPTION_MESSAGE, throwable.getMessage());
 
-			StringWriter writer = new StringWriter();
+			var writer = new StringWriter();
 			throwable.printStackTrace(new PrintWriter(writer));
 			attrsBuilder.put(SemanticKey.EXCEPTION_STACKTRACE, writer.toString());
 		}
@@ -222,8 +222,8 @@ public class AgentLogDataImpl implements AgentLogData {
 				keys = data.keySet();
 			}
 
-			AttributesBuilder ab = getAttributesBuilder();
-			for (String key : keys) {
+			var ab = getAttributesBuilder();
+			for (var key : keys) {
 				ab.put(SemanticKey.stringKey(key), data.get(key));
 			}
 			return this;

@@ -6,7 +6,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import com.mawen.agent.log4j2.Logger;
@@ -19,7 +18,6 @@ import com.mawen.agent.plugin.api.context.AsyncContext;
 import com.mawen.agent.plugin.api.context.RequestContext;
 import com.mawen.agent.plugin.api.trace.Getter;
 import com.mawen.agent.plugin.api.trace.ITracing;
-import com.mawen.agent.plugin.api.trace.Injector;
 import com.mawen.agent.plugin.api.trace.MessagingRequest;
 import com.mawen.agent.plugin.api.trace.Request;
 import com.mawen.agent.plugin.api.trace.Scope;
@@ -91,7 +89,7 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public int enter(Object key) {
-		Integer count = entered.get(key);
+		var count = entered.get(key);
 		if (count == null) {
 			count = 1;
 		} else {
@@ -103,7 +101,7 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public int exit(Object key) {
-		Integer count = entered.get(key);
+		var count = entered.get(key);
 		if (count == null) {
 			return 0;
 		}
@@ -118,7 +116,7 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public Cleaner importAsync(AsyncContext snapshot) {
-		Scope scope = tracing.importAsync(snapshot.getSpanContext());
+		var scope = tracing.importAsync(snapshot.getSpanContext());
 		context.putAll(snapshot.getAll());
 		if (hasCleaner) {
 			return new AsyncCleaner(scope, false);
@@ -160,13 +158,13 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public void consumerInject(Span span, MessagingRequest request) {
-		Injector<MessagingRequest> injector = tracing.messagingTracing().consumerInjector();
+		var injector = tracing.messagingTracing().consumerInjector();
 		injector.inject(span, request);
 	}
 
 	@Override
 	public void producerInject(Span span, MessagingRequest request) {
-		Injector<MessagingRequest> injector = tracing.messagingTracing().producerInjector();
+		var injector = tracing.messagingTracing().producerInjector();
 		injector.inject(span, request);
 	}
 
@@ -182,14 +180,14 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public void injectForwardedHeaders(Setter setter) {
-		Set<String> fields = ProgressFields.getForwardHeaderSet();
+		var fields = ProgressFields.getForwardHeaderSet();
 		if (fields.isEmpty()) {
 			return;
 		}
-		for (String field : fields) {
-			Object o = context.get(field);
-			if (o instanceof String) {
-				setter.setHeader(field, (String) o);
+		for (var field : fields) {
+			var o = context.get(field);
+			if (o instanceof String str) {
+				setter.setHeader(field, str);
 			}
 		}
 	}
@@ -240,7 +238,7 @@ public class SessionContext implements InitializeContext {
 		if (this.retStack.size() <= this.retBound.peek().size) {
 			return null;
 		}
-		Object o = this.retStack.pop();
+		var o = this.retStack.pop();
 		if (o == NullObject.NULL) {
 			return null;
 		}
@@ -252,7 +250,7 @@ public class SessionContext implements InitializeContext {
 		if (this.retStack.isEmpty()) {
 			return null;
 		}
-		Object o = this.retStack.pop();
+		var o = this.retStack.pop();
 		if (o == NullObject.NULL) {
 			return null;
 		}
@@ -306,13 +304,14 @@ public class SessionContext implements InitializeContext {
 	}
 
 	private Cleaner importForwardedHeaders(Getter getter, Setter setter) {
-		Set<String> fields = ProgressFields.getForwardHeaderSet();
+		var fields = ProgressFields.getForwardHeaderSet();
 		if (fields.isEmpty()) {
 			return NoOpCleaner.INSTANCE;
 		}
-		List<String> fieldArr = new ArrayList<>(fields.size());
-		for (String field : fields) {
-			String o = getter.header(field);
+
+		var fieldArr = new ArrayList<String>(fields.size());
+		for (var field : fields) {
+			var o = getter.header(field);
 			if (o == null) {
 				continue;
 			}
@@ -341,14 +340,10 @@ public class SessionContext implements InitializeContext {
 		}
 	}
 
-	@AllArgsConstructor
-	public static class CurrentContextRunnable implements Runnable {
-
-		private final AsyncContext asyncContext;
-		private final Runnable task;
+	public static record CurrentContextRunnable(AsyncContext asyncContext, Runnable task) implements Runnable {
 		@Override
 		public void run() {
-			try (Cleaner cleaner = asyncContext.importToCurrent()) {
+			try (var cleaner = asyncContext.importToCurrent()) {
 				task.run();
 			}
 		}

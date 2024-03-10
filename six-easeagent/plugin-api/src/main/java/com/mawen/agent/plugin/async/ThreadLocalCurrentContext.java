@@ -31,13 +31,13 @@ public class ThreadLocalCurrentContext {
 	}
 
 	public Scope newScope(@Nullable Context current) {
-		final Context previous = local.get();
+		final var previous = local.get();
 		local.set(current);
 		return previous != null ? new RevertToPreviousScope(local,previous) : revertToNull;
 	}
 
 	public Scope maybeScope(@Nullable Context context) {
-		Context current = get();
+		var current = get();
 		if (Objects.equals(current, context)) {
 			return Scope.NOOP;
 		}
@@ -45,9 +45,9 @@ public class ThreadLocalCurrentContext {
 	}
 
 	public void fill(BiConsumer<String, String> consumer,  String[] names) {
-		final Context ctx = get();
+		final var ctx = get();
 		if (ctx != null) {
-			for (String one : names) {
+			for (var one : names) {
 				consumer.accept(one, ctx.get(one));
 			}
 		}
@@ -57,7 +57,7 @@ public class ThreadLocalCurrentContext {
 	 * Wraps the input so that it executes with the same context as now.
 	 */
 	public Runnable wrap(Runnable task) {
-		final Context invocationContext = get();
+		final var invocationContext = get();
 		return new CurrentContextRunnable(this, invocationContext, task);
 	}
 
@@ -69,23 +69,14 @@ public class ThreadLocalCurrentContext {
 		if (kvs.length % 2 != 0) {
 			throw new IllegalArgumentException("size of kvs should be even number");
 		}
-		final Context ctx = new Context();
-		for (int i = 0; i < kvs.length; i += 2) {
+		final var ctx = new Context();
+		for (var i = 0; i < kvs.length; i += 2) {
 			ctx.put(kvs[i], kvs[i + 1]);
 		}
 		return ctx;
 	}
 
-	public static class CurrentContextRunnable implements Runnable {
-		private final ThreadLocalCurrentContext threadLocalCurrentContext;
-		private final Context ctx;
-		private final Runnable original;
-
-		public CurrentContextRunnable(ThreadLocalCurrentContext threadLocalCurrentContext, Context ctx, Runnable original) {
-			this.threadLocalCurrentContext = threadLocalCurrentContext;
-			this.ctx = ctx;
-			this.original = original;
-		}
+	public static record CurrentContextRunnable(ThreadLocalCurrentContext threadLocalCurrentContext, Context ctx, Runnable original) implements Runnable {
 
 		@Override
 		public void run() {
@@ -133,12 +124,7 @@ public class ThreadLocalCurrentContext {
 		}
 	}
 
-	static final class RevertToNullScope implements Scope {
-		final ThreadLocal<Context> local;
-
-		public RevertToNullScope(ThreadLocal<Context> local) {
-			this.local = local;
-		}
+	record RevertToNullScope(ThreadLocal<Context> local) implements Scope {
 
 		@Override
 		public void close() {
@@ -146,14 +132,7 @@ public class ThreadLocalCurrentContext {
 		}
 	}
 
-	static final class RevertToPreviousScope implements Scope {
-		final ThreadLocal<Context> local;
-		final Context previous;
-
-		public RevertToPreviousScope(ThreadLocal<Context> local, Context previous) {
-			this.local = local;
-			this.previous = previous;
-		}
+	static final record RevertToPreviousScope(ThreadLocal<Context> local,  Context previous) implements Scope {
 
 		@Override
 		public void close() {

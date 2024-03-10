@@ -1,7 +1,6 @@
 package com.mawen.agent.core.plugin.matcher;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -11,7 +10,6 @@ import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.Ordered;
 import com.mawen.agent.plugin.interceptor.AgentInterceptorChain;
-import com.mawen.agent.plugin.interceptor.Interceptor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.bytebuddy.description.method.MethodDescription;
@@ -35,16 +33,15 @@ public class MethodTransformation {
 			final String type,
 			final String method,
 			final String methodDescription) {
-		List<Supplier<Interceptor>> suppliers = this.providerBuilder.build()
+		var suppliers = this.providerBuilder.build()
 				.getSupplierChain();
 
-		List<Interceptor> interceptors = suppliers.stream()
+		var interceptors = suppliers.stream()
 				.map(Supplier::get)
 				.sorted(Comparator.comparing(Ordered::order))
 				.collect(Collectors.toList());
 
 		interceptors.forEach(i -> {
-			InterceptorPluginDecorator decorator;
 			if (i instanceof InterceptorPluginDecorator interceptor) {
 				try {
 					interceptor.init(interceptor.getConfig(), type, method, methodDescription);

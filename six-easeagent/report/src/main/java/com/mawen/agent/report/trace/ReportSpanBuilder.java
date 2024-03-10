@@ -96,7 +96,7 @@ public class ReportSpanBuilder extends ReportSpanImpl.Builder {
 	}
 
 	public static Endpoint endpoint(zipkin2.Endpoint endpoint) {
-		Endpoint e = new Endpoint();
+		var e = new Endpoint();
 		e.setPort(endpoint.port());
 		e.setServiceName(endpoint.serviceName());
 		e.setIpV4(endpoint.ipv4());
@@ -287,7 +287,7 @@ public class ReportSpanBuilder extends ReportSpanImpl.Builder {
 	}
 
 	public ReportSpan build() {
-		String missing = "";
+		var missing = "";
 		if (traceId == null) {
 			missing += " traceId";
 		}
@@ -298,7 +298,7 @@ public class ReportSpanBuilder extends ReportSpanImpl.Builder {
 			throw new IllegalStateException("Missing: " + missing);
 		}
 		if (id.equals(parentId)) {
-			Logger logger = Logger.getLogger(ReportSpan.class.getName());
+			var logger = Logger.getLogger(ReportSpan.class.getName());
 			if (logger.isLoggable(Level.FINEST)) {
 				logger.fine(format("undoing circular dependency: traceId=%s, spanId=%s", traceId, id));
 			}
@@ -307,7 +307,7 @@ public class ReportSpanBuilder extends ReportSpanImpl.Builder {
 		annotations = sortedList(annotations);
 
 		if (this.shared && kind.equals(Span.Kind.CLIENT.name())) {
-			Logger logger = Logger.getLogger(ReportSpan.class.getName());
+			var logger = Logger.getLogger(ReportSpan.class.getName());
 			if (logger.isLoggable(Level.FINEST)) {
 				logger.fine(format("removing shared flag on client: traceId=%s, spanId=%s", traceId, id));
 			}
@@ -365,10 +365,10 @@ public class ReportSpanBuilder extends ReportSpanImpl.Builder {
 	}
 
 	static String padLeft(String id, int desiredLength) {
-		int length = id.length();
-		int numZeros = desiredLength - length;
+		var length = id.length();
+		var numZeros = desiredLength - length;
 
-		char[] data = Platform.shortStringBuffer();
+		var data = Platform.shortStringBuffer();
 		THIRTY_TWO_ZEROS.getChars(0,numZeros,data,0);
 		id.getChars(0, length, data, numZeros);
 

@@ -44,7 +44,7 @@ public class AgentKafkaSender implements Sender {
 	public void init(Config config, String prefix) {
 		this.config = config;
 		this.prefix = prefix;
-		String outputServer = config.getString(BOOTSTRAP_SERVERS);
+		var outputServer = config.getString(BOOTSTRAP_SERVERS);
 		if (StringUtils.isEmpty(outputServer)) {
 			this.enabled = false;
 			return;
@@ -73,7 +73,7 @@ public class AgentKafkaSender implements Sender {
 		if (!enabled) {
 			return new NoOpCall<>();
 		}
-		zipkin2.Call<Void> call = this.sender.sendSpans(encodedData.getData());
+		var call = this.sender.sendSpans(encodedData.getData());
 		return new ZipkinCallWrapper<>(call);
 	}
 
@@ -84,7 +84,7 @@ public class AgentKafkaSender implements Sender {
 
 	@Override
 	public void updateConfigs(Map<String, String> changes) {
-		String name = changes.get(join(prefix, APPEND_TYPE_KEY));
+		var name = changes.get(join(prefix, APPEND_TYPE_KEY));
 		if (StringUtils.isNotEmpty(name) && !SENDER_NAME.equals(name)) {
 			try {
 				this.close();
@@ -96,7 +96,7 @@ public class AgentKafkaSender implements Sender {
 		}
 
 		boolean refresh = false;
-		for (String key : changes.keySet()) {
+		for (var key : changes.keySet()) {
 			if (key.startsWith(OUTPUT_SERVER_V2) || key.startsWith(this.topicKey)) {
 				refresh = true;
 				break;
@@ -123,10 +123,6 @@ public class AgentKafkaSender implements Sender {
 	}
 
 	private boolean checkEnable(Config config) {
-		boolean check = config.getBoolean(join(this.prefix, ENABLED_KEY), true);
-		if (check) {
-			return config.getBoolean(OUTPUT_SERVERS_ENABLE);
-		}
-		return false;
+		return config.getBoolean(join(this.prefix, ENABLED_KEY), true) ? config.getBoolean(OUTPUT_SERVERS_ENABLE) : false;
 	}
 }

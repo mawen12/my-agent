@@ -1,6 +1,5 @@
 package com.mawen.agent.log4j2;
 
-import java.util.Iterator;
 import java.util.ServiceLoader;
 
 /**
@@ -14,13 +13,13 @@ public interface ClassLoaderSupplier {
 	class ClassLoaderHolder implements ClassLoaderSupplier {
 		@Override
 		public ClassLoader get() {
-			FinalClassLoaderSupplier supplier = new FinalClassLoaderSupplier();
-			ClassLoader classLoader = supplier.get();
+			var supplier = new FinalClassLoaderSupplier();
+			var classLoader = supplier.get();
 			if (classLoader != null) {
 				return classLoader;
 			}
-			ServiceLoader<ClassLoaderSupplier> loader = ServiceLoader.load(ClassLoaderSupplier.class);
-			Iterator<ClassLoaderSupplier> iterator = loader.iterator();
+			var loader = ServiceLoader.load(ClassLoaderSupplier.class);
+			var iterator = loader.iterator();
 			while (iterator.hasNext()) {
 				classLoader = iterator.next().get();
 				if (classLoader != null) {

@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import lombok.AllArgsConstructor;
 import net.bytebuddy.agent.ByteBuddyAgent;
-import org.apache.kafka.common.metrics.Stat;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;

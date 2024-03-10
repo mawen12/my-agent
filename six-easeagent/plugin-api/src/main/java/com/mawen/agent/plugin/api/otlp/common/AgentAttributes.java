@@ -20,7 +20,7 @@ public final class AgentAttributes extends HashMap<AttributeKey<?>, Object> impl
 	@Nullable
 	@Override
 	public <T> T get(AttributeKey<T> key) {
-		Object v = super.get(key);
+		var v = super.get(key);
 		return v == null ? null : (T) v;
 	}
 

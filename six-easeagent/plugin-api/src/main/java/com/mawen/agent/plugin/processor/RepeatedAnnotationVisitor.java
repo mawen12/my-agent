@@ -85,7 +85,7 @@ public class RepeatedAnnotationVisitor implements AnnotationValueVisitor<Set<Ann
 
 	@Override
 	public Set<AnnotationMirror> visitArray(List<? extends AnnotationValue> vals, Class<? extends Annotation> aClass) {
-		final Set<AnnotationMirror> accept = new HashSet<>();
+		final var accept = new HashSet<AnnotationMirror>();
 
 		for (AnnotationValue v : vals) {
 			accept.addAll(v.accept(this, aClass));

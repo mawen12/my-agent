@@ -79,19 +79,19 @@ public class Arguments {
 			return new Arguments(new HashMap<>());
 		}
 
-		Map<String, List<String>> map = new HashMap<>();
-		for (String argPair : args.split(",")) {
+		var map = new HashMap<String, List<String>>();
+		for (var argPair : args.split(",")) {
 			String[] strs = argPair.split("=");
 			if (strs.length != 2) {
 				throw new IllegalArgumentException("Arguments for the agent should be like: key1=value1,key2=value2");
 			}
 
-			String key = strs[0].trim();
+			var key = strs[0].trim();
 			if (key.isEmpty()) {
 				throw new IllegalArgumentException("Argument key should not be empty");
 			}
 
-			List<String> list = map.computeIfAbsent(key, k -> new ArrayList<>());
+			var list = map.computeIfAbsent(key, k -> new ArrayList<>());
 			list.add(strs[1].trim());
 		}
 

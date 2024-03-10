@@ -64,8 +64,8 @@ public class ConverterAdapter extends AbstractConverter {
 			SortedMap<String, Histogram> histograms,
 			SortedMap<String, Meter> meters,
 			SortedMap<String, Timer> timers) {
-		Set<String> results = new HashSet<>();
-		for (KeyType keyType : this.keyTypes) {
+		var results = new HashSet<String>();
+		for (var keyType : this.keyTypes) {
 			if (keyType != null) {
 				switch (keyType) {
 					case Timer -> keys(timers.keySet(), results);
@@ -82,13 +82,13 @@ public class ConverterAdapter extends AbstractConverter {
 
 	@Override
 	protected void writeGauges(String key, MetricSubType metricSubType, SortedMap<String, Gauge> gauges, Map<String, Object> output) {
-		Map<MetricSubType, MetricName> map = nameFactory.gaugeNames(key);
+		var map = nameFactory.gaugeNames(key);
 		consumerMetric(map, metricSubType, v -> {
-			Gauge gauge = gauges.get(v.name());
+			var gauge = gauges.get(v.name());
 			if (gauge == null) {
 				return;
 			}
-			Object value = gauge.getValue();
+			var value = gauge.getValue();
 			if (value instanceof GaugeMetricModel model) {
 				output.putAll(model.toHashMap());
 			}
@@ -103,7 +103,7 @@ public class ConverterAdapter extends AbstractConverter {
 
 	@Override
 	protected void writeCounters(String key, MetricSubType metricSubType, SortedMap<String, Counter> counters, Map<String, Object> output) {
-		Map<MetricSubType, MetricName> map = nameFactory.counterNames(key);
+		var map = nameFactory.counterNames(key);
 		consumerMetric(map, metricSubType, v -> {
 			Optional.ofNullable(counters.get(v.name()))
 					.ifPresent(c -> v.getValueFetcher().forEach((fieldName, fetcher) -> appendField(output, fieldName, fetcher, CounterImpl.build(c))));
@@ -118,7 +118,7 @@ public class ConverterAdapter extends AbstractConverter {
 
 	@Override
 	protected void writeMeters(String key, MetricSubType metricSubType, SortedMap<String, Meter> meters, Map<String, Object> output) {
-		Map<MetricSubType, MetricName> map = nameFactory.meterNames(key);
+		var map = nameFactory.meterNames(key);
 		consumerMetric(map, metricSubType, v -> Optional
 				.ofNullable(meters.get(v.name()))
 				.ifPresent(m -> v.getValueFetcher().forEach((fieldName, fetcher) -> appendField(output, fieldName, fetcher, MeterImpl.build(m)))));
@@ -126,11 +126,11 @@ public class ConverterAdapter extends AbstractConverter {
 
 	@Override
 	protected void writeTimers(String key, MetricSubType metricSubType, SortedMap<String, Timer> timers, Map<String, Object> output) {
-		Map<MetricSubType, MetricName> map = nameFactory.timerNames(key);
+		var map = nameFactory.timerNames(key);
 		consumerMetric(map, metricSubType, v -> Optional
 				.ofNullable(timers.get(v.name()))
 				.ifPresent(t -> {
-					final Snapshot snapshot = t.getSnapshot();
+					final var snapshot = t.getSnapshot();
 					v.getValueFetcher().forEach((fieldName, fetcher) -> {
 						if (fetcher.getClazz().equals(Snapshot.class)) {
 							appendField(output, fieldName, fetcher, SnapshotImpl.build(snapshot));

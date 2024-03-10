@@ -35,18 +35,18 @@ public class PluginPropertyHttpHandler extends AgentHttpHandler {
 
 	@Override
 	public Response process(RouterNanoHTTPD.UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
-		String version = urlParams.get("version");
+		var version = urlParams.get("version");
 		if (version == null) {
 			return Response.newFixedLengthResponse(Status.BAD_REQUEST, AgentHttpServer.JSON_TYPE, (String) null);
 		}
 		try {
-			String property = ConfigUtils.buildPluginProperty(
+			var property = ConfigUtils.buildPluginProperty(
 					ConfigUtils.requireNonEmpty(urlParams.get("domain"), "urlParams.domain must not be null and empty"),
 					ConfigUtils.requireNonEmpty(urlParams.get("namespace"), "urlParams.namespace must not be null and empty"),
 					ConfigUtils.requireNonEmpty(urlParams.get("id"), "urlParams.id must not be null and empty"),
 					ConfigUtils.requireNonEmpty(urlParams.get("property"), "urlParams.property must not be null and empty")
 			);
-			String value = Objects.requireNonNull(urlParams.get("value"), "urlParams.value must not be null");
+			var value = Objects.requireNonNull(urlParams.get("value"), "urlParams.value must not be null");
 			this.mxBeanConfig.updateService2(Collections.singletonMap(property, value), version);
 			return Response.newFixedLengthResponse(Status.OK, AgentHttpServer.JSON_TYPE, (String) null);
 		}

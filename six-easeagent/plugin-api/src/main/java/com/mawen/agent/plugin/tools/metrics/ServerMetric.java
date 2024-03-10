@@ -7,12 +7,9 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.ImmutableMap;
-import com.mawen.agent.plugin.api.metric.Counter;
-import com.mawen.agent.plugin.api.metric.Meter;
 import com.mawen.agent.plugin.api.metric.MetricRegistry;
 import com.mawen.agent.plugin.api.metric.ServiceMetric;
 import com.mawen.agent.plugin.api.metric.ServiceMetricSupplier;
-import com.mawen.agent.plugin.api.metric.Timer;
 import com.mawen.agent.plugin.api.metric.name.MetricField;
 import com.mawen.agent.plugin.api.metric.name.MetricSubType;
 import com.mawen.agent.plugin.api.metric.name.MetricValueFetcher;
@@ -44,13 +41,13 @@ public class ServerMetric extends ServiceMetric {
 	}
 
 	public void collectMetric(String key, int statusCode, Throwable throwable, long startMillis, long endMillis) {
-		Timer timer = timer(key, MetricSubType.DEFAULT);
+		var timer = timer(key, MetricSubType.DEFAULT);
 		timer.update(Duration.ofMillis(endMillis - startMillis));
-		final Meter defaultMeter = meter(key, MetricSubType.DEFAULT);
-		final Meter errorMeter = meter(key, MetricSubType.ERROR);
-		Counter defaultCounter = counter(key, MetricSubType.DEFAULT);
-		Counter errorCounter = counter(key, MetricSubType.ERROR);
-		boolean hasException = throwable != null;
+		final var defaultMeter = meter(key, MetricSubType.DEFAULT);
+		final var errorMeter = meter(key, MetricSubType.ERROR);
+		var defaultCounter = counter(key, MetricSubType.DEFAULT);
+		var errorCounter = counter(key, MetricSubType.ERROR);
+		var hasException = throwable != null;
 		if (statusCode >= 400 || hasException) {
 			errorMeter.mark();
 			errorCounter.inc();
@@ -59,11 +56,11 @@ public class ServerMetric extends ServiceMetric {
 		defaultCounter.inc();
 
 		gauge(key, MetricSubType.DEFAULT, () -> () -> {
-			BigDecimal m1ErrorPercent = BigDecimal.ZERO;
-			BigDecimal m5ErrorPercent = BigDecimal.ZERO;
-			BigDecimal m15ErrorPercent = BigDecimal.ZERO;
-			BigDecimal error = BigDecimal.valueOf(errorMeter.getOneMinuteRate()).setScale(5, BigDecimal.ROUND_HALF_DOWN);
-			BigDecimal n = BigDecimal.valueOf(defaultMeter.getOneMinuteRate());
+			var m1ErrorPercent = BigDecimal.ZERO;
+			var m5ErrorPercent = BigDecimal.ZERO;
+			var m15ErrorPercent = BigDecimal.ZERO;
+			var error = BigDecimal.valueOf(errorMeter.getOneMinuteRate()).setScale(5, BigDecimal.ROUND_HALF_DOWN);
+			var n = BigDecimal.valueOf(defaultMeter.getOneMinuteRate());
 			// 1 minute
 			if (n.compareTo(BigDecimal.ZERO) != 0) {
 				m1ErrorPercent = error.divide(n, 2, BigDecimal.ROUND_HALF_UP);

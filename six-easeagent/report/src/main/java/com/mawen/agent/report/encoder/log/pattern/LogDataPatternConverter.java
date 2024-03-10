@@ -37,8 +37,8 @@ public abstract class LogDataPatternConverter extends LogEventPatternConverter {
 
 	@Override
 	public void format(Object obj, StringBuilder output) {
-		if (obj instanceof AgentLogData) {
-			format((AgentLogData)obj,output);
+		if (obj instanceof AgentLogData agentLogData) {
+			format(agentLogData,output);
 		} else {
 			super.format(obj, output);
 		}
@@ -50,7 +50,7 @@ public abstract class LogDataPatternConverter extends LogEventPatternConverter {
 	}
 
 	protected String[] getOptions(String pattern, int start) {
-		List<String> options = new ArrayList<>();
+		List<String> options = new ArrayList<String>();
 		extractOptions(pattern, start, options);
 		return options.toArray(new String[0]);
 	}

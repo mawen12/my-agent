@@ -54,12 +54,7 @@ public class AgentLoggerSender implements Sender{
 		// ignored
 	}
 
-	static class ConsoleCall implements Call<Void> {
-		private final byte[] msg;
-
-		ConsoleCall(byte[] msg) {
-			this.msg = msg;
-		}
+	record ConsoleCall(byte[] msg) implements Call<Void> {
 
 		@Override
 		public Void execute() throws IOException {

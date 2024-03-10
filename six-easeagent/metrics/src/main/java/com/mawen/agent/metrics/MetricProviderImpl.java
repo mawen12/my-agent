@@ -17,7 +17,6 @@ import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.api.metric.MetricProvider;
 import com.mawen.agent.plugin.api.metric.MetricRegistry;
 import com.mawen.agent.plugin.api.metric.MetricRegistrySupplier;
-import com.mawen.agent.plugin.api.metric.name.MetricType;
 import com.mawen.agent.plugin.api.metric.name.NameFactory;
 import com.mawen.agent.plugin.api.metric.name.Tags;
 import com.mawen.agent.plugin.report.AgentReport;
@@ -66,8 +65,8 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
 	}
 
 	public static List<KeyType> keyTypes(NameFactory nameFactory) {
-		List<KeyType> keyTypes = new ArrayList<>();
-		for (MetricType metricType : nameFactory.metricTypes()) {
+		var keyTypes = new ArrayList<KeyType>();
+		for (var metricType : nameFactory.metricTypes()) {
 			switch (metricType) {
 				case TimerType -> keyTypes.add(KeyType.Timer);
 				case GaugeType -> keyTypes.add(KeyType.Gauge);
@@ -83,16 +82,16 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
 
 		@Override
 		public MetricRegistry newMetricRegistry(IPluginConfig config, NameFactory nameFactory, Tags tags) {
-			PluginMetricsConfig metricsConfig = new PluginMetricsConfig(config);
-			List<KeyType> keyTypes = keyTypes(nameFactory);
-			ConverterAdapter converterAdapter = new ConverterAdapter(nameFactory, keyTypes, additionalAttributes, tags);
-			Reporter reporter = agentReport.metricReporter().reporter(config);
-			com.codahale.metrics.MetricRegistry metricRegistry = MetricRegistryService.DEFAULT.createMetricRegistry(converterAdapter, additionalAttributes, tags);
-			AutoRefreshReporter autoRefreshReporter = new AutoRefreshReporter(metricRegistry, metricsConfig, converterAdapter, reporter::report);
+			var metricsConfig = new PluginMetricsConfig(config);
+			var keyTypes = keyTypes(nameFactory);
+			var converterAdapter = new ConverterAdapter(nameFactory, keyTypes, additionalAttributes, tags);
+			var reporter = agentReport.metricReporter().reporter(config);
+			var metricRegistry = MetricRegistryService.DEFAULT.createMetricRegistry(converterAdapter, additionalAttributes, tags);
+			var autoRefreshReporter = new AutoRefreshReporter(metricRegistry, metricsConfig, converterAdapter, reporter::report);
 			autoRefreshReporter.run();
 			registerReporter(autoRefreshReporter);
 
-			MetricRegistry result = MetricRegistryImpl.build(metricRegistry);
+			var result = MetricRegistryImpl.build(metricRegistry);
 			registerMetricRegistry(result);
 			return result;
 		}

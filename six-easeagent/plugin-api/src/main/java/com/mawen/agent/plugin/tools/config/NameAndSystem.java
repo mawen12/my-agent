@@ -21,12 +21,12 @@ public class NameAndSystem {
 		Agent.getConfig().addChangeListener(new ConfigChangeListener() {
 			@Override
 			public void onChange(List<ChangeItem> list) {
-				for (ChangeItem changeItem : list) {
-					if (ConfigConst.SERVICE_NAME.equals(changeItem.getFullName())) {
-						INSTANCE.name = changeItem.getNewValue();
+				for (var changeItem : list) {
+					if (ConfigConst.SERVICE_NAME.equals(changeItem.fullName())) {
+						INSTANCE.name = changeItem.newValue();
 					}
-					if (ConfigConst.SYSTEM_NAME.equals(changeItem.getFullName())) {
-						INSTANCE.system = changeItem.getNewValue();
+					if (ConfigConst.SYSTEM_NAME.equals(changeItem.fullName())) {
+						INSTANCE.system = changeItem.newValue();
 					}
 				}
 			}

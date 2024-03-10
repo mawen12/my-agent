@@ -15,20 +15,20 @@ public class AgentDynamicFieldAccessor {
 	public static final String DYNAMIC_FIELD_NAME = "agent_dynamic_$$$_data";
 
 	public static <T> T getDynamicFieldValue(Object target) {
-		if (!(target instanceof DynamicFieldAccessor)) {
+		if (!(target instanceof DynamicFieldAccessor dynamicFieldAccessor)) {
 			logger.warn(target.getClass().getName()," must implements DynamicFieldAccessor");
 			return null;
 		}
 
-		return (T) ((DynamicFieldAccessor) target).getAgent$$DynamicField$$Data();
+		return (T) (dynamicFieldAccessor.getAgent$$DynamicField$$Data());
 	}
 
 	public static void setDynamicFieldValue(Object target, Object value) {
-		if (!(target instanceof DynamicFieldAccessor)) {
+		if (!(target instanceof DynamicFieldAccessor dynamicFieldAccessor)) {
 			logger.warn(target.getClass().getName()," must implements DynamicFieldAccessor");
 			return;
 		}
-		((DynamicFieldAccessor) target).setAgent$$DynamicField$$Data(value);
+		dynamicFieldAccessor.setAgent$$DynamicField$$Data(value);
 	}
 
 	public static Field getDynamicFieldFormClass(Class<?> clazz) {

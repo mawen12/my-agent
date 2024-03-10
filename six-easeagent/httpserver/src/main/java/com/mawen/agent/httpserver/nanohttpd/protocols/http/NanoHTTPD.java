@@ -6,11 +6,9 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.security.KeyStore;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,17 +138,17 @@ public class NanoHTTPD {
 	 * @return a map of {@code String} （parameter name) to {@code List<String>} (a list of the values supplied).
 	 */
 	protected static Map<String, List<String>> decodeParameters(String queryString) {
-		Map<String, List<String>> params = new HashMap<>();
+		var params = new HashMap<String, List<String>>();
 		if (queryString != null) {
-			StringTokenizer st = new StringTokenizer(queryString, "&");
+			var st = new StringTokenizer(queryString, "&");
 			while (st.hasMoreTokens()) {
-				String e = st.nextToken();
-				int sep = e.indexOf("=");
-				String propertyName = sep >= 0 ? decodePercent(e.substring(0, sep)).trim() : decodePercent(e).trim();
+				var e = st.nextToken();
+				var sep = e.indexOf("=");
+				var propertyName = sep >= 0 ? decodePercent(e.substring(0, sep)).trim() : decodePercent(e).trim();
 				if (!params.containsKey(propertyName)) {
 					params.put(propertyName, new ArrayList<>());
 				}
-				String propertyValue = sep >= 0 ? decodePercent(e.substring(sep + 1)) : null;
+				var propertyValue = sep >= 0 ? decodePercent(e.substring(sep + 1)) : null;
 				if (propertyValue != null) {
 					params.get(propertyName).add(propertyValue);
 				}
@@ -184,9 +182,9 @@ public class NanoHTTPD {
 	public static SSLServerSocketFactory makeSSLSocketFactory(KeyStore loadedKeyStore, KeyManager[] keyManagers) throws IOException {
 		SSLServerSocketFactory res = null;
 		try {
-			TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			var trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 			trustManagerFactory.init(loadedKeyStore);
-			SSLContext ctx = SSLContext.getInstance("TLS");
+			var ctx = SSLContext.getInstance("TLS");
 			ctx.init(keyManagers, trustManagerFactory.getTrustManagers(), null);
 			res = ctx.getServerSocketFactory();
 		}
@@ -235,8 +233,8 @@ public class NanoHTTPD {
 	 * @return a response to the incoming session
 	 */
 	public Response handle(IHTTPSession session) {
-		for (IHandler<IHTTPSession, Response> interceptor : interceptors) {
-			Response response = interceptor.handle(session);
+		for (var interceptor : interceptors) {
+			var response = interceptor.handle(session);
 			if (response != null) {
 				return response;
 			}
@@ -263,7 +261,7 @@ public class NanoHTTPD {
 	 * @return the connected mime/type
 	 */
 	public static String getMimeTypeForFile(String uri) {
-		int dot = uri.lastIndexOf('.');
+		var dot = uri.lastIndexOf('.');
 		String mime = null;
 		if (dot >= 0) {
 			mime = mimeTypes().get(uri.substring(dot + 1).toLowerCase());
@@ -271,16 +269,16 @@ public class NanoHTTPD {
 		return mime == null ? "application/octet-stream" : mime;
 	}
 
-	public final static void safeClose(Object closeable) {
+	public final static void safeClose(Object object) {
 		try {
-			if (closeable != null) {
-				if (closeable instanceof Closeable) {
-					((Closeable) closeable).close();
+			if (object != null) {
+				if (object instanceof Closeable closeable) {
+					closeable.close();
 				}
-				else if (closeable instanceof Socket) {
-					((Socket)closeable).close();
-				} else if (closeable instanceof ServerSocket) {
-					((ServerSocket)closeable).close();
+				else if (object instanceof Socket socket) {
+					socket.close();
+				} else if (object instanceof ServerSocket serverSocket) {
+					serverSocket.close();
 				} else {
 					throw new IllegalArgumentException("Unknown object to close");
 				}
@@ -320,7 +318,7 @@ public class NanoHTTPD {
 		this.myServerSocket = this.getServerSocketFactory().create();
 		this.myServerSocket.setReuseAddress(true);
 
-		ServerRunnable serverRunnable = createServerRunnable(timeout);
+		var serverRunnable = createServerRunnable(timeout);
 		this.myThread = new Thread(serverRunnable);
 		this.myThread.setDaemon(true);
 		this.myThread.setName("NanoHttpd Main Listener");
@@ -388,10 +386,10 @@ public class NanoHTTPD {
 
 	private static void loadMimeTypes(Map<String, String> result, String resourceName) {
 		try {
-			Enumeration<URL> resources = NanoHTTPD.class.getClassLoader().getResources(resourceName);
+			var resources = NanoHTTPD.class.getClassLoader().getResources(resourceName);
 			while (resources.hasMoreElements()) {
-				URL url = resources.nextElement();
-				Properties properties = new Properties();
+				var url = resources.nextElement();
+				var properties = new Properties();
 				InputStream stream = null;
 				try {
 					stream = url.openStream();

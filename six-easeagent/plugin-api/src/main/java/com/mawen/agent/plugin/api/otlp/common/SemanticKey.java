@@ -21,7 +21,7 @@ public class SemanticKey {
 	private static final ConcurrentHashMap<String, AttributeKey<String>> keysMap = new ConcurrentHashMap<>();
 
 	public static AttributeKey<String> stringKey(String key) {
-		AttributeKey<String> vk = keysMap.get(key);
+		var vk = keysMap.get(key);
 		return vk != null ? vk : keysMap.computeIfAbsent(key, AttributeKey::stringKey);
 	}
 }

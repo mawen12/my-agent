@@ -43,7 +43,7 @@ public class HttpSpanJsonEncoder implements Encoder<ReportSpan>{
 
 	@Override
 	public EncodedData encodeList(List<EncodedData> encodedDataItems) {
-		EncodedData body = this.encoder.encodeList(encodedDataItems);
+		var body = this.encoder.encodeList(encodedDataItems);
 		return new OkHttpJsonRequestBody(body.getData());
 	}
 

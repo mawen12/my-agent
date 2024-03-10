@@ -1,7 +1,6 @@
 package com.mawen.agent.report.async.zipkin;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.mawen.agent.plugin.report.Encoder;
@@ -34,8 +33,8 @@ public class AgentBufferNextMessage<S> implements WithSizeConsumer<S> {
 	}
 
 	public boolean offer(S next, int nextSizeInBytes) {
-		int x = messageSizeInBytes(nextSizeInBytes);
-		int includingNextVsMaxBytes = Integer.compare(x, maxBytes);
+		var x = messageSizeInBytes(nextSizeInBytes);
+		var includingNextVsMaxBytes = Integer.compare(x, maxBytes);
 
 		if (includingNextVsMaxBytes > 0) {
 			bufferFull = true;
@@ -63,8 +62,8 @@ public class AgentBufferNextMessage<S> implements WithSizeConsumer<S> {
 	}
 
 	public void drain(WithSizeConsumer<S> consumer) {
-		Iterator<S> spanIterator = spans.iterator();
-		Iterator<Integer> sizeIterator = sizes.iterator();
+		var spanIterator = spans.iterator();
+		var sizeIterator = sizes.iterator();
 		while (spanIterator.hasNext()) {
 			if (consumer.offer(spanIterator.next(), sizeIterator.next())) {
 				bufferFull = false;

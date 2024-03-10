@@ -54,11 +54,11 @@ public class AgentResource extends Resource implements ConfigChangeListener {
 	@Override
 	public void onChange(List<ChangeItem> list) {
 		list.forEach(change -> {
-			if (change.getFullName().equals("name")) {
-				this.service = change.getNewValue();
+			if (change.fullName().equals("name")) {
+				this.service = change.newValue();
 			}
-			else if (change.getFullName().equals("system")) {
-				this.system = change.getNewValue();
+			else if (change.fullName().equals("system")) {
+				this.system = change.newValue();
 			}
 
 			this.resource.merge(Resource.create(

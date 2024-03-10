@@ -42,8 +42,8 @@ public class WrappedConfigManager implements ConfigManagerMXBean{
 			});
 		}
 		catch (Exception e) {
-			if (e.getCause() instanceof IOException) {
-				throw (IOException) e.getCause();
+			if (e.getCause() instanceof IOException ioe) {
+				throw ioe;
 			}
 			throw e;
 		}
@@ -63,8 +63,8 @@ public class WrappedConfigManager implements ConfigManagerMXBean{
 			});
 		}
 		catch (RuntimeException e) {
-			if (e.getCause() instanceof IOException) {
-				throw (IOException) e.getCause();
+			if (e.getCause() instanceof IOException ioe) {
+				throw ioe;
 			}
 			throw e;
 		}

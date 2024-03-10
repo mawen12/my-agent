@@ -14,19 +14,11 @@ import com.mawen.agent.httpserver.nanohttpd.util.IFactoryThrowing;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/27
  */
-public class SecureServerSocketFactory implements IFactoryThrowing<ServerSocket, IOException> {
-
-	private SSLServerSocketFactory sslServerSocketFactory;
-	private String[] sslProtocols;
-
-	public SecureServerSocketFactory(SSLServerSocketFactory sslServerSocketFactory, String[] sslProtocols) {
-		this.sslServerSocketFactory = sslServerSocketFactory;
-		this.sslProtocols = sslProtocols;
-	}
+public record SecureServerSocketFactory(SSLServerSocketFactory sslServerSocketFactory, String[] sslProtocols) implements IFactoryThrowing<ServerSocket, IOException> {
 
 	@Override
 	public ServerSocket create() throws IOException {
-		SSLServerSocket ss = (SSLServerSocket) this.sslServerSocketFactory.createServerSocket();
+		var ss = (SSLServerSocket) this.sslServerSocketFactory.createServerSocket();
 		if (this.sslProtocols != null) {
 			ss.setEnabledProtocols(this.sslProtocols);
 		} else {

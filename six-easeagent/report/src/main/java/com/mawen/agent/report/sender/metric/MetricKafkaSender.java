@@ -69,9 +69,9 @@ public class MetricKafkaSender implements Sender {
 			appenderManager.refresh();
 		}
 		// check topic
-		Map<String, String> cfg = this.props.asReportConfig().getConfigs();
+		var cfg = this.props.asReportConfig().getConfigs();
 		cfg.putAll(changes);
-		MetricProps nProps = MetricProps.newDefault(new GlobalConfigs(cfg), this.prefix);
+		var nProps = MetricProps.newDefault(new GlobalConfigs(cfg), this.prefix);
 		if (nProps.getTopic().equals(this.props.getTopic())) {
 			try {
 				this.close();
@@ -108,16 +108,16 @@ public class MetricKafkaSender implements Sender {
 		if (logger != null) {
 			return;
 		}
-		String loggerName = prepareAppenderAndLogger();
+		var loggerName = prepareAppenderAndLogger();
 		logger = com.mawen.agent.report.sender.metric.log4j.LoggerFactory.getLoggerContext().getLogger(loggerName);
 	}
 
 	private String prepareAppenderAndLogger() {
-		RefreshableAppender build = RefreshableAppender.builder()
+		return RefreshableAppender.builder()
 				.names(this.props.getName())
 				.metricProps(this.props)
 				.appenderManager(appenderManager)
-				.build();
-		return build.getLogger();
+				.build()
+				.getLogger();
 	}
 }

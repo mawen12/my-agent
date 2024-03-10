@@ -18,7 +18,7 @@ public class ValidateUtils {
 
 	public static void validate(Configs configs,  String name, Validator... vs) {
 		String value = configs.getString(name);
-		for (Validator one : vs) {
+		for (var one : vs) {
 			one.validate(name,value);
 		}
 	}
@@ -30,7 +30,7 @@ public class ValidateUtils {
 	});
 
 	public static final Validator Bool = ((name, value) -> {
-		String upper = value.toUpperCase();
+		var upper = value.toUpperCase();
 		if (upper.equals("TRUE") || upper.equals("FALSE")) {
 			return;
 		}

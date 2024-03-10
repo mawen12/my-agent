@@ -66,7 +66,7 @@ public enum Status implements IStatus {
 	}
 
 	public static Status lookup(int requestStatus) {
-		for (Status status : Status.values()) {
+		for (var status : Status.values()) {
 			if (status.requestStatus == requestStatus) {
 				return status;
 			}

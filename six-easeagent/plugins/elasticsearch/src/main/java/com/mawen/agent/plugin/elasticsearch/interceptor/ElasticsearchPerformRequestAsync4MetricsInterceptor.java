@@ -2,7 +2,6 @@ package com.mawen.agent.plugin.elasticsearch.interceptor;
 
 import com.mawen.agent.plugin.annotation.AdviceTo;
 import com.mawen.agent.plugin.api.Context;
-import com.mawen.agent.plugin.api.context.AsyncContext;
 import com.mawen.agent.plugin.elasticsearch.ElasticsearchPlugin;
 import com.mawen.agent.plugin.elasticsearch.points.ElasticsearchPerformRequestAsyncPoints;
 import com.mawen.agent.plugin.interceptor.MethodInfo;
@@ -20,11 +19,11 @@ public class ElasticsearchPerformRequestAsync4MetricsInterceptor extends Elastic
 
 	@Override
 	public void before(MethodInfo methodInfo, Context context) {
-		Request request = (Request) methodInfo.getArgs()[0];
+		var request = (Request) methodInfo.getArgs()[0];
 		context.put(REQUEST, request);
-		AsyncContext asyncContext = context.exportAsync();
-		ResponseListener listener = (ResponseListener) methodInfo.getArgs()[1];
-		ResponseListener asyncResponse4MetricsListener = new AsyncResponse4MetricsListener(listener, asyncContext, elasticsearchMetric);
+		var asyncContext = context.exportAsync();
+		var listener = (ResponseListener) methodInfo.getArgs()[1];
+		var asyncResponse4MetricsListener = new AsyncResponse4MetricsListener(listener, asyncContext, elasticsearchMetric);
 		methodInfo.changeArg(1, asyncResponse4MetricsListener);
 	}
 }

@@ -4,12 +4,7 @@ package com.mawen.agent.plugin.report;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/24
  */
-public class ByteWrapper implements EncodedData{
-	byte[] data;
-
-	public ByteWrapper(byte[] data) {
-		this.data = data;
-	}
+public record ByteWrapper(byte[] data) implements EncodedData{
 
 	@Override
 	public int size() {
@@ -18,6 +13,6 @@ public class ByteWrapper implements EncodedData{
 
 	@Override
 	public byte[] getData() {
-		return data;
+		return data();
 	}
 }

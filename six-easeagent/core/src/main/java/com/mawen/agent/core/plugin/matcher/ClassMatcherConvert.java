@@ -27,17 +27,17 @@ public class ClassMatcherConvert implements Converter<IClassMatcher, ElementMatc
 		}
 
 		if (source instanceof AndClassMatcher andMatcher) {
-			ElementMatcher.Junction<TypeDescription> leftMatcher = this.convert(andMatcher.getLeft());
-			ElementMatcher.Junction<TypeDescription> rightMatcher = this.convert(andMatcher.getRight());
+			var leftMatcher = this.convert(andMatcher.getLeft());
+			var rightMatcher = this.convert(andMatcher.getRight());
 			return leftMatcher.and(rightMatcher);
 		}
 		else if (source instanceof OrClassMatcher orMatcher) {
-			ElementMatcher.Junction<TypeDescription> leftMatcher = this.convert(orMatcher.getLeft());
-			ElementMatcher.Junction<TypeDescription> rightMatcher = this.convert(orMatcher.getRight());
+			var leftMatcher = this.convert(orMatcher.getLeft());
+			var rightMatcher = this.convert(orMatcher.getRight());
 			return leftMatcher.or(rightMatcher);
 		}
 		else if (source instanceof NegateClassMatcher matcher) {
-			ElementMatcher.Junction<TypeDescription> notMatcher = this.convert(matcher.getMatcher());
+			var notMatcher = this.convert(matcher.getMatcher());
 			return new NegatingMatcher<>(notMatcher);
 		}
 
@@ -49,25 +49,18 @@ public class ClassMatcherConvert implements Converter<IClassMatcher, ElementMatc
 	}
 
 	private ElementMatcher.Junction<TypeDescription> convert(ClassMatcher matcher) {
-		ElementMatcher.Junction<TypeDescription> c;
-		switch (matcher.getMatchType()) {
-			case NAMED:
-				c = named(matcher.getName());
-				break;
-			case SUPER_CLASS:
-			case INTERFACE:
-				c = hasSuperType(named(matcher.getName()));
-				break;
-			case ANNOTATION:
-				c = isAnnotatedWith(named(matcher.getName()));
-				break;
-			default:
-				return null;
-		}
+		var name = matcher.getName();
+		ElementMatcher.Junction<TypeDescription> c = switch (matcher.getMatchType()) {
+			case NAMED -> named(name);
+			case SUPER_CLASS -> hasSuperType(named(name));
+			case INTERFACE -> hasSuperType(named(name));
+			case ANNOTATION -> isAnnotatedWith(named(name));
+			default -> null;
+		};
 
-		ElementMatcher.Junction<TypeDescription> mc = fromModifier(matcher.getModifier(), false);
+		var mc = fromModifier(matcher.getModifier(), false);
 		if (mc != null) {
-			c = c.and(c);
+			c = c.and(mc);
 		}
 		mc = fromModifier(matcher.getNotModifier(), true);
 		if (mc != null) {

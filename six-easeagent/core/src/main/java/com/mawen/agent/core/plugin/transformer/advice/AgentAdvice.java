@@ -24,7 +24,6 @@ import net.bytebuddy.asm.Advice;
 import net.bytebuddy.build.HashCodeAndEqualsPlugin;
 import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.method.MethodList;
 import net.bytebuddy.description.method.ParameterDescription;
 import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
@@ -72,13 +71,13 @@ public class AgentAdvice extends Advice {
 	private static final InDefinedShape SUPPRESS_EXIT;
 
 	static {
-		MethodList<InDefinedShape> enter = TypeDescription.ForLoadedType.of(OnMethodEnter.class).getDeclaredMethods();
+		var enter = TypeDescription.ForLoadedType.of(OnMethodEnter.class).getDeclaredMethods();
 		SKIP_ON = enter.filter(named("skipOn")).getOnly();
 		PREPEND_LINE_NUMBER = enter.filter(named("prependLineNumber")).getOnly();
 		INLINE_ENTER = enter.filter(named("inline")).getOnly();
 		SUPPRESS_ENTER = enter.filter(named("suppress")).getOnly();
 
-		MethodList<InDefinedShape> exit = TypeDescription.ForLoadedType.of(OnMethodExit.class).getDeclaredMethods();
+		var exit = TypeDescription.ForLoadedType.of(OnMethodExit.class).getDeclaredMethods();
 		REPEAT_ON = exit.filter(named("repeatOn")).getOnly();
 		ON_THROWABLE = exit.filter(named("onThrowable")).getOnly();
 		BACKUP_ARGUMENTS = exit.filter(named("backupArguments")).getOnly();
@@ -558,27 +557,13 @@ public class AgentAdvice extends Advice {
 		protected void onVisitInsn(int opcode) {
 			if (mv instanceof StackAwareMethodVisitor visitor) {
 				switch (opcode) {
-					case Opcodes.RETURN:
-						visitor.drainStack();
-						break;
-					case Opcodes.IRETURN:
-						methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.ISTORE, Opcodes.ILOAD, StackSize.SINGLE));
-						break;
-					case Opcodes.FRETURN:
-						methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.FSTORE, Opcodes.FLOAD, StackSize.SINGLE));
-						break;
-					case Opcodes.DRETURN:
-						methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.DSTORE, Opcodes.DLOAD, StackSize.DOUBLE));
-						break;
-					case Opcodes.LRETURN:
-						methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.LSTORE, Opcodes.LLOAD, StackSize.DOUBLE));
-						break;
-					case Opcodes.ARETURN:
-						methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.ASTORE, Opcodes.ALOAD, StackSize.SINGLE));
-						break;
-					default:
-						mv.visitInsn(opcode);
-						return;
+					case Opcodes.RETURN -> visitor.drainStack();
+					case Opcodes.IRETURN -> methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.ISTORE, Opcodes.ILOAD, StackSize.SINGLE));
+					case Opcodes.FRETURN -> methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.FSTORE, Opcodes.FLOAD, StackSize.SINGLE));
+					case Opcodes.DRETURN -> methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.DSTORE, Opcodes.DLOAD, StackSize.DOUBLE));
+					case Opcodes.LRETURN -> methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.LSTORE, Opcodes.LLOAD, StackSize.DOUBLE));
+					case Opcodes.ARETURN -> methodSizeHandler.requireLocalVariableLength(visitor.drainStack(Opcodes.ASTORE, Opcodes.ALOAD, StackSize.SINGLE));
+					default -> mv.visitInsn(opcode);
 				}
 				mv.visitJumpInsn(Opcodes.GOTO, returnHandler);
 			}

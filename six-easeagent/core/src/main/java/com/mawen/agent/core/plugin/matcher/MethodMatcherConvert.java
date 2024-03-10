@@ -8,7 +8,6 @@ import com.mawen.agent.plugin.matcher.operator.AndMethodMatcher;
 import com.mawen.agent.plugin.matcher.operator.NegateMethodMatcher;
 import com.mawen.agent.plugin.matcher.operator.OrMethodMatcher;
 import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.NegatingMatcher;
 
@@ -29,17 +28,17 @@ public class MethodMatcherConvert implements Converter<IMethodMatcher, ElementMa
 		}
 
 		if (source instanceof AndMethodMatcher andMatcher) {
-			ElementMatcher.Junction<MethodDescription> leftMatcher = this.convert(andMatcher.getLeft());
-			ElementMatcher.Junction<MethodDescription> rightMatcher = this.convert(andMatcher.getRight());
+			var leftMatcher = this.convert(andMatcher.getLeft());
+			var rightMatcher = this.convert(andMatcher.getRight());
 			return leftMatcher.and(rightMatcher);
 		}
 		else if (source instanceof OrMethodMatcher orMatcher) {
-			ElementMatcher.Junction<MethodDescription> leftMatcher = this.convert(orMatcher.getLeft());
-			ElementMatcher.Junction<MethodDescription> rightMatcher = this.convert(orMatcher.getRight());
+			var leftMatcher = this.convert(orMatcher.getLeft());
+			var rightMatcher = this.convert(orMatcher.getRight());
 			return leftMatcher.or(rightMatcher);
 		}
 		else if (source instanceof NegateMethodMatcher matcher) {
-			ElementMatcher.Junction<MethodDescription> notMatcher = this.convert(matcher.getMatcher());
+			var notMatcher = this.convert(matcher.getMatcher());
 			return new NegatingMatcher<>(notMatcher);
 		}
 
@@ -53,30 +52,19 @@ public class MethodMatcherConvert implements Converter<IMethodMatcher, ElementMa
 	private ElementMatcher.Junction<MethodDescription> convert(MethodMatcher matcher) {
 		ElementMatcher.Junction<MethodDescription> c = null;
 		if (matcher.getName() != null && matcher.getNameMatchType() != null) {
-			switch (matcher.getNameMatchType()) {
-				case EQUALS:
-					if ("<init>".equals(matcher.getName())) {
-						c = isConstructor();
-					}
-					else {
-						c = named(matcher.getName());
-					}
-					break;
-				case START_WITH:
-					c = nameStartsWith(matcher.getName());
-					break;
-				case END_WITH:
-					c = nameEndsWith(matcher.getName());
-					break;
-				case CONTAINS:
-					c = nameContains(matcher.getName());
-					break;
-				default:
-					return null;
-			}
+			var name = matcher.getName();
+			var nameMatchType = matcher.getNameMatchType();
+
+			c = switch (nameMatchType) {
+				case EQUALS -> "<init>".equals(matcher.getName()) ? isConstructor() : named(name);
+				case START_WITH -> nameStartsWith(name);
+				case END_WITH -> nameStartsWith(name);
+				case CONTAINS -> nameContains(matcher.getName());
+				default -> null;
+			};
 		}
 
-		ElementMatcher.Junction<MethodDescription> mc = fromModifier(matcher.getModifier(), false);
+		var mc = fromModifier(matcher.getModifier(), false);
 		if (mc != null) {
 			c = c == null ? mc : c.and(mc);
 		}
@@ -96,7 +84,7 @@ public class MethodMatcherConvert implements Converter<IMethodMatcher, ElementMa
 			c = c == null ? mc : c.and(mc);
 		}
 
-		String[] args = matcher.getArgs();
+		var args = matcher.getArgs();
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
 				if (args[i] != null) {
@@ -112,7 +100,7 @@ public class MethodMatcherConvert implements Converter<IMethodMatcher, ElementMa
 		}
 
 		if (matcher.getOverriddenFrom() != null) {
-			ElementMatcher.Junction<TypeDescription> cls = ClassMatcherConvert.INSTANCE.convert(matcher.getOverriddenFrom());
+			var cls = ClassMatcherConvert.INSTANCE.convert(matcher.getOverriddenFrom());
 			mc = isOverriddenFrom(cls);
 			c = c == null ? mc : c.and(mc);
 		}

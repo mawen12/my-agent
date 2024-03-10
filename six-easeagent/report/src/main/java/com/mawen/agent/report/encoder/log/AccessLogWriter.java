@@ -63,7 +63,7 @@ public class AccessLogWriter implements WriteBuffer.Writer<AccessLogInfo> {
 			return value.getEncodedData().size();
 		}
 
-		int size = STATIC_SIZE;
+		var size = STATIC_SIZE;
 		size += value.getType().length();
 
 		size += JsonEscaper.jsonEscapedSizeInBytes(value.getUrl());
@@ -188,11 +188,11 @@ public class AccessLogWriter implements WriteBuffer.Writer<AccessLogInfo> {
 	}
 
 	private int mapSizeInBytes(Map<String, String> vs) {
-		int s = 1;
+		var s = 1;
 		if (vs.isEmpty()) {
 			return s;
 		}
-		for (Map.Entry<String, String> kv : vs.entrySet()) {
+		for (var kv : vs.entrySet()) {
 			if (s > 1) {
 				s += 6;
 			} else {
@@ -214,7 +214,7 @@ public class AccessLogWriter implements WriteBuffer.Writer<AccessLogInfo> {
 
 	private void writeMap(Map<String, String> vs, WriteBuffer b) {
 		int idx = 0;
-		for (Map.Entry<String, String> kv : vs.entrySet()) {
+		for (var kv : vs.entrySet()) {
 			if (idx++ > 0) {
 				b.writeByte(',');
 			}

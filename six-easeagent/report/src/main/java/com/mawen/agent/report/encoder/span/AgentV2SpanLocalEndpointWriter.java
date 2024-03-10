@@ -18,7 +18,7 @@ public class AgentV2SpanLocalEndpointWriter extends AbstractAgentV2SpanEndpointW
 		if (value.localEndpoint() == null) {
 			return 0;
 		}
-		int size = LOCAL_ENDPOINT_FIELD_NAME.length();
+		var size = LOCAL_ENDPOINT_FIELD_NAME.length();
 		size += this.endpointSizeInBytes(value.localEndpoint(), true);
 		return size;
 	}

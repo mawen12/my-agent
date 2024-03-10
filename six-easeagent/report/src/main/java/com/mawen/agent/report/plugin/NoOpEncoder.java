@@ -38,7 +38,7 @@ public class NoOpEncoder<S> implements Encoder<S> {
 
 	@Override
 	public EncodedData encodeList(List<EncodedData> encodedItems) {
-		StringBuilder sb = new StringBuilder();
+		var sb = new StringBuilder();
 		encodedItems.forEach(sb::append);
 		return new ByteWrapper(sb.toString().getBytes(StandardCharsets.US_ASCII));
 	}

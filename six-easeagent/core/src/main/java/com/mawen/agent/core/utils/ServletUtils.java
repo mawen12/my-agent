@@ -1,7 +1,6 @@
 package com.mawen.agent.core.utils;
 
 import java.net.URLDecoder;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +21,7 @@ public class ServletUtils {
 	public static final String BEST_MATCHING_PATTERN_ATTRIBUTE = "org.springframework.web.servlet.HandlerMapping.bestMatchingPattern";
 
 	public static String getHttpRouteAttributeFromRequest(HttpServletRequest request) {
-		Object httpRoute = request.getAttribute(BEST_MATCHING_PATTERN_ATTRIBUTE);
+		var httpRoute = request.getAttribute(BEST_MATCHING_PATTERN_ATTRIBUTE);
 		return httpRoute != null ? httpRoute.toString() : "";
 	}
 
@@ -31,7 +30,7 @@ public class ServletUtils {
 			return UNKNOWN;
 		}
 
-		String ip = request.getHeader("x-forwarded-for");
+		var ip = request.getHeader("x-forwarded-for");
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("Proxy-Client-IP");
 		}
@@ -45,11 +44,11 @@ public class ServletUtils {
 	}
 
 	public static Map<String, String> getHeaders(HttpServletRequest request) {
-		Enumeration<String> headerNames = request.getHeaderNames();
-		Map<String, String> map = new HashMap<>();
+		var headerNames = request.getHeaderNames();
+		var map = new HashMap<String, String>();
 		while (headerNames.hasMoreElements()) {
-			String name = headerNames.nextElement();
-			String value = request.getHeader(name);
+			var name = headerNames.nextElement();
+			var value = request.getHeader(name);
 			map.put(name, value);
 		}
 		return map;
@@ -57,20 +56,20 @@ public class ServletUtils {
 
 	@SneakyThrows
 	public static Map<String, List<String>> getQueries(HttpServletRequest request) {
-		Map<String, List<String>> map = new HashMap<>();
-		String queryString = request.getQueryString();
+		var map = new HashMap<String, List<String>>();
+		var queryString = request.getQueryString();
 		if (queryString == null || queryString.isEmpty()) {
 			return map;
 		}
 
-		String[] pairs = queryString.split("&");
-		for (String pair : pairs) {
-			int idx = pair.indexOf("=");
-			String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
+		var pairs = queryString.split("&");
+		for (var pair : pairs) {
+			var idx = pair.indexOf("=");
+			var key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
 			if (!map.containsKey(key)) {
 				map.put(key, new LinkedList<>());
 			}
-			String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
+			var value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
 			map.get(key).add(value);
 		}
 

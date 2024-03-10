@@ -1,10 +1,7 @@
 package com.mawen.agent.metrics.jvm.memory;
 
 import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryPoolMXBean;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.mawen.agent.metrics.model.JVMMemoryGaugeMetricModel;
@@ -15,7 +12,6 @@ import com.mawen.agent.plugin.api.metric.MetricRegistry;
 import com.mawen.agent.plugin.api.metric.ServiceMetric;
 import com.mawen.agent.plugin.api.metric.ServiceMetricRegistry;
 import com.mawen.agent.plugin.api.metric.ServiceMetricSupplier;
-import com.mawen.agent.plugin.api.metric.name.MetricName;
 import com.mawen.agent.plugin.api.metric.name.MetricSubType;
 import com.mawen.agent.plugin.api.metric.name.NameFactory;
 import com.mawen.agent.plugin.api.metric.name.Tags;
@@ -50,9 +46,9 @@ public class JVMMemoryMetricV2 extends ServiceMetric implements ScheduleRunner {
 
 	public static JVMMemoryMetricV2 getMetric() {
 		config = AutoRefreshPluginConfigRegistry.getOrCreate("observability", "jvmMemory", "metric");
-		Tags tags = new Tags("application", "jvm-memory", "resource");
+		var tags = new Tags("application", "jvm-memory", "resource");
 
-		JVMMemoryMetricV2 v2 = ServiceMetricRegistry.getOrCreate(config, tags, SUPPLIER);
+		var v2 = ServiceMetricRegistry.getOrCreate(config, tags, SUPPLIER);
 		ScheduleHelper.DEFAULT.nonStopExecute(10, 10, v2::doJob);
 
 		return v2;
@@ -70,15 +66,15 @@ public class JVMMemoryMetricV2 extends ServiceMetric implements ScheduleRunner {
 			return;
 		}
 
-		List<MemoryPoolMXBean> memoryPoolMXBeans = ManagementFactory.getMemoryPoolMXBeans();
-		for (MemoryPoolMXBean memoryPoolMXBean : memoryPoolMXBeans) {
-			String memoryPoolMXBeanName = memoryPoolMXBean.getName();
+		var memoryPoolMXBeans = ManagementFactory.getMemoryPoolMXBeans();
+		for (var memoryPoolMXBean : memoryPoolMXBeans) {
+			var memoryPoolMXBeanName = memoryPoolMXBean.getName();
 
-			final String poolName = com.codahale.metrics.MetricRegistry.name(POOLS, WHITESPACE.matcher(memoryPoolMXBeanName).replaceAll("-"));
+			final var poolName = com.codahale.metrics.MetricRegistry.name(POOLS, WHITESPACE.matcher(memoryPoolMXBeanName).replaceAll("-"));
 
-			Map<MetricSubType, MetricName> map = this.nameFactory.gaugeNames(poolName);
-			for (Map.Entry<MetricSubType, MetricName> entry : map.entrySet()) {
-				MetricName metricName = entry.getValue();
+			var map = this.nameFactory.gaugeNames(poolName);
+			for (var entry : map.entrySet()) {
+				var metricName = entry.getValue();
 
 				Gauge<JVMMemoryGaugeMetricModel> gauge = () -> new JVMMemoryGaugeMetricModel(
 						memoryPoolMXBean.getUsage().getInit(),

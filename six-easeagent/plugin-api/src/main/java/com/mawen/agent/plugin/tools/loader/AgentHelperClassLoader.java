@@ -27,7 +27,7 @@ public class AgentHelperClassLoader extends URLClassLoader {
 	}
 
 	public static AgentHelperClassLoader getClassLoader(ClassLoader parent, URLClassLoader agent) {
-		AgentHelperClassLoader help = helpLoaders.getIfPresent(parent);
+		var help = helpLoaders.getIfPresent(parent);
 		if (help != null) {
 			return help;
 		}
@@ -54,7 +54,7 @@ public class AgentHelperClassLoader extends URLClassLoader {
 		}
 		catch (ClassNotFoundException e) {
 			try {
-				final Class<?> aClass = this.agentClassLoader.loadClass(name);
+				final var aClass = this.agentClassLoader.loadClass(name);
 				if (resolve) {
 					resolveClass(aClass);
 				}
@@ -69,7 +69,7 @@ public class AgentHelperClassLoader extends URLClassLoader {
 
 	@Override
 	public URL findResource(String name) {
-		URL url = super.findResource(name);
+		var url = super.findResource(name);
 		try {
 			url = this.agentClassLoader.getResource(name);
 			if (url != null) {

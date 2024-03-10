@@ -3,20 +3,14 @@ package com.mawen.agent.plugin.tools.metrics;
 import java.util.Map;
 
 import com.mawen.agent.plugin.utils.ImmutableMap;
-import lombok.Builder;
-import lombok.Data;
 
-/**
- * @author <a href="1181963012mw@gmail.com">mawen12</a>
- * @since 2024/3/4
- */
-@Builder
-@Data
-public class LastMinutesCounterGauge implements GaugeMetricModel{
-	private final long m1Count;
-	private final long m5Count;
-	private final long m15Count;
-	private final String prefix;
+
+public record LastMinutesCounterGauge(
+		long m1Count,
+		long m5Count,
+		long m15Count,
+		String prefix
+) implements GaugeMetricModel{
 
 	@Override
 	public Map<String, Object> toHashMap() {

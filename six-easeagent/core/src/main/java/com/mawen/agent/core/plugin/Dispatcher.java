@@ -8,7 +8,6 @@ import com.mawen.agent.plugin.api.InitializeContext;
 import com.mawen.agent.plugin.interceptor.AgentInterceptorChain;
 import com.mawen.agent.plugin.interceptor.MethodInfo;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -22,15 +21,15 @@ public final class Dispatcher implements AppendBootstrapLoader {
 	static AgentArray<AgentInterceptorChain> chains = new AgentArray<>();
 
 	public static void enter(int index, MethodInfo info, InitializeContext ctx) {
-		AgentInterceptorChain chain = chains.getUncheck(index);
-		int pos = 0;
+		var chain = chains.getUncheck(index);
+		var pos = 0;
 		ContextUtils.setBeginTime(ctx);
 		chain.doBefore(info, pos, ctx);
 	}
 
 	public static Object exit(int index, MethodInfo info, InitializeContext ctx) {
-		AgentInterceptorChain chain = chains.getUncheck(index);
-		int pos = chain.size() - 1;
+		var chain = chains.getUncheck(index);
+		var pos = chain.size() - 1;
 		ContextUtils.setEndTime(ctx);
 		return chain.doAfter(info, pos, ctx);
 	}

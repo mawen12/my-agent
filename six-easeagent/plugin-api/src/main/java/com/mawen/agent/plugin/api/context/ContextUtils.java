@@ -32,7 +32,7 @@ public class ContextUtils {
 	}
 
 	public static Long getDuration(Context context, Object startKey) {
-		Long now = SystemClock.now();
+		var now = SystemClock.now();
 		return now - (Long) context.remove(startKey);
 	}
 

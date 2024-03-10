@@ -29,7 +29,7 @@ public class CommonInlineAdvice {
 			return null;
 		}
 
-		MethodInfo methodInfo = MethodInfo.builder()
+		var methodInfo = MethodInfo.builder()
 				.invoker(invoker)
 				.type(type)
 				.method(method)

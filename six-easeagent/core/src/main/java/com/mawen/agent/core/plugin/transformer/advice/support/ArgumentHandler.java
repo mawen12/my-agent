@@ -294,7 +294,7 @@ public interface ArgumentHandler {
 		}
 	}
 
-	public enum Factory {
+	enum Factory {
 		SIMPLE {
 			@Override
 			public ForInstrumentedMethod resolve(MethodDescription method, TypeDefinition enterType, TypeDefinition exitType, SortedMap<String, TypeDefinition> namedTypes) {

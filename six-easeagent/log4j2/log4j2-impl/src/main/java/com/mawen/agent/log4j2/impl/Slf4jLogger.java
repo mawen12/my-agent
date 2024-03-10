@@ -31,107 +31,44 @@ public class Slf4jLogger extends java.util.logging.Logger {
 
 	@Override
 	public boolean isLoggable(Level level) {
-		switch (level.intValue()) {
-			case ERROR_VALUE:
-				return logger.isErrorEnabled();
-			case WARN_VALUE:
-				return logger.isWarnEnabled();
-			case INFO_VALUE:
-				return logger.isInfoEnabled();
-			case DEBUG_VALUE:
-				return logger.isDebugEnabled();
-			case TRACE_VALUE:
-				return logger.isTraceEnabled();
-			default:
-		}
-		return false;
+		return switch (level.intValue()) {
+			case ERROR_VALUE -> logger.isErrorEnabled();
+			case WARN_VALUE -> logger.isWarnEnabled();
+			case INFO_VALUE -> logger.isInfoEnabled();
+			case DEBUG_VALUE -> logger.isDebugEnabled();
+			case TRACE_VALUE -> logger.isTraceEnabled();
+			default -> false;
+		};
 	}
 
 	@Override
 	public void log(Level level, String msg) {
-		switch (level.intValue()) {
-			case ERROR_VALUE:
-				logger.error(msg);
-				break;
-			case WARN_VALUE:
-				logger.warn(msg);
-				break;
-			case INFO_VALUE:
-				logger.info(msg);
-				break;
-			case DEBUG_VALUE:
-				logger.debug(msg);
-				break;
-			case TRACE_VALUE:
-				logger.trace(msg);
-				break;
-			default:
-		}
+		doLog(level,msg,null);
 	}
 
 	@Override
 	public void log(Level level, String msg, Object param1) {
-		switch (level.intValue()) {
-			case ERROR_VALUE:
-				logger.error(msg, param1);
-				break;
-			case WARN_VALUE:
-				logger.warn(msg, param1);
-				break;
-			case INFO_VALUE:
-				logger.info(msg, param1);
-				break;
-			case DEBUG_VALUE:
-				logger.debug(msg, param1);
-				break;
-			case TRACE_VALUE:
-				logger.trace(msg, param1);
-				break;
-			default:
-		}
+		doLog(level,msg,param1);
 	}
 
 	@Override
 	public void log(Level level, String msg, Object[] params) {
-		switch (level.intValue()) {
-			case ERROR_VALUE:
-				logger.error(msg, params);
-				break;
-			case WARN_VALUE:
-				logger.warn(msg, params);
-				break;
-			case INFO_VALUE:
-				logger.info(msg, params);
-				break;
-			case DEBUG_VALUE:
-				logger.debug(msg, params);
-				break;
-			case TRACE_VALUE:
-				logger.trace(msg, params);
-				break;
-			default:
-		}
+		doLog(level, msg, params);
 	}
 
 	@Override
 	public void log(Level level, String msg, Throwable thrown) {
+		doLog(level,msg,thrown);
+	}
+
+	protected void doLog(Level level, String msg, Object object) {
 		switch (level.intValue()) {
-			case ERROR_VALUE:
-				logger.error(msg, thrown);
-				break;
-			case WARN_VALUE:
-				logger.warn(msg, thrown);
-				break;
-			case INFO_VALUE:
-				logger.info(msg, thrown);
-				break;
-			case DEBUG_VALUE:
-				logger.debug(msg, thrown);
-				break;
-			case TRACE_VALUE:
-				logger.trace(msg, thrown);
-				break;
-			default:
+			case ERROR_VALUE -> logger.error(msg, object);
+			case WARN_VALUE -> logger.warn(msg, object);
+			case INFO_VALUE -> logger.info(msg, object);
+			case DEBUG_VALUE -> logger.debug(msg, object);
+			case TRACE_VALUE -> logger.trace(msg, object);
+			default -> {}
 		}
 	}
 }

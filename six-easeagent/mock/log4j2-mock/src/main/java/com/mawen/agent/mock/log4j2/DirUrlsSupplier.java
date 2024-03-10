@@ -13,19 +13,19 @@ public class DirUrlsSupplier implements UrlSupplier{
 
 	@Override
 	public URL[] get() {
-		String dir = System.getProperty(LIB_DIR_ENV);
+		var dir = System.getProperty(LIB_DIR_ENV);
 		if (dir == null) {
 			return new URL[0];
 		}
-		File file = new File(dir);
+		var file = new File(dir);
 		if (!file.isDirectory()) {
 			return new URL[0];
 		}
-		File[] files = file.listFiles();
+		var files = file.listFiles();
 		if (files == null) {
 			return new URL[0];
 		}
-		URL[] urls = new URL[files.length];
+		var urls = new URL[files.length];
 		for (int i = 0; i < files.length; i++) {
 			try {
 				urls[i] = files[i].toURI().toURL();

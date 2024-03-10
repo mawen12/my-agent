@@ -23,7 +23,7 @@ import com.mawen.agent.plugin.api.config.ConfigConst.Observability;
 public class CompatibilityConversion {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CompatibilityConversion.class);
 
-	protected static final String[] REQUEST_NAMESPACE = new String[]{
+	protected static final String[] REQUEST_NAMESPACE = new String[] {
 			Namespace.HTTP_CLIENT,
 			Namespace.OK_HTTP,
 			Namespace.WEB_CLIENT,
@@ -72,11 +72,11 @@ public class CompatibilityConversion {
 	}
 
 	public static Map<String, String> transform(Map<String, String> oldConfigs) {
-		Map<String, Object> changedKeys = new HashMap<>();
-		Map<String, String> newConfigs = new HashMap<>();
-		for (Map.Entry<String, String> entry : oldConfigs.entrySet()) {
-			Conversion<?> conversion = transformConversion(entry.getKey());
-			Object changed = conversion.transform(newConfigs, entry.getValue());
+		var changedKeys = new HashMap<String, Object>();
+		var newConfigs = new HashMap<String, String>();
+		for (var entry : oldConfigs.entrySet()) {
+			var conversion = transformConversion(entry.getKey());
+			var changed = conversion.transform(newConfigs, entry.getValue());
 			if (conversion.isChange()) {
 				changedKeys.put(entry.getKey(), changed);
 			}
@@ -86,19 +86,20 @@ public class CompatibilityConversion {
 			return oldConfigs;
 		}
 
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("config key has transform: ");
-			for (Map.Entry<String, Object> entry : changedKeys.entrySet()) {
-				LOGGER.info("{} to {}", entry.getKey(), entry.getValue());
-			}
+
+		LOGGER.info("config key has transform: ");
+		for (Map.Entry<String, Object> entry : changedKeys.entrySet()) {
+			LOGGER.info("{} to {}", entry.getKey(), entry.getValue());
 		}
+
 		return newConfigs;
 	}
 
 	private static Conversion<?> transformConversion(String key) {
 		if (key.startsWith("observability.metrics.")) {
 			return metricConversion(key);
-		} else if (key.startsWith("observability.tracings.")) {
+		}
+		else if (key.startsWith("observability.tracings.")) {
 			return tracingConversion(key);
 		}
 		return new FinalConversion(key, false);
@@ -123,21 +124,21 @@ public class CompatibilityConversion {
 	}
 
 	private static Conversion<?> conversion(String key, Set<String> skipTest, String pluginId) {
-		String[] keys = ConfigConst.split(key);
+		var keys = ConfigConst.split(key);
 		if (keys.length < 4) {
 			return new FinalConversion(key, false);
 		}
-		String key2 = keys[2];
+		var key2 = keys[2];
 		if (skipTest.contains(key2)) {
 			return new FinalConversion(key, false);
 		}
-		BiFunction<String, String, Conversion<?>> builder = KEY_TO_NAMESPACE.get(key2);
+		var builder = KEY_TO_NAMESPACE.get(key2);
 		if (builder == null) {
 			builder = SingleBuilder.observability(key2);
 		}
-		String[] properties = new String[keys.length - 3];
+		var properties = new String[keys.length - 3];
 		int index = 0;
-		for (int i = 0; i < keys.length; i++) {
+		for (var i = 0; i < keys.length; i++) {
 			properties[index++] = keys[i];
 		}
 		return builder.apply(pluginId, ConfigConst.join(properties));
@@ -149,15 +150,7 @@ public class CompatibilityConversion {
 		boolean isChange();
 	}
 
-	static class FinalConversion implements Conversion<String> {
-
-		private final String key;
-		private final boolean change;
-
-		public FinalConversion(String key, boolean change) {
-			this.key = key;
-			this.change = change;
-		}
+	static record FinalConversion(String key, boolean change) implements Conversion<String> {
 
 		@Override
 		public String transform(Map<String, String> configs, String value) {
@@ -171,15 +164,7 @@ public class CompatibilityConversion {
 		}
 	}
 
-	static class MultipleFinalConversion implements Conversion<List<String>> {
-
-		private final List<FinalConversion> conversions;
-		private final boolean change;
-
-		public MultipleFinalConversion(List<FinalConversion> conversions, boolean change) {
-			this.conversions = conversions;
-			this.change = change;
-		}
+	static record MultipleFinalConversion(List<FinalConversion> conversions, boolean change) implements Conversion<List<String>> {
 
 		@Override
 		public List<String> transform(Map<String, String> configs, String value) {
@@ -196,19 +181,7 @@ public class CompatibilityConversion {
 		}
 	}
 
-	static class SingleConversion implements Conversion<String> {
-
-		private final String domain;
-		private final String namespace;
-		private final String id;
-		private final String property;
-
-		public SingleConversion(String domain, String namespace, String id, String property) {
-			this.domain = domain;
-			this.namespace = namespace;
-			this.id = id;
-			this.property = property;
-		}
+	static record SingleConversion(String domain, String namespace, String id, String property) implements Conversion<String> {
 
 		@Override
 		public String transform(Map<String, String> configs, String value) {
@@ -223,19 +196,7 @@ public class CompatibilityConversion {
 		}
 	}
 
-	static class MultipleConversion implements Conversion<List<String>> {
-
-		private final String domain;
-		private final List<String> namespaces;
-		private final String id;
-		private final  String property;
-
-		public MultipleConversion(String domain, List<String> namespaces, String id, String property) {
-			this.domain = domain;
-			this.namespaces = namespaces;
-			this.id = id;
-			this.property = property;
-		}
+	static record MultipleConversion(String domain, List<String> namespaces, String id, String property) implements Conversion<List<String>> {
 
 		@Override
 		public List<String> transform(Map<String, String> configs, String value) {
@@ -253,15 +214,7 @@ public class CompatibilityConversion {
 			return true;
 		}
 
-		static class SingleBuilder implements BiFunction<String, String, Conversion<?>> {
-
-			private final String domain;
-			private final String namespace;
-
-			public SingleBuilder(String domain, String namespace) {
-				this.domain = domain;
-				this.namespace = namespace;
-			}
+		static record SingleBuilder(String domain, String namespace) implements BiFunction<String, String, Conversion<?>> {
 
 			@Override
 			public Conversion<?> apply(String id, String property) {
@@ -274,15 +227,7 @@ public class CompatibilityConversion {
 		}
 	}
 
-	static class MultipleBuilder implements BiFunction<String, String, Conversion<?>> {
-
-		private final String domain;
-		private final List<String> namespaces;
-
-		public MultipleBuilder(String domain, List<String> namespaces) {
-			this.domain = domain;
-			this.namespaces = namespaces;
-		}
+	static record MultipleBuilder(String domain, List<String> namespaces) implements BiFunction<String, String, Conversion<?>> {
 
 		@Override
 		public Conversion<?> apply(String id, String property) {

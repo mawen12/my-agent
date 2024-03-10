@@ -70,7 +70,7 @@ public class LogDataWriter implements WriteBuffer.Writer<AgentLogData> {
 
 	@Override
 	public int sizeInBytes(AgentLogData value) {
-		int size = STATIC_SIZE;
+		var size = STATIC_SIZE;
 
 		size += JsonEscaper.jsonEscapedSizeInBytes(value.getAgentResource().getService());
 		size += JsonEscaper.jsonEscapedSizeInBytes(value.getAgentResource().getSystem());
@@ -80,7 +80,7 @@ public class LogDataWriter implements WriteBuffer.Writer<AgentLogData> {
 			size += SPAN_ID_FIELD_NAME.length() + value.getSpanContext().getSpanId().length() + 1;
 		}
 
-		StringBuilder sb = getStringBuilder();
+		var sb = getStringBuilder();
 		if (this.dataTypeIsNumber) {
 			size += TIMESTAMP_NUM_FIELD_NAME.length();
 			size += WriteBuffer.asciiSizeInBytes(value.getEpochMillis());
@@ -108,7 +108,7 @@ public class LogDataWriter implements WriteBuffer.Writer<AgentLogData> {
 
 	@Override
 	public void write(AgentLogData value, WriteBuffer b) {
-		StringBuilder sb = getStringBuilder();
+		var sb = getStringBuilder();
 
 		// fix items
 		b.writeByte(123);
@@ -206,7 +206,7 @@ public class LogDataWriter implements WriteBuffer.Writer<AgentLogData> {
 	private void writeKeyValue(WriteBuffer b, String key, AgentLogData value,
 	                           List<LogDataPatternFormatter> formatters,
 	                           StringBuilder sb, boolean escape) {
-		String d = value.getPatternMap().get(key);
+		var d = value.getPatternMap().get(key);
 		if (d == null) {
 			sb.setLength(0);
 			d = toSerializable(value, formatters, sb);
@@ -234,7 +234,7 @@ public class LogDataWriter implements WriteBuffer.Writer<AgentLogData> {
 	}
 
 	protected static StringBuilder getStringBuilder() {
-		StringBuilder result = threadLocal.get();
+		var result = threadLocal.get();
 		if (result == null) {
 			result = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
 			threadLocal.set(result);

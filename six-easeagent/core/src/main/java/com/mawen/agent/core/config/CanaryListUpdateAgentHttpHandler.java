@@ -41,12 +41,12 @@ public class CanaryListUpdateAgentHttpHandler extends ConfigsUpdateAgentHttpHand
 	public Response processJsonConfig(Map<String, Object> map, Map<String, String> urlParams) {
 		logger.info("call /config-global-transmission. configs: {}", map);
 		synchronized (LAST_COUNT) {
-			List<String> headers = (List<String>) map.get("headers");
-			Map<String, String> config = new HashMap<>();
-			for (int i = 0; i < headers.size(); i++) {
+			var headers = (List<String>) map.get("headers");
+			var config = new HashMap<String, String>();
+			for (var i = 0; i < headers.size(); i++) {
 				config.put("agent.progress.forwarded.headers.global.transmission." + i, headers.get(i));
 			}
-			int last = LAST_COUNT.get();
+			var last = LAST_COUNT.get();
 			if (headers.size() < last) {
 				for (int i = headers.size(); i < last; i++) {
 					config.put("agent.progress.forwarded.headers.global.transmission" + i, "");

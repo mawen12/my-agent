@@ -53,11 +53,11 @@ public abstract class AbstractConverter implements Converter {
 			SortedMap<String, Meter> meters,
 			SortedMap<String, Timer> timers) {
 
-		List<String> keys = keysFromMetric(gauges, counters, histograms, meters, timers);
-		final List<Map<String, Object>> result = new ArrayList<>();
+		var keys = keysFromMetric(gauges, counters, histograms, meters, timers);
+		final var result = new ArrayList<Map<String, Object>>();
 		for (String key : keys) {
 			try {
-				Map<String, Object> output = buildMap();
+				var output = buildMap();
 				writeKey(output, key);
 				writeTag(output);
 				writeGauges(key, null, gauges, output);
@@ -91,12 +91,12 @@ public abstract class AbstractConverter implements Converter {
 	protected abstract void writeTimers(String key, MetricSubType metricSubType, SortedMap<String, Timer> timers, Map<String, Object> output);
 
 	private String calculateRateUnit() {
-		final String s = TimeUnit.SECONDS.toString().toLowerCase(Locale.US);
+		final var s = TimeUnit.SECONDS.toString().toLowerCase(Locale.US);
 		return s.substring(0, s.length() - 1);
 	}
 
 	private Map<String, Object> buildMap() {
-		Map<String, Object> map = new HashMap<>();
+		var map = new HashMap<String, Object>();
 		map.put("timestamp", System.currentTimeMillis());
 		map.putAll(additionalAttributes.get());
 		return map;

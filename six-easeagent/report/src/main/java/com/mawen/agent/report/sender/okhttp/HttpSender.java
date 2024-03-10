@@ -1,7 +1,6 @@
 package com.mawen.agent.report.sender.okhttp;
 
 import java.io.IOException;
-import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.SynchronousQueue;
@@ -117,8 +116,8 @@ public class HttpSender implements Sender{
 		Request request;
 
 		try {
-			if (encodedData instanceof RequestBody) {
-				request = newRequest((RequestBody)encodedData);
+			if (encodedData instanceof RequestBody requestBody) {
+				request = newRequest(requestBody);
 			} else {
 				request = newRequest(new ByteRequestBody(encodedData.getData()));
 			}
@@ -141,10 +140,10 @@ public class HttpSender implements Sender{
 	public void updateConfigs(Map<String, String> changes) {
 		this.config.updateConfigsNotNotify(changes);
 
-		String newUsername = StringUtils.noEmptyOf(config.getString(usernameKey), config.getString(SERVER_USER_NAME_KEY));
-		String newPassword = StringUtils.noEmptyOf(config.getString(passwordKey), config.getString(SERVER_PASSWORD_KEY));
+		var newUsername = StringUtils.noEmptyOf(config.getString(usernameKey), config.getString(SERVER_USER_NAME_KEY));
+		var newPassword = StringUtils.noEmptyOf(config.getString(passwordKey), config.getString(SERVER_PASSWORD_KEY));
 		// check new client
-		boolean renewClient = !getUrl(this.config).equals(this.url)
+		var renewClient = !getUrl(this.config).equals(this.url)
 				|| !org.apache.commons.lang3.StringUtils.equals(newUsername, this.username)
 				|| !org.apache.commons.lang3.StringUtils.equals(newPassword, this.password)
 				|| !org.apache.commons.lang3.StringUtils.equals(this.config.getString(TLS_CA_CERT), this.tlsCaCert)
@@ -165,27 +164,27 @@ public class HttpSender implements Sender{
 
 	public static void appendBasicAuth(OkHttpClient.Builder builder, String basicUser, String basicPassword) {
 		builder.addInterceptor(chain -> {
-			Request request = chain.request();
-			Request authRequest = request.newBuilder().header(AUTH_HEADER, Credentials.basic(basicUser, basicPassword)).build();
+			var request = chain.request();
+			var authRequest = request.newBuilder().header(AUTH_HEADER, Credentials.basic(basicUser, basicPassword)).build();
 			return chain.proceed(authRequest);
 		});
 	}
 
 	public static void appendBasicAuth(OkHttpClient.Builder builder, String basicCredential) {
 		builder.addInterceptor(chain -> {
-			Request request = chain.request();
-			Request authRequest = request.newBuilder().header(AUTH_HEADER, basicCredential).build();
+			var request = chain.request();
+			var authRequest = request.newBuilder().header(AUTH_HEADER, basicCredential).build();
 			return chain.proceed(authRequest);
 		});
 	}
 
 	public static void appendTls(OkHttpClient.Builder builder, String tlsCaCert, String tlsCert, String tlsKey) {
-		X509Certificate clientX509Certificate = Certificates.decodeCertificatePem(tlsCert);
-		HeldCertificate clientCertificateKey = HeldCertificate.decode(tlsCert + tlsKey);
-		HandshakeCertificates.Builder handshakeCertificatesBuilder = new HandshakeCertificates.Builder();
+		var clientX509Certificate = Certificates.decodeCertificatePem(tlsCert);
+		var clientCertificateKey = HeldCertificate.decode(tlsCert + tlsKey);
+		var handshakeCertificatesBuilder = new HandshakeCertificates.Builder();
 		handshakeCertificatesBuilder.addPlatformTrustedCertificates();
 		if (org.apache.commons.lang3.StringUtils.isNotBlank(tlsCaCert)) {
-			X509Certificate rootX509Certificate = Certificates.decodeCertificatePem(tlsCaCert);
+			var rootX509Certificate = Certificates.decodeCertificatePem(tlsCaCert);
 			handshakeCertificatesBuilder.addTrustedCertificate(rootX509Certificate);
 		}
 		handshakeCertificatesBuilder.heldCertificate(clientCertificateKey, clientX509Certificate);
@@ -195,10 +194,10 @@ public class HttpSender implements Sender{
 
 	static Dispatcher newDispatcher(int maxRequests) {
 		// bound the executor so that we get consistent performance
-		ThreadPoolExecutor dispatchExecutor = new ThreadPoolExecutor(0,maxRequests, 60L, TimeUnit.SECONDS,
+		var dispatchExecutor = new ThreadPoolExecutor(0,maxRequests, 60L, TimeUnit.SECONDS,
 				new SynchronousQueue<>(), OkHttpSenderThreadFactory.INSTANCE );
 
-		Dispatcher dispatcher = new Dispatcher(dispatchExecutor);
+		var dispatcher = new Dispatcher(dispatchExecutor);
 		dispatcher.setMaxRequests(maxRequests);
 		dispatcher.setMaxRequestsPerHost(maxRequests);
 		return dispatcher;
@@ -251,8 +250,8 @@ public class HttpSender implements Sender{
 
 	private String getUrl(Config config) {
 		// url
-		String outputServer = config.getString(BOOTSTRAP_SERVERS);
-		String cUrl = NoNull.of(config.getString(urlKey), "");
+		var outputServer = config.getString(BOOTSTRAP_SERVERS);
+		var cUrl = NoNull.of(config.getString(urlKey), "");
 		if (!StringUtils.isEmpty(outputServer) && !cUrl.startsWith("http")) {
 			cUrl = outputServer + cUrl;
 		}
@@ -268,13 +267,13 @@ public class HttpSender implements Sender{
 	}
 
 	private void newClient() {
-		String clientKey = getClientKey();
-		OkHttpClient newClient = clientMap.get(clientKey);
+		var clientKey = getClientKey();
+		var newClient = clientMap.get(clientKey);
 		if (newClient != null) {
 			client = newClient;
 			return;
 		}
-		OkHttpClient.Builder builder = new OkHttpClient.Builder();
+		var builder = new OkHttpClient.Builder();
 
 		// timeout
 		builder.connectTimeout(timeout, TimeUnit.MILLISECONDS);
@@ -306,7 +305,7 @@ public class HttpSender implements Sender{
 	}
 
 	private Request newRequest(RequestBody body) throws IOException {
-		Request.Builder request = new Request.Builder().url(httpUrl);
+		var request = new Request.Builder().url(httpUrl);
 		// Amplification can occur when the Zipkin endpoint is accessed through a proxy, and the proxy is instrumented.
 		// The prevents that is proxies, such as Envoy, that understand B3 single format.
 		request.addHeader("b3", "0");
@@ -315,8 +314,8 @@ public class HttpSender implements Sender{
 		}
 		if (this.gzip) {
 			request.addHeader("Content-Encoding", "gzip");
-			Buffer gzipped = new Buffer();
-			BufferedSink gzipSink = Okio.buffer(new GzipSink(gzipped));
+			var gzipped = new Buffer();
+			var gzipSink = Okio.buffer(new GzipSink(gzipped));
 			body.writeTo(gzipSink);
 			gzipSink.close();
 			body = new BufferRequestBody(body.contentType(), gzipped);
@@ -326,11 +325,11 @@ public class HttpSender implements Sender{
 	}
 
 	private void clearClient() {
-		OkHttpClient dClient = clientMap.remove(getClientKey());
+		var dClient = clientMap.remove(getClientKey());
 		if (dClient == null) {
 			return;
 		}
-		Dispatcher dispatcher = dClient.dispatcher();
+		var dispatcher = dClient.dispatcher();
 		dispatcher.executorService().shutdown();
 		try {
 			if (!dispatcher.executorService().awaitTermination(1, TimeUnit.SECONDS)) {

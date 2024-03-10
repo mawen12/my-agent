@@ -61,11 +61,11 @@ public class DynamicFieldTransformer implements AgentBuilder.Transformer {
 	}
 
 	private static boolean check(TypeDescription typeDescription,  Class<?> accessor, ClassLoader classLoader) {
-		String key = typeDescription.getCanonicalName().concat(accessor.getCanonicalName());
+		var key = typeDescription.getCanonicalName().concat(accessor.getCanonicalName());
 
-		Cache<ClassLoader, Boolean> checkCache = FIELD_MAP.get(key);
+		var checkCache = FIELD_MAP.get(key);
 		if (checkCache == null) {
-			Cache<ClassLoader, Boolean> cache = CacheBuilder.newBuilder().weakKeys().build();
+			var cache = CacheBuilder.newBuilder().weakKeys().<ClassLoader,Boolean>build();
 			cache.put(classLoader, true);
 			checkCache = FIELD_MAP.putIfAbsent(key, cache);
 			if (checkCache == null) {

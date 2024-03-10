@@ -15,12 +15,12 @@ public final class ConfigPropertiesUtils {
 	private ConfigPropertiesUtils() {}
 
 	public static boolean getBoolean(String propertyName, boolean defaultValue) {
-		String strValue = getString(propertyName);
+		var strValue = getString(propertyName);
 		return strValue == null ? defaultValue : Boolean.parseBoolean(strValue);
 	}
 
 	public static int getInt(String propertyName, int defaultValue) {
-		String strValue = getString(propertyName);
+		var strValue = getString(propertyName);
 		if (strValue == null) {
 			return defaultValue;
 		}
@@ -33,7 +33,7 @@ public final class ConfigPropertiesUtils {
 	}
 
 	public static String getString(String propertyName) {
-		String value = System.getProperty(propertyName);
+		var value = System.getProperty(propertyName);
 		if (value != null) {
 			return value;
 		}

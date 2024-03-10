@@ -9,7 +9,7 @@ public class TextUtils {
 	private TextUtils(){}
 
 	public static boolean hasText(String content) {
-		return content != null && content.trim().length() > 0;
+		return content != null && !content.trim().isEmpty();
 	}
 
 	public static boolean isEmpty(String value) {

@@ -12,11 +12,9 @@ import com.mawen.agent.plugin.api.config.ChangeItem;
 import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 import com.mawen.agent.plugin.utils.common.StringUtils;
-import com.mawen.agent.report.async.AsyncProps;
 import com.mawen.agent.report.async.AsyncReporter;
 import com.mawen.agent.report.async.DefaultAsyncReporter;
 import com.mawen.agent.report.plugin.ReporterRegistry;
-import com.mawen.agent.report.sender.SenderWithEncoder;
 import io.opentelemetry.sdk.logs.data.LogData;
 
 import static com.mawen.agent.config.report.ReportConfigConst.*;
@@ -31,14 +29,14 @@ public class ApplicationLogReporter implements ConfigChangeListener {
 	AsyncReporter<LogData> asyncReporter;
 
 	public ApplicationLogReporter(Config configs) {
-		Map<String, String> cfg = ConfigUtils.extractByPrefix(configs.getConfigs(), LOGS);
+		var cfg = ConfigUtils.extractByPrefix(configs.getConfigs(), LOGS);
 		cfg.putAll(ConfigUtils.extractByPrefix(configs.getConfigs(), OUTPUT_SERVER_V2));
 		cfg.putAll(ConfigUtils.extractByPrefix(configs.getConfigs(), LOG_ASYNC));
 		this.config = new Configs(cfg);
 		configs.addChangeListener(this);
 
-		SenderWithEncoder sender = ReporterRegistry.getSender(LOG_SENDER, configs);
-		AsyncProps asyncProps = new LogAsyncProps(this.config, null);
+		var sender = ReporterRegistry.getSender(LOG_SENDER, configs);
+		var asyncProps = new LogAsyncProps(this.config, null);
 		this.asyncReporter = DefaultAsyncReporter.create(sender,asyncProps);
 		this.asyncReporter.startFlushThread();
 	}
@@ -49,7 +47,7 @@ public class ApplicationLogReporter implements ConfigChangeListener {
 
 	@Override
 	public void onChange(List<ChangeItem> list) {
-		Map<String, String> changes = filterChanges(list);
+		var changes = filterChanges(list);
 		if (changes.isEmpty()) {
 			return;
 		}
@@ -59,14 +57,14 @@ public class ApplicationLogReporter implements ConfigChangeListener {
 
 	private Map<String, String> filterChanges(List<ChangeItem> list) {
 		return list.stream()
-				.filter(it -> it.getFullName().startsWith(LOGS)
-						|| it.getFullName().startsWith(OUTPUT_SERVER_V2))
-				.collect(Collectors.toMap(ChangeItem::getFullName, ChangeItem::getNewValue));
+				.filter(it -> it.fullName().startsWith(LOGS)
+						|| it.fullName().startsWith(OUTPUT_SERVER_V2))
+				.collect(Collectors.toMap(ChangeItem::fullName, ChangeItem::newValue));
 	}
 
 	public synchronized void refresh(Map<String, String> cfg) {
-		String name = cfg.get(LOG_ACCESS_SENDER_NAME);
-		SenderWithEncoder sender = asyncReporter.getSender();
+		var name = cfg.get(LOG_ACCESS_SENDER_NAME);
+		var sender = asyncReporter.getSender();
 		if (sender != null) {
 			if (StringUtils.isNotEmpty(name) && !sender.name().equals(name)) {
 				try {
@@ -84,7 +82,7 @@ public class ApplicationLogReporter implements ConfigChangeListener {
 			asyncReporter.setSender(sender);
 		}
 
-		AsyncProps asyncProps = new LogAsyncProps(this.config, null);
+		var asyncProps = new LogAsyncProps(this.config, null);
 		asyncReporter.closeFlushThread();
 		asyncReporter.setPending(asyncProps.getQueuedMaxItems(), asyncProps.getQueuedMaxSize());
 		asyncReporter.setMessageTimeoutNanos(messageTimeout(asyncProps.getMessageTimeout()));

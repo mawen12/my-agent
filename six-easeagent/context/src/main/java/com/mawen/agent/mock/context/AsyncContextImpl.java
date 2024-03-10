@@ -14,11 +14,7 @@ import com.mawen.agent.plugin.api.trace.SpanContext;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/4
  */
-public class AsyncContextImpl implements AsyncContext {
-
-	private final SpanContext spanContext;
-	private final Map<Object, Object> context;
-	private final Supplier<InitializeContext> supplier;
+public record AsyncContextImpl(SpanContext spanContext, Map<Object, Object> context, Supplier<InitializeContext> supplier) implements AsyncContext {
 
 	public AsyncContextImpl(SpanContext spanContext, Map<Object, Object> context, Supplier<InitializeContext> supplier) {
 		this.spanContext = Objects.requireNonNull(spanContext, "spanContext must not be null");

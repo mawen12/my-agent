@@ -11,7 +11,7 @@ public abstract class ClassInstance<T> {
 	private final Class<?> type;
 
 	public ClassInstance() {
-		Type superClass = getClass().getGenericSuperclass();
+		var superClass = getClass().getGenericSuperclass();
 		if (superClass instanceof Class<?>) {
 			throw new IllegalArgumentException("Internal error: MetricInstance constructed without actual type information");
 		}

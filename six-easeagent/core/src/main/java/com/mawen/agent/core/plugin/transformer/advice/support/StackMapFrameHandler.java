@@ -548,17 +548,10 @@ public interface StackMapFrameHandler {
 				@Override
 				public void translateFrame(MethodVisitor methodVisitor, int type, int localVariableLength, Object[] localVariable, int stackSize, Object[] stack) {
 					switch (type) {
-						case Opcodes.F_SAME:
-						case Opcodes.F_SAME1:
-							break;
-						case Opcodes.F_APPEND:
-							currentFrameDivergence += localVariableLength;
-							break;
-						case Opcodes.F_CHOP:
-							currentFrameDivergence -= localVariableLength;
-							break;
-						case Opcodes.F_FULL:
-						case Opcodes.F_NEW:
+						case Opcodes.F_SAME, Opcodes.F_SAME1 -> {}
+						case Opcodes.F_APPEND -> currentFrameDivergence += localVariableLength;
+						case Opcodes.F_CHOP -> currentFrameDivergence -= localVariableLength;
+						case Opcodes.F_FULL, Opcodes.F_NEW -> {
 							Object[] translated = new Object[localVariableLength
 									+ (method.isStatic() ? 0 : 1)
 									+ method.getParameters().size()
@@ -593,9 +586,8 @@ public interface StackMapFrameHandler {
 							localVariableLength = translated.length;
 							localVariable = translated;
 							currentFrameDivergence = localVariableLength;
-							break;
-						default:
-							throw new IllegalArgumentException("Unexpected frame type: " + type);
+						}
+						default -> throw new IllegalArgumentException("Unexpected frame type: " + type);
 					}
 					methodVisitor.visitFrame(type, localVariableLength, localVariable, stackSize, stack);
 				}

@@ -25,7 +25,7 @@ public class SpanJsonEncoder extends JsonEncoder<ReportSpan> {
 
 	@Override
 	public void init(Config config) {
-		GlobalExtractor extrasSupplier = GlobalExtractor.getInstance(Agent.getConfig());
+		var extrasSupplier = GlobalExtractor.getInstance(Agent.getConfig());
 		writer = new AgentV2SpanWriter(extrasSupplier);
 	}
 

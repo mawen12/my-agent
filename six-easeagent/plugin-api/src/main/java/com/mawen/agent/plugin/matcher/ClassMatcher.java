@@ -14,13 +14,14 @@ import lombok.Data;
 @Data
 public class ClassMatcher implements IClassMatcher {
 
+	public static final int MODIFIER_MASK = Modifier.ACC_ABSTRACT | Modifier.ACC_INTERFACE
+			| Modifier.ACC_PRIVATE | Modifier.ACC_PUBLIC | Modifier.ACC_PROTECTED;
+
 	private String name;
 	private ClassMatch matchType;
 	private int modifier = Modifier.ACC_NONE;
 	private int notModifier = Modifier.ACC_NONE;
 
-	public static final int MODIFIER_MASK = Modifier.ACC_ABSTRACT | Modifier.ACC_INTERFACE
-			| Modifier.ACC_PRIVATE | Modifier.ACC_PUBLIC | Modifier.ACC_PROTECTED;
 
 	protected ClassMatcher(){}
 
@@ -172,13 +173,11 @@ public class ClassMatcher implements IClassMatcher {
 				return matcher;
 			}
 
-			switch (this.operator) {
+			matcher = switch (this.operator) {
 				case OR -> new OrClassMatcher(this.left, matcher);
 				case AND -> new AndClassMatcher(this.left, matcher);
-				default -> {
-					return matcher;
-				}
-			}
+				default -> matcher;
+			};
 			return matcher;
 		}
 	}

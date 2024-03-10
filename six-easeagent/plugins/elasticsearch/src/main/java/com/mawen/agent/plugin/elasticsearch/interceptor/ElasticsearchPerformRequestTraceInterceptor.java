@@ -21,7 +21,7 @@ public class ElasticsearchPerformRequestTraceInterceptor extends ElasticsearchBa
 
 	@Override
 	public void after(MethodInfo methodInfo, Context context) {
-		Response response = (Response) methodInfo.getRetValue();
+		var response = (Response) methodInfo.getRetValue();
 		ElasticsearchCtxUtils.finishSpan(response, methodInfo.getThrowable(), context);
 	}
 }

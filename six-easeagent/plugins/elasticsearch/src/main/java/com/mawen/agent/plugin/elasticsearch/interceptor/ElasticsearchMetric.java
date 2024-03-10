@@ -5,12 +5,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
-import com.mawen.agent.plugin.api.metric.Counter;
-import com.mawen.agent.plugin.api.metric.Meter;
 import com.mawen.agent.plugin.api.metric.MetricRegistry;
 import com.mawen.agent.plugin.api.metric.ServiceMetric;
 import com.mawen.agent.plugin.api.metric.name.MetricField;
-import com.mawen.agent.plugin.api.metric.name.MetricName;
 import com.mawen.agent.plugin.api.metric.name.MetricSubType;
 import com.mawen.agent.plugin.api.metric.name.MetricValueFetcher;
 import com.mawen.agent.plugin.api.metric.name.NameFactory;
@@ -69,24 +66,23 @@ public class ElasticsearchMetric extends ServiceMetric {
 
 	public void collectMetric(String key, long duration, boolean success) {
 		metricRegistry.timer(this.nameFactory.timerName(key, MetricSubType.DEFAULT)).update(duration, TimeUnit.MILLISECONDS);
-		final Meter defaultMeter = metricRegistry.meter(nameFactory.meterName(key, MetricSubType.DEFAULT));
-		final Counter defaultCounter = metricRegistry.counter(nameFactory.counterName(key, MetricSubType.DEFAULT));
+		final var defaultMeter = metricRegistry.meter(nameFactory.meterName(key, MetricSubType.DEFAULT));
+		final var defaultCounter = metricRegistry.counter(nameFactory.counterName(key, MetricSubType.DEFAULT));
 
 		if (!success) {
-			final Meter errorMeter = metricRegistry.meter(nameFactory.meterName(key, MetricSubType.ERROR));
-			final Counter errorCount = metricRegistry.counter(nameFactory.counterName(key, MetricSubType.ERROR));
+			final var errorMeter = metricRegistry.meter(nameFactory.meterName(key, MetricSubType.ERROR));
+			final var errorCount = metricRegistry.counter(nameFactory.counterName(key, MetricSubType.ERROR));
 			errorMeter.mark();
 			errorCount.inc();
 		}
 		defaultMeter.mark();
 		defaultCounter.inc();
 
-		MetricName gaugeName = nameFactory.gaugeNames(key).get(MetricSubType.DEFAULT);
+		var gaugeName = nameFactory.gaugeNames(key).get(MetricSubType.DEFAULT);
 		metricRegistry.gauge(gaugeName.name(), () -> () ->
-				LastMinutesCounterGauge.builder()
-						.m1Count((long) (defaultMeter.getOneMinuteRate() * 60))
-						.m5Count((long) (defaultMeter.getFiveMinuteRate() * 60 * 5))
-						.m15Count((long) (defaultMeter.getFifteenMinuteRate() * 60 * 15))
-						.build());
+				new LastMinutesCounterGauge((long) (defaultMeter.getOneMinuteRate() * 60),
+						(long) (defaultMeter.getFiveMinuteRate() * 60 * 5),
+						(long) (defaultMeter.getFifteenMinuteRate() * 60 * 15),
+						""));
 	}
 }

@@ -10,7 +10,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -139,14 +138,14 @@ public class Response implements Closeable {
 	 * Sends given response to the socket.
 	 */
 	public void send(OutputStream outputStream) {
-		SimpleDateFormat gmtFormat = new SimpleDateFormat("E, d MMM yyyy HH:mm:ss 'GMT'", Locale.US);
+		var gmtFormat = new SimpleDateFormat("E, d MMM yyyy HH:mm:ss 'GMT'", Locale.US);
 		gmtFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 
 		try {
 			if (this.status == null) {
 				throw new Error("sendResponse(): Status can't be null.");
 			}
-			PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream, new ContentType(this.mimeType).getEncoding())), false);
+			var pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream, new ContentType(this.mimeType).getEncoding())), false);
 			pw.append("HTTP/1.1 ").append(this.status.getDescription()).append(" \r\n");
 			if (this.mimeType == null) {
 				printHeader(pw, "Content-Type", this.mimeType);
@@ -170,7 +169,7 @@ public class Response implements Closeable {
 				printHeader(pw, "Content-Encoding", "gzip");
 				setChunkedTransfer(true);
 			}
-			long pending = this.data != null ? this.contentLength : 0;
+			var pending = this.data != null ? this.contentLength : 0;
 			if (this.requestMethod != Method.HEAD && this.chunkedTransfer) {
 				printHeader(pw, "Transfer-Encoding", "chunked");
 			}
@@ -216,13 +215,13 @@ public class Response implements Closeable {
 	 * Create a text response with known length.
 	 */
 	public static Response newFixedLengthResponse(IStatus status, String mimeType, String txt) {
-		ContentType contentType = new ContentType(mimeType);
+		var contentType = new ContentType(mimeType);
 		if (txt == null) {
 			return newFixedLengthResponse(status, mimeType, new ByteArrayInputStream(new byte[0]), 0);
 		} else {
 			byte[] bytes;
 			try {
-				CharsetEncoder newEncoder = Charset.forName(contentType.getEncoding()).newEncoder();
+				var newEncoder = Charset.forName(contentType.getEncoding()).newEncoder();
 				if (!newEncoder.canEncode(txt)) {
 					contentType = contentType.tryUTF8();
 				}
@@ -265,8 +264,8 @@ public class Response implements Closeable {
 	}
 
 	protected long sendContentLengthHeaderIfNotAlreadyPresent(PrintWriter pw, long defaultSize) {
-		String contentLengthString = getHeader("content-length");
-		long size = defaultSize;
+		var contentLengthString = getHeader("content-length");
+		var size = defaultSize;
 		if (contentLengthString != null) {
 			try {
 				size = Long.parseLong(contentLengthString);
@@ -282,7 +281,7 @@ public class Response implements Closeable {
 
 	private void sendBodyWithCorrectTransferAndEncoding(OutputStream outputStream, long pending) throws IOException {
 		if (this.requestMethod != Method.HEAD && this.chunkedTransfer) {
-			ChunkedOutputStream chunkedOutputStream = new ChunkedOutputStream(outputStream);
+			var chunkedOutputStream = new ChunkedOutputStream(outputStream);
 			sendBodyWithCorrectEncoding(chunkedOutputStream, -1);
 			try {
 				chunkedOutputStream.flush();
@@ -327,12 +326,12 @@ public class Response implements Closeable {
 	 * @throws IOException if something goes wrong while sending the data.
 	 */
 	private void sendBody(OutputStream outputStream, long pending) throws IOException {
-		int BUFFER_SIZE = 16 * 1024;
-		byte[] buff = new byte[BUFFER_SIZE];
-		boolean sendEverything = pending == -1;
+		var BUFFER_SIZE = 16 * 1024;
+		var buff = new byte[BUFFER_SIZE];
+		var sendEverything = pending == -1;
 		while (pending > 0 || sendEverything) {
-			long bytesToRead = sendEverything ? BUFFER_SIZE : Math.min(pending, BUFFER_SIZE);
-			int read = this.data.read(buff, 0, (int) bytesToRead);
+			var bytesToRead = sendEverything ? BUFFER_SIZE : Math.min(pending, BUFFER_SIZE);
+			var read = this.data.read(buff, 0, (int) bytesToRead);
 			if (read <= 0) {
 				break;
 			}

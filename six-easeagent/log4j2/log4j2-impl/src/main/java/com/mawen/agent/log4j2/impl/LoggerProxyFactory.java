@@ -35,13 +35,13 @@ public class LoggerProxyFactory extends AbstractLoggerAdapter<AgentLoggerProxy> 
 
 	@Override
 	protected AgentLoggerProxy newLogger(String name, LoggerContext context) {
-		final String key = Logger.ROOT_LOGGER_NAME.equals(name) ? LogManager.ROOT_LOGGER_NAME : name;
+		final var key = Logger.ROOT_LOGGER_NAME.equals(name) ? LogManager.ROOT_LOGGER_NAME : name;
 		return new AgentLoggerProxy(validateContext(context).getLogger(key), name, loggerFqcn);
 	}
 
 	@Override
 	protected LoggerContext getContext() {
-		final Class<?> anchor = StackLocatorUtil.getCallerClass(FQCN, PACKAGE);
+		final var anchor = StackLocatorUtil.getCallerClass(FQCN, PACKAGE);
 		return (anchor == null) ? LogManager.getContext() : getContext(StackLocatorUtil.getCallerClass(anchor));
 	}
 

@@ -1,6 +1,5 @@
 package com.mawen.agent.mock.context;
 
-import java.util.Iterator;
 import java.util.ServiceLoader;
 
 import com.mawen.agent.mock.config.MockConfig;
@@ -19,11 +18,11 @@ public class MockContextManager {
 	private static final ContextManager CONTEXT_MANAGER_MOCK = ContextManager.build(MockConfig.getConfigs());
 
 	static {
-		ServiceLoader<MockProvider> loader = ServiceLoader.load(MockProvider.class);
-		Iterator<MockProvider> iterator = loader.iterator();
+		var loader = ServiceLoader.load(MockProvider.class);
+		var iterator = loader.iterator();
 		while (iterator.hasNext()) {
-			MockProvider mockProvider = iterator.next();
-			Object o = mockProvider.get();
+			var mockProvider = iterator.next();
+			var o = mockProvider.get();
 			if (o == null) {
 				continue;
 			}

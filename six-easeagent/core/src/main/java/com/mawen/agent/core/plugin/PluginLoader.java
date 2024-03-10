@@ -38,9 +38,9 @@ public class PluginLoader {
 	public static AgentBuilder load(AgentBuilder ab, Configs conf) {
 		pluginLoad();
 		providerLoad();
-		Set<ClassTransformation> sortedTransformations = pointsLoad();
+		var sortedTransformations = pointsLoad();
 
-		for (ClassTransformation transformation : sortedTransformations) {
+		for (var transformation : sortedTransformations) {
 			ab = ab.type(transformation.getClassMatcher(), transformation.getClassLoaderMatcher())
 					.transform(compound(transformation.isHasDynamicField(), transformation.getMethodTransformations()));
 		}
@@ -48,7 +48,7 @@ public class PluginLoader {
 	}
 
 	public static void providerLoad() {
-		for (InterceptorProvider provider : BaseLoader.load(InterceptorProvider.class)) {
+		for (var provider : BaseLoader.load(InterceptorProvider.class)) {
 			log.debug("loading provider: {}", provider.getClass().getName());
 
 			try {
@@ -65,7 +65,7 @@ public class PluginLoader {
 	}
 
 	public static Set<ClassTransformation> pointsLoad() {
-		List<Points> points = BaseLoader.load(Points.class);
+		var points = BaseLoader.load(Points.class);
 		return points.stream()
 				.map(point -> {
 					try {
@@ -83,7 +83,7 @@ public class PluginLoader {
 	}
 
 	public static void pluginLoad() {
-		for (AgentPlugin plugin : BaseLoader.loadOrdered(AgentPlugin.class)) {
+		for (var plugin : BaseLoader.loadOrdered(AgentPlugin.class)) {
 			log.info("Loading plugin {}:{} [class {}]",
 					plugin.getDomain(),
 					plugin.getNamespace(),

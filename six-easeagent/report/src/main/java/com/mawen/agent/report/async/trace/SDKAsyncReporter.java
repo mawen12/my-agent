@@ -22,8 +22,6 @@ import com.mawen.agent.report.encoder.PackedMessage;
 import com.mawen.agent.report.encoder.span.GlobalExtrasSupplier;
 import com.mawen.agent.report.sender.SenderWithEncoder;
 import com.mawen.agent.report.util.SpanUtils;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import zipkin2.Call;
@@ -72,9 +70,9 @@ public class SDKAsyncReporter<S> extends AsyncReporter<S> {
 
 	public static SDKAsyncReporter<ReportSpan> builderSDKAsyncReporter(SenderWithEncoder sender,
 			AsyncProps traceProperties, GlobalExtrasSupplier extrasSupplier) {
-		SDKAsyncReporter<ReportSpan> reporter = new Builder(sender, traceProperties)
+		var reporter = new Builder(sender, traceProperties)
 				.globalExtrasSupplier(extrasSupplier)
-				.build();
+				.<ReportSpan>build();
 
 		reporter.setTraceProperties(traceProperties);
 		return reporter;
@@ -144,14 +142,14 @@ public class SDKAsyncReporter<S> extends AsyncReporter<S> {
 	}
 
 	public void setPending(int queuedMaxSpans, int queuedMaxBytes) {
-		AgentByteBoundedQueue<S> copyPending = this.pending;
+		var copyPending = this.pending;
 		this.pending = new AgentByteBoundedQueue<>(queuedMaxSpans, queuedMaxBytes);
 		consumerData(copyPending);
 	}
 
 	public void startFlushThread() {
 		if (this.messageTimeoutNanos > 0) {
-			List<Thread> threads = new CopyOnWriteArrayList<>();
+			var threads = new CopyOnWriteArrayList<Thread>();
 			for (int i = 0; i < traceProperties.getReportThread(); i++) {
 				AgentBufferNextMessage<S> consumer = AgentBufferNextMessage.create(encoder, this.messageMaxBytes, this.messageTimeoutNanos);
 				Thread thread = this.threadFactory.newThread(new Flusher<>(this, consumer, this.sender));
@@ -181,7 +179,7 @@ public class SDKAsyncReporter<S> extends AsyncReporter<S> {
 		metrics.incrementMessages();
 		metrics.incrementMessageBytes(bundler.sizeInBytes());
 
-		PackedMessage.DefaultPackedMessage message = new PackedMessage.DefaultPackedMessage(bundler.count(), encoder);
+		var message = new PackedMessage.DefaultPackedMessage(bundler.count(), encoder);
 		bundler.drain((next, nextSizeInBytes) -> {
 			if (message.calculateAppendSize(nextSizeInBytes) < messageMaxBytes) {
 				message.addMessage(encoder.encode(next));
@@ -197,12 +195,12 @@ public class SDKAsyncReporter<S> extends AsyncReporter<S> {
 			sender.send(nextMessage).execute();
 		}
 		catch (IOException | RuntimeException e) {
-			int count = nextMessage.size();
+			var count = nextMessage.size();
 			Call.propagateIfFatal(e);
 			metrics.incrementMessagesDropped(e);
 			metrics.incrementSpansDropped(count);
 
-			Level logLevel = Level.FINE;
+			var logLevel = Level.FINE;
 			if (shouldWarnException) {
 				logger.log(Level.WARNING, """
       Spans were dropped due to exceptions. All subsequent errors will be logged at FINE level.
@@ -223,7 +221,7 @@ public class SDKAsyncReporter<S> extends AsyncReporter<S> {
 	}
 
 	private void consumerData(AgentByteBoundedQueue<S> copyPending) {
-		Thread thread = this.threadFactory.newThread(() -> {
+		var thread = this.threadFactory.newThread(() -> {
 			AgentBufferNextMessage<S> bufferNextMessage = AgentBufferNextMessage.create(encoder, messageMaxBytes, 0);
 			while (copyPending.getCount() > 0) {
 				flush(bufferNextMessage, copyPending);
@@ -309,14 +307,14 @@ public class SDKAsyncReporter<S> extends AsyncReporter<S> {
 			Encoder<S> encoder = this.sender.getEncoder();
 			if (encoder == null) throw new NullPointerException("encoder is null");
 
-			SDKAsyncReporter<S> result = new SDKAsyncReporter<>(this, encoder, this.props);
+			var result = new SDKAsyncReporter<>(this, encoder, this.props);
 
 			if (this.messageTimeoutNanos > 0) {
 				List<Thread> flushThreads = new CopyOnWriteArrayList<>();
 				for (int i = 0; i < this.props.getReportThread(); i++) {
-					AgentBufferNextMessage<S> consumer = AgentBufferNextMessage.create(encoder, this.messageMaxBytes, this.messageTimeoutNanos);
+					var consumer = AgentBufferNextMessage.create(encoder, this.messageMaxBytes, this.messageTimeoutNanos);
 
-					Thread flushThread = this.threadFactory
+					var flushThread = this.threadFactory
 							.newThread(new Flusher<S>(result, consumer, this.sender));
 					flushThread.setName(NAME_PREFIX + "{" + this.sender + "}");
 					flushThread.setDaemon(true);
@@ -331,14 +329,13 @@ public class SDKAsyncReporter<S> extends AsyncReporter<S> {
 		}
 	}
 
-	@AllArgsConstructor(access = AccessLevel.PACKAGE)
-	public static final class Flusher<S> implements Runnable {
+	public record Flusher<S>(
+			SDKAsyncReporter<S> result,
+			AgentBufferNextMessage<S> consumer,
+			SenderWithEncoder sender) implements Runnable {
 
 		static final Logger logger = Logger.getLogger(Flusher.class.getName());
 
-		final SDKAsyncReporter<S> result;
-		final AgentBufferNextMessage<S> consumer;
-		final SenderWithEncoder sender;
 
 		@Override
 		public void run() {
@@ -348,7 +345,7 @@ public class SDKAsyncReporter<S> extends AsyncReporter<S> {
 				}
 			}
 			finally {
-				int count = consumer.count();
+				var count = consumer.count();
 				if (count > 0) {
 					result.metrics.incrementSpansDropped(count);
 					logger.log(Level.WARNING, "Dropped {0} spans due to AsyncReporter.close()", count);

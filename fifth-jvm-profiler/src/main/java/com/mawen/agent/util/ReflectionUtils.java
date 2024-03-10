@@ -48,11 +48,11 @@ public class ReflectionUtils {
 	}
 
 	public static Object executeStaticMethods(String className, String methods) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-		String[] methodArray = methods.split("\\.");
-		Class<?> clazz = Class.forName(className);
+		var methodArray = methods.split("\\.");
+		var clazz = Class.forName(className);
 		Object clazzObject = null;
 		Object result = null;
-		for (String entry : methodArray) {
+		for (var entry : methodArray) {
 			Method method = clazz.getMethod(entry);
 			if (method == null) {
 				return null;

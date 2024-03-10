@@ -26,7 +26,6 @@ public class Configs implements Config {
 	protected ConfigNotifier notifier;
 
 	protected Configs() {
-
 	}
 
 	public Configs(Map<String, String> source) {
@@ -46,14 +45,14 @@ public class Configs implements Config {
 
 	@Override
 	public String getString(String name, String defVal) {
-		String val = this.source.get(name);
+		var val = this.source.get(name);
 
 		return val == null ? defVal : val;
 	}
 
 	@Override
 	public Integer getInt(String name) {
-		String value = this.source.get(name);
+		var value = this.source.get(name);
 		if (value == null) {
 			return null;
 		}
@@ -68,13 +67,13 @@ public class Configs implements Config {
 
 	@Override
 	public Integer getInt(String name, int defVal) {
-		Integer anInt = getInt(name);
+		var anInt = getInt(name);
 		return anInt == null ? defVal : anInt;
 	}
 
 	@Override
 	public Boolean getBoolean(String name) {
-		String value = this.source.get(name);
+		var value = this.source.get(name);
 		if (value == null) {
 			return false;
 		}
@@ -83,13 +82,13 @@ public class Configs implements Config {
 
 	@Override
 	public Boolean getBoolean(String name, boolean defVal) {
-		Boolean aBoolean = getBoolean(name);
+		var aBoolean = getBoolean(name);
 		return aBoolean == null ? defVal : aBoolean;
 	}
 
 	@Override
 	public Boolean getBooleanNullForUnset(String name) {
-		String value = this.source.get(name);
+		var value = this.source.get(name);
 		if (value == null) {
 			return null;
 		}
@@ -99,7 +98,7 @@ public class Configs implements Config {
 
 	@Override
 	public Double getDouble(String name) {
-		String value = this.source.get(name);
+		var value = this.source.get(name);
 		if (value == null) {
 			return null;
 		}
@@ -113,13 +112,13 @@ public class Configs implements Config {
 
 	@Override
 	public Double getDouble(String name, double defVal) {
-		Double anDouble = getDouble(name);
+		var anDouble = getDouble(name);
 		return anDouble == null ? defVal : anDouble;
 	}
 
 	@Override
 	public Long getLong(String name) {
-		String value = this.source.get(name);
+		var value = this.source.get(name);
 		if (value == null) {
 			return null;
 		}
@@ -133,13 +132,13 @@ public class Configs implements Config {
 
 	@Override
 	public Long getLong(String name, long defVal) {
-		Long aLong = getLong(name);
+		var aLong = getLong(name);
 		return aLong == null ? defVal : aLong;
 	}
 
 	@Override
 	public List<String> getStringList(String name) {
-		String value = this.source.get(name);
+		var value = this.source.get(name);
 		if (value == null) {
 			return null;
 		}
@@ -163,10 +162,10 @@ public class Configs implements Config {
 
 	@Override
 	public void updateConfigs(Map<String, String> changes) {
-		Map<String, String> dump = new TreeMap<>(this.source);
-		List<ChangeItem> items = new LinkedList<>();
+		var dump = new TreeMap<>(this.source);
+		var items = new LinkedList<ChangeItem>();
 		changes.forEach((name, value) -> {
-			String old = dump.get(name);
+			var old = dump.get(name);
 			if (!Objects.equals(old, value)) {
 				dump.put(name, value);
 				items.add(new ChangeItem(name, name, old, value));

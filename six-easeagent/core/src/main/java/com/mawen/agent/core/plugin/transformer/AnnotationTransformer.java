@@ -30,9 +30,9 @@ public class AnnotationTransformer implements AgentBuilder.Transformer {
 				.ofType(AgentInstrumented.class)
 				.define("value", methodTransformation.getIndex())
 				.build();
-		MemberAttributeExtension.ForMethod forMethod = new MemberAttributeExtension.ForMethod()
+		var forMethod = new MemberAttributeExtension.ForMethod()
 				.annotateMethod(this.annotationDescription);
-		this.visitorWrapper = new ForMethodDelegate(annotationDescription, forMethod, methodTransformation)
+		this.visitorWrapper = new ForMethodDelegate(annotationDescription.getAnnotationType(), forMethod, methodTransformation)
 				.on(methodTransformation.getMatcher());
 	}
 
@@ -42,23 +42,14 @@ public class AnnotationTransformer implements AgentBuilder.Transformer {
 		return builder.visit(this.visitorWrapper);
 	}
 
-	public static class ForMethodDelegate implements AsmVisitorWrapper.ForDeclaredMethods.MethodVisitorWrapper {
-
-		private final TypeDescription annotation;
-		private final MemberAttributeExtension.ForMethod forMethod;
-		private final MethodTransformation methodTransformation;
-
-		public ForMethodDelegate(AnnotationDescription annotation, MemberAttributeExtension.ForMethod forMethod, MethodTransformation methodTransformation) {
-			this.annotation = annotation.getAnnotationType();
-			this.forMethod = forMethod;
-			this.methodTransformation = methodTransformation;
-		}
+	public static record ForMethodDelegate(TypeDescription annotation, MemberAttributeExtension.ForMethod forMethod, MethodTransformation methodTransformation)
+			implements AsmVisitorWrapper.ForDeclaredMethods.MethodVisitorWrapper {
 
 		@Override
 		public MethodVisitor wrap(TypeDescription typeDescription, MethodDescription methodDescription, MethodVisitor methodVisitor, Implementation.Context context, TypePool typePool, int i, int i1) {
 			AnnotationDescription annotation = methodDescription.getDeclaredAnnotations().ofType(this.annotation);
 			if (annotation != null) {
-				Integer index = annotation.getValue("value").resolve(Integer.class);
+				annotation.getValue("value").resolve(Integer.class);
 			}
 			return methodVisitor;
 		}

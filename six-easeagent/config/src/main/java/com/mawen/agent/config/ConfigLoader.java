@@ -25,7 +25,7 @@ public class ConfigLoader {
 	}
 
 	static GlobalConfigs loadFromFile(File file) {
-		try (FileInputStream in = new FileInputStream(file)) {
+		try (var in = new FileInputStream(file)) {
 			return ConfigLoader.loadFromStream(in, file.getAbsolutePath());
 		}
 		catch (IOException e) {
@@ -54,10 +54,10 @@ public class ConfigLoader {
 		}
 	}
 
-	private static HashMap<String, String> extractPropsMap(InputStream in) throws IOException {
-		Properties properties = new Properties();
+	private static Map<String, String> extractPropsMap(InputStream in) throws IOException {
+		var properties = new Properties();
 		properties.load(in);
-		HashMap<String, String> map = new HashMap<>();
+		var map = new HashMap<String, String>();
 		for (String one : properties.stringPropertyNames()) {
 			map.put(one, properties.getProperty(one));
 		}
@@ -65,7 +65,7 @@ public class ConfigLoader {
 	}
 
 	static GlobalConfigs loadFromClasspath(ClassLoader classLoader, String file) {
-		try (InputStream in = classLoader.getResourceAsStream(file)) {
+		try (var in = classLoader.getResourceAsStream(file)) {
 			return ConfigLoader.loadFromStream(in, file);
 		}
 		catch (IOException e) {

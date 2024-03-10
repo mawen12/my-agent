@@ -38,7 +38,7 @@ public class OtelSdkConfigs {
 	private static final Map<String, String> OTEL_SDK_ENV_VAR_TO_AGENT_PROPS = new HashMap<>();
 
 	static {
-		for (Map.Entry<String, String> entry : SDK_ATTRIBUTES_TO_AGENT_PROPS.entrySet()) {
+		for (var entry : SDK_ATTRIBUTES_TO_AGENT_PROPS.entrySet()) {
 			// lower.hyphen -> UPPER_UNDERSCORE
 			OTEL_SDK_PROPS_TO_AGENT_PROPS.put(
 					"otel." + entry.getKey(),
@@ -46,7 +46,7 @@ public class OtelSdkConfigs {
 			);
 		}
 
-		for (Map.Entry<String, String> entry : OTEL_SDK_PROPS_TO_AGENT_PROPS.entrySet()) {
+		for (var entry : OTEL_SDK_PROPS_TO_AGENT_PROPS.entrySet()) {
 			// dot.case -> UPPER_UNDERSCORE
 			OTEL_SDK_ENV_VAR_TO_AGENT_PROPS.put(
 					ConfigPropertiesUtils.toEnvVarName(entry.getKey()),
@@ -68,14 +68,14 @@ public class OtelSdkConfigs {
 	 * <p>java properties > environment variables > OTEL_RESOURCE_ATTRIBUTES
 	 */
 	static Map<String, String> updateEnvCfg() {
-		Map<String, String> envCfg = new TreeMap<>();
+		var envCfg = new TreeMap<String, String>();
 
-		String configEnv = ConfigPropertiesUtils.getString(OTEL_RESOURCE_ATTRIBUTES_KEY);
+		var configEnv = ConfigPropertiesUtils.getString(OTEL_RESOURCE_ATTRIBUTES_KEY);
 		if (StringUtils.isNotEmpty(configEnv)) {
-			Map<String, String> map = OTEL_RESOURCE_ATTRIBUTES_SPLITTER.split(configEnv);
+			var map = OTEL_RESOURCE_ATTRIBUTES_SPLITTER.split(configEnv);
 			if (!map.isEmpty()) {
-				for (Map.Entry<String, String> entry : SDK_ATTRIBUTES_TO_AGENT_PROPS.entrySet()) {
-					String value = map.get(entry.getKey());
+				for (var entry : SDK_ATTRIBUTES_TO_AGENT_PROPS.entrySet()) {
+					var value = map.get(entry.getKey());
 					if (!StringUtils.isEmpty(value)) {
 						envCfg.put(entry.getValue(), value);
 					}
@@ -84,16 +84,16 @@ public class OtelSdkConfigs {
 		}
 
 		// override by environment variables, eg: export OTEL_SERVICE_NAME=xxx
-		for (Map.Entry<String, String> entry : OTEL_SDK_ENV_VAR_TO_AGENT_PROPS.entrySet()) {
-			String value = SystemEnv.get(entry.getKey());
+		for (var entry : OTEL_SDK_ENV_VAR_TO_AGENT_PROPS.entrySet()) {
+			var value = SystemEnv.get(entry.getKey());
 			if (!StringUtils.isEmpty(value)) {
 				envCfg.put(entry.getValue(), value);
 			}
 		}
 
 		// override by java properties; eg: java -Dotel.service.name=xxx
-		for (Map.Entry<String, String> entry : OTEL_SDK_PROPS_TO_AGENT_PROPS.entrySet()) {
-			String value = System.getProperty(entry.getKey());
+		for (var entry : OTEL_SDK_PROPS_TO_AGENT_PROPS.entrySet()) {
+			var value = System.getProperty(entry.getKey());
 			if (!StringUtils.isEmpty(value)) {
 				envCfg.put(entry.getValue(), value);
 			}

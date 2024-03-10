@@ -2,9 +2,7 @@ package com.mawen.agent.config;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
 
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
@@ -18,25 +16,25 @@ public class JarFileConfigLoader {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JarFileConfigLoader.class);
 
 	static GlobalConfigs load(String file) {
-		String agentJarPath = System.getProperty(ConfigConst.AGENT_JAR_PATH);
+		var agentJarPath = System.getProperty(ConfigConst.AGENT_JAR_PATH);
 		if (agentJarPath == null) {
 			return null;
 		}
 		try {
-			JarFile jarFile = new JarFile(new File(agentJarPath));
-			ZipEntry zipEntry = jarFile.getEntry(file);
+			var jarFile = new JarFile(new File(agentJarPath));
+			var zipEntry = jarFile.getEntry(file);
 			if (zipEntry == null) {
 				return null;
 			}
-			try (InputStream in = jarFile.getInputStream(zipEntry)) {
+			try (var in = jarFile.getInputStream(zipEntry)) {
 				return ConfigLoader.loadFromStream(in, file);
 			}
 			catch (IOException e) {
-				LOGGER.debug("Load config file:{} failure: {}", file, e);
+				LOGGER.warn("Load config file:{} failure: {}", file, e);
 			}
 		}
 		catch (IOException e) {
-			LOGGER.debug("create JarFile:{} failure:{}", agentJarPath, e);
+			LOGGER.warn("create JarFile:{} failure:{}", agentJarPath, e);
 		}
 
 		return null;

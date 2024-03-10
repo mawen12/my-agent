@@ -11,14 +11,14 @@ import com.mawen.agent.plugin.utils.common.DataSize;
 public class TextUtils {
 
 	public static String cutStrByDataSize(String str, DataSize size) {
-		byte[] now = str.getBytes(StandardCharsets.UTF_8);
+		var now = str.getBytes(StandardCharsets.UTF_8);
 		if (now.length <= size.toBytes()) {
 			return str;
 		}
 
-		String temp = new String(now, 0, (int)size.toBytes(), StandardCharsets.UTF_8);
-		char unstable = temp.charAt(temp.length() - 1);
-		char old = str.charAt(temp.length() - 1);
+		var temp = new String(now, 0, (int)size.toBytes(), StandardCharsets.UTF_8);
+		var unstable = temp.charAt(temp.length() - 1);
+		var old = str.charAt(temp.length() - 1);
 		if (unstable != old) {
 			return temp;
 		}

@@ -1,6 +1,5 @@
 package com.mawen.agent.metrics;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.mawen.agent.config.ConfigAware;
@@ -26,9 +25,7 @@ public class MetricBeanProviderImpl implements BeanProvider, AgentHttpHandlerPro
 
 	@Override
 	public List<AgentHttpHandler> getAgentHttpHandlers() {
-		List<AgentHttpHandler> list = new ArrayList<>();
-		list.add(new PrometheusAgentHttpHandler());
-		return list;
+		return List.of(new PrometheusAgentHttpHandler());
 	}
 
 	@Override

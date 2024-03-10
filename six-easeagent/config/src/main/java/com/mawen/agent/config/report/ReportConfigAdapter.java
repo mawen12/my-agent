@@ -27,12 +27,12 @@ public class ReportConfigAdapter {
 	}
 
 	public static void convertConfig(Map<String, String> config) {
-		Map<String, String> cfg = extractAndConvertReporterConfig(config);
+		var cfg = extractAndConvertReporterConfig(config);
 		config.putAll(cfg);
 	}
 
 	public static Map<String, String> extractReporterConfig(Config configs) {
-		Map<String, String> cfg = ConfigUtils.extractByPrefix(configs.getConfigs(), REPORT);
+		var cfg = ConfigUtils.extractByPrefix(configs.getConfigs(), REPORT);
 
 		// default config
 		cfg.put(TRACE_SENDER, NoNull.of(cfg.get(TRACE_ENCODER), SPAN_JSON_ENCODER_NAME));
@@ -49,7 +49,7 @@ public class ReportConfigAdapter {
 	}
 
 	public static String getDefaultAppender(Map<String, String> cfg) {
-		String outputAppender = cfg.get(join(OUTPUT_SERVER_V2, APPEND_TYPE_KEY));
+		var outputAppender = cfg.get(join(OUTPUT_SERVER_V2, APPEND_TYPE_KEY));
 
 		if (StringUtils.isEmpty(outputAppender)) {
 			return Const.DEFAULT_APPEND_TYPE;
@@ -59,8 +59,8 @@ public class ReportConfigAdapter {
 	}
 
 	private static Map<String, String> extractAndConvertReporterConfig(Map<String, String> srcConfig) {
-		Map<String, String> extract = extractTracingConfig(srcConfig);
-		Map<String, String> outputCfg = new TreeMap<>(extract);
+		var extract = extractTracingConfig(srcConfig);
+		var outputCfg = new TreeMap<>(extract);
 
 		// metric config
 		extract = extractMetricPluginConfig(srcConfig);
@@ -86,13 +86,13 @@ public class ReportConfigAdapter {
 	 */
 	private static Map<String, String> extractTracingConfig(Map<String, String> srcCfg) {
 		// outputServer config
-		Map<String, String> extract = ConfigUtils.extractAndConvertPrefix(srcCfg, OUTPUT_SERVER_V1, OUTPUT_SERVER_V2);
-		Map<String, String> outputCfg = new TreeMap<>(extract);
+		var extract = ConfigUtils.extractAndConvertPrefix(srcCfg, OUTPUT_SERVER_V1, OUTPUT_SERVER_V2);
+		var outputCfg = new TreeMap<>(extract);
 
 		// async output config
 		extract = ConfigUtils.extractAndConvertPrefix(srcCfg, TRACE_OUTPUT_V1, TRACE_ASYNC);
 
-		String target = srcCfg.get(join(TRACE_OUTPUT_V1, "target"));
+		var target = srcCfg.get(join(TRACE_OUTPUT_V1, "target"));
 		extract.remove(join(TRACE_ASYNC, "target"));
 
 		if (!StringUtils.isEmpty(outputCfg.get(TRACE_SENDER_NAME))) {
@@ -108,7 +108,7 @@ public class ReportConfigAdapter {
 			}
 		} else if ("zipkin".equals(target)) {
 			outputCfg.put(TRACE_SENDER_NAME, ZIPKIN_SENDER_NAME);
-			String url = extract.remove(join(TRACE_ASYNC, "target.zipkinUrl"));
+			var url = extract.remove(join(TRACE_ASYNC, "target.zipkinUrl"));
 			if (StringUtils.isEmpty(url)) {
 				outputCfg.put(TRACE_SENDER_NAME, CONSOLE_SENDER_NAME);
 			} else {
@@ -131,9 +131,9 @@ public class ReportConfigAdapter {
 	 */
 	private static void updateAccessLogCfg(Map<String, String> outputCfg) {
 		// reporter.metric.access.*
-		String prefix = join(METRIC_V2, ConfigConst.Namespace.ACCESS);
-		Map<String, String> metricAccess = ConfigUtils.extractByPrefix(outputCfg, prefix);
-		Map<String, String> accessLog = ConfigUtils.extractAndConvertPrefix(metricAccess, prefix, LOG_ACCESS);
+		var prefix = join(METRIC_V2, ConfigConst.Namespace.ACCESS);
+		var metricAccess = ConfigUtils.extractByPrefix(outputCfg, prefix);
+		var accessLog = ConfigUtils.extractAndConvertPrefix(metricAccess, prefix, LOG_ACCESS);
 
 		// access log use `kakfa` sender
 		if (METRIC_KAFKA_SENDER_NAME.equals(accessLog.get(LOG_ACCESS_SENDER_NAME))) {
@@ -154,25 +154,25 @@ public class ReportConfigAdapter {
 	 * @return metric reporter config start with 'reporter.metric.[namespace].sender'
 	 */
 	public static Map<String, String> extractMetricPluginConfig(Map<String, String> srcCfg) {
-		final String globalKey = DELIMITER + ConfigConst.PLUGIN_GLOBAL + DELIMITER;
-		final String prefix = join(ConfigConst.PLUGIN, ConfigConst.OBSERVABILITY);
-		int metricKeyLength = ConfigConst.METRIC_SERVICE_ID.length();
+		final var globalKey = DELIMITER + ConfigConst.PLUGIN_GLOBAL + DELIMITER;
+		final var prefix = join(ConfigConst.PLUGIN, ConfigConst.OBSERVABILITY);
+		var metricKeyLength = ConfigConst.METRIC_SERVICE_ID.length();
 
-		Map<String, String> global = extractGlobalMetricConfig(srcCfg);
-		HashSet<String> namespaces = new HashSet<>();
-		Map<String, String> metricConfigs = new HashMap<>(global);
+		var global = extractGlobalMetricConfig(srcCfg);
+		var namespaces = new HashSet<String>();
+		var metricConfigs = new HashMap<>(global);
 
-		for (Map.Entry<String, String> e : srcCfg.entrySet()) {
-			String key = e.getKey();
+		for (var e : srcCfg.entrySet()) {
+			var key = e.getKey();
 			if (!key.startsWith(prefix)) {
 				continue;
 			}
-			int idx = key.indexOf(ConfigConst.METRIC_SERVICE_ID, prefix.length());
+			var idx = key.indexOf(ConfigConst.METRIC_SERVICE_ID, prefix.length());
 			if (idx < 0) {
 				continue;
 			}
-			String namespaceWithSeparator = key.substring(prefix.length(), idx);
-			String suffix = key.substring(idx + metricKeyLength + 1);
+			var namespaceWithSeparator = key.substring(prefix.length(), idx);
+			var suffix = key.substring(idx + metricKeyLength + 1);
 			String newKey;
 
 			if (namespaceWithSeparator.equals(globalKey)) {
@@ -207,10 +207,10 @@ public class ReportConfigAdapter {
 	}
 
 	private static Map<String, String> extractGlobalMetricConfig(Map<String, String> srcCfg) {
-		final String prefix = join(ConfigConst.PLUGIN, ConfigConst.OBSERVABILITY, ConfigConst.PLUGIN_GLOBAL,
+		final var prefix = join(ConfigConst.PLUGIN, ConfigConst.OBSERVABILITY, ConfigConst.PLUGIN_GLOBAL,
 				ConfigConst.PluginID.METRIC);
-		Map<String, String> global = new TreeMap<>();
-		Map<String, String> extract = ConfigUtils.extractAndConvertPrefix(srcCfg, prefix, METRIC_SENDER);
+		var global = new TreeMap<String, String>();
+		var extract = ConfigUtils.extractAndConvertPrefix(srcCfg, prefix, METRIC_SENDER);
 
 		for (Map.Entry<String, String> e : extract.entrySet()) {
 			if (e.getKey().startsWith(ENCODER_KEY, METRIC_SENDER.length() + 1)) {
@@ -244,33 +244,33 @@ public class ReportConfigAdapter {
 	 * @return metric reporter config start with 'reporter.metric.[namespace].sender'
 	 */
 	private static Map<String, String> extractLogPluginConfig(Map<String, String> srcCfg) {
-		final String globalKey = "." + ConfigConst.PLUGIN_GLOBAL + ".";
-		final String prefix = join(ConfigConst.PLUGIN, ConfigConst.OBSERVABILITY);
+		final var globalKey = "." + ConfigConst.PLUGIN_GLOBAL + ".";
+		final var prefix = join(ConfigConst.PLUGIN, ConfigConst.OBSERVABILITY);
 
-		String typeKey = join("", ConfigConst.PluginID.LOG, "");
-		int typeKeyLength = ConfigConst.PluginID.LOG.length();
+		var typeKey = join("", ConfigConst.PluginID.LOG, "");
+		var typeKeyLength = ConfigConst.PluginID.LOG.length();
 
-		final String reporterPrefix = LOGS;
+		final var reporterPrefix = LOGS;
 
-		Map<String, String> global = extractGlobalLogConfig(srcCfg);
-		HashSet<String> namespaces = new HashSet<>();
-		Map<String, String> outputConfigs = new TreeMap<>(global);
+		var global = extractGlobalLogConfig(srcCfg);
+		var namespaces = new HashSet<String>();
+		var outputConfigs = new TreeMap<>(global);
 
-		for (Map.Entry<String, String> e : srcCfg.entrySet()) {
-			String key = e.getKey();
+		for (var e : srcCfg.entrySet()) {
+			var key = e.getKey();
 			if (!key.startsWith(prefix)) {
 				continue;
 			}
-			int idx = key.indexOf(typeKey, prefix.length());
+			var idx = key.indexOf(typeKey, prefix.length());
 			if (idx < 0) {
 				continue;
 			}
 			else {
 				idx += 1;
 			}
-			String namespaceWithSeparator = key.substring(prefix.length(), idx);
-			String suffix = key.substring(idx + typeKeyLength + 1);
-			String newKey;
+			var namespaceWithSeparator = key.substring(prefix.length(), idx);
+			var suffix = key.substring(idx + typeKeyLength + 1);
+			var newKey;
 
 			if (namespaceWithSeparator.equals(globalKey)) {
 				continue;
@@ -304,13 +304,13 @@ public class ReportConfigAdapter {
 	 * @return reporter log config
 	 */
 	private static Map<String, String> extractGlobalLogConfig(Map<String, String> srcCfg) {
-		final String prefix = join(ConfigConst.PLUGIN, ConfigConst.OBSERVABILITY,
+		final var prefix = join(ConfigConst.PLUGIN, ConfigConst.OBSERVABILITY,
 				ConfigConst.PLUGIN_GLOBAL, ConfigConst.PluginID.LOG);
-		Map<String, String> global = new TreeMap<>();
-		Map<String, String> extract = ConfigUtils.extractAndConvertPrefix(srcCfg, prefix, LOG_SENDER);
+		var global = new TreeMap<String, String>();
+		var extract = ConfigUtils.extractAndConvertPrefix(srcCfg, prefix, LOG_SENDER);
 
-		for (Map.Entry<String, String> e : extract.entrySet()) {
-			String key = e.getKey();
+		for (var e : extract.entrySet()) {
+			var key = e.getKey();
 			if (key.startsWith(ENCODER_KEY, LOG_SENDER.length() + 1)) {
 				global.put(join(LOGS, key.substring(LOG_SENDER.length() + 1)), e.getValue());
 			}

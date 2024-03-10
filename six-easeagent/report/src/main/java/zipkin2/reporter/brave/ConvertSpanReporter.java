@@ -98,8 +98,8 @@ final class ConvertSpanReporter implements Reporter<MutableSpan> {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) return true;
-		if (!(obj instanceof ConvertSpanReporter)) return false;
-		return delegate.equals(((ConvertSpanReporter) obj).delegate);
+		if (!(obj instanceof ConvertSpanReporter other)) return false;
+		return delegate.equals(other.delegate);
 	}
 
 	@Override

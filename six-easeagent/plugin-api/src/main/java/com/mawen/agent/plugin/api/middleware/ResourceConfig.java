@@ -20,11 +20,11 @@ public class ResourceConfig {
 	private final List<HostAndPort> hostAndPorts = new ArrayList<>();
 
 	public static ResourceConfig getResourceConfig(String env, boolean needParse) {
-		String str = SystemEnv.get(env);
+		var str = SystemEnv.get(env);
 		if (str == null) {
 			return null;
 		}
-		ResourceConfig resourceConfig = JsonUtil.toObject(str, new TypeReference<ResourceConfig>() {});
+		var resourceConfig = JsonUtil.toObject(str, new TypeReference<ResourceConfig>() {});
 		resourceConfig.parseHostAndPort(needParse);
 		if (resourceConfig.hasUrl()) {
 			return resourceConfig;
@@ -40,14 +40,14 @@ public class ResourceConfig {
 		if (uris == null || uris.isEmpty()) {
 			return;
 		}
-		String[] list = uris.split(",");
-		for (String uri : list) {
+		var list = uris.split(",");
+		for (var uri : list) {
 			uriList.add(uri);
-			int begin = uri.indexOf(":");
-			int end = uri.lastIndexOf(":");
+			var begin = uri.indexOf(":");
+			var end = uri.lastIndexOf(":");
 			if (begin == end) {
-				String[] arr = uri.split(":");
-				HostAndPort obj = new HostAndPort();
+				var arr = uri.split(":");
+				var obj = new HostAndPort();
 				obj.setHost(arr[0]);
 				obj.setPort(Integer.parseInt(arr[1]));
 				this.hostAndPorts.add(obj);

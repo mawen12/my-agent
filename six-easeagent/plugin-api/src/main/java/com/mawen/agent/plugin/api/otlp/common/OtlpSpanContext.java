@@ -1,6 +1,5 @@
 package com.mawen.agent.plugin.api.otlp.common;
 
-import com.mawen.agent.plugin.api.Context;
 import com.mawen.agent.plugin.api.trace.Span;
 import com.mawen.agent.plugin.bridge.Agent;
 import io.opentelemetry.api.trace.SpanContext;
@@ -16,14 +15,14 @@ public class OtlpSpanContext {
 	}
 
 	public static SpanContext getLogSpanContext() {
-		Context context = Agent.getContext();
+		var context = Agent.getContext();
 		SpanContext spanContext;
 
 		if (!context.currentTracing().hasCurrentSpan()) {
 			spanContext = SpanContext.getInvalid();
 		}
 		else {
-			Span span = context.currentTracing().currentSpan();
+			var span = context.currentTracing().currentSpan();
 			spanContext = new AgentSpanContext(span, TraceFlags.getSampled(), TraceState.getDefault());
 		}
 		return spanContext;

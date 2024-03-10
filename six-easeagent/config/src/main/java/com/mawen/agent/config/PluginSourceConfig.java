@@ -4,15 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import lombok.Getter;
+
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/26
  */
 public class PluginSourceConfig {
-
+	@Getter
 	private final String domain;
+	@Getter
 	private final String namespace;
+	@Getter
 	private final String id;
+	@Getter
 	private final Map<String, String> source;
 	private final Map<PluginProperty, String> properties;
 
@@ -25,10 +30,10 @@ public class PluginSourceConfig {
 	}
 
 	public static PluginSourceConfig build(String domain, String namespace, String id, Map<String, String> source) {
-		Map<String, String> pluginSource = new HashMap<>();
-		Map<PluginProperty, String> properties = new HashMap<>();
+		var pluginSource = new HashMap<String, String>();
+		var properties = new HashMap<PluginProperty, String>();
 		for (Map.Entry<String, String> sourceEntry : source.entrySet()) {
-			String key = sourceEntry.getKey();
+			var key = sourceEntry.getKey();
 			if (!ConfigUtils.isPluginConfig(key, domain, namespace, id)) {
 				continue;
 			}
@@ -40,26 +45,10 @@ public class PluginSourceConfig {
 		return new PluginSourceConfig(domain, namespace, id, pluginSource, properties);
 	}
 
-	public String getDomain() {
-		return domain;
-	}
-
-	public String getNamespace() {
-		return namespace;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public Map<String, String> getSource() {
-		return source;
-	}
-
 	public Map<String , String> getProperties() {
-		Map<String, String> result = new HashMap<>();
-		for (Map.Entry<PluginProperty, String> propertyEntry : properties.entrySet()) {
-			result.put(propertyEntry.getKey().getProperty(), propertyEntry.getValue());
+		var result = new HashMap<String, String>();
+		for (var entry : properties.entrySet()) {
+			result.put(entry.getKey().property(), entry.getValue());
 		}
 		return result;
 	}

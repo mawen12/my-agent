@@ -1,6 +1,5 @@
 package com.mawen.agent.core.plugin.transformer.advice;
 
-import lombok.AllArgsConstructor;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.utility.JavaConstant;
 
@@ -8,9 +7,7 @@ import net.bytebuddy.utility.JavaConstant;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-@AllArgsConstructor
-public class MethodIdentityJavaConstant implements JavaConstant {
-	private Integer identify;
+public record MethodIdentityJavaConstant(Integer identify) implements JavaConstant {
 
 	@Override
 	public Object toDescription() {

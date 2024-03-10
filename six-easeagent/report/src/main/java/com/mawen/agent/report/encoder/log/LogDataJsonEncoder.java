@@ -52,13 +52,13 @@ public class LogDataJsonEncoder extends JsonEncoder<AgentLogData> implements Con
 		if (list.isEmpty()) {
 			return;
 		}
-		Map<String, String> changes = new HashMap<>();
-		list.forEach(change -> changes.put(change.getFullName(), change.getNewValue()));
+		var changes = new HashMap<String, String>();
+		list.forEach(change -> changes.put(change.fullName(), change.newValue()));
 		Map<String, String> encoderChanges = getEncoderConfig(changes);
 		if (encoderChanges.isEmpty()) {
 			return;
 		}
-		Map<String, String> cfg = this.encoderConfig.getConfigs();
+		var cfg = this.encoderConfig.getConfigs();
 		cfg.putAll(encoderChanges);
 		this.encoderConfig = new Configs(cfg);
 		this.writer = new LogDataWriter(this.encoderConfig);
@@ -67,7 +67,7 @@ public class LogDataJsonEncoder extends JsonEncoder<AgentLogData> implements Con
 	@Override
 	public EncodedData encode(AgentLogData input) {
 		try {
-			EncodedData d = input.getEncodedData();
+			var d = input.getEncodedData();
 			if (d == null) {
 				d = new ByteWrapper(JsonCodec.write(writer, input));
 				input.setEncodedData(d);
@@ -80,7 +80,7 @@ public class LogDataJsonEncoder extends JsonEncoder<AgentLogData> implements Con
 	}
 
 	private Map<String, String> getEncoderConfig(Map<String, String> cfgMap) {
-		Map<String, String> encoderMap = new TreeMap<>();
+		var encoderMap = new TreeMap<String, String>();
 
 		cfgMap.forEach((k, v) -> {
 			if (k.contains(ReportConfigConst.ENCODER_KEY) && !k.endsWith(ReportConfigConst.ENCODER_KEY)) {

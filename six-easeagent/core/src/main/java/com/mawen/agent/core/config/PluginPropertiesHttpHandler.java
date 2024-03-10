@@ -28,15 +28,15 @@ public class PluginPropertiesHttpHandler extends ConfigsUpdateAgentHttpHandler {
 	@Override
 	public Response processConfig(Map<String, String> config, Map<String, String> urlParams, String version) {
 		try {
-			String domain = ConfigUtils.requireNonEmpty(urlParams.get("domain"), "urlParams.domain must not be null or empty.");
-			String namespace = ConfigUtils.requireNonEmpty(urlParams.get("namespace"), "urlParams.namespace must not be null or empty.");
-			String id = ConfigUtils.requireNonEmpty(urlParams.get("id"), "urlParams.id must not be null or empty.");
+			var domain = ConfigUtils.requireNonEmpty(urlParams.get("domain"), "urlParams.domain must not be null or empty.");
+			var namespace = ConfigUtils.requireNonEmpty(urlParams.get("namespace"), "urlParams.namespace must not be null or empty.");
+			var id = ConfigUtils.requireNonEmpty(urlParams.get("id"), "urlParams.id must not be null or empty.");
 
-			Map<String, String> changeConfig = new HashMap<>();
+			var changeConfig = new HashMap<String, String>();
 			for (Map.Entry<String, String> entry : config.entrySet()) {
-				String key = ConfigUtils.requireNonEmpty(entry.getKey(), "body.key must not be null or empty.");
-				String property = ConfigUtils.buildPluginProperty(domain, namespace, id, key);
-				String value = Objects.requireNonNull(entry.getValue(), "body.%s must not be null or empty.".formatted(entry.getKey()));
+				var key = ConfigUtils.requireNonEmpty(entry.getKey(), "body.key must not be null or empty.");
+				var property = ConfigUtils.buildPluginProperty(domain, namespace, id, key);
+				var value = Objects.requireNonNull(entry.getValue(), "body.%s must not be null or empty.".formatted(entry.getKey()));
 				changeConfig.put(property, value);
 			}
 			this.mxBeanConfig.updateService2(changeConfig,version);

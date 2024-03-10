@@ -1,10 +1,10 @@
 package com.mawen.agent.report.metric;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import com.mawen.agent.plugin.api.Reporter;
 import com.mawen.agent.plugin.api.config.ChangeItem;
@@ -42,7 +42,7 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigC
 
 	@Override
 	public void onChange(List<ChangeItem> list) {
-		Map<String, String> changes = filterChanges(list);
+		var changes = filterChanges(list);
 		if (changes.isEmpty()) {
 			return;
 		}
@@ -51,7 +51,7 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigC
 
 	@Override
 	public Reporter reporter(IPluginConfig pluginConfig) {
-		DefaultMetricReporter reporter = reporters.get(pluginConfig.namespace());
+		var reporter = reporters.get(pluginConfig.namespace());
 		if (reporter != null) {
 			return reporter;
 		}
@@ -68,10 +68,8 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigC
 	}
 
 	private Map<String, String> filterChanges(List<ChangeItem> list) {
-		Map<String, String> cfg = new HashMap<>();
-		list.forEach(one -> cfg.put(one.getFullName(),one.getNewValue()));
-
-		return cfg;
+		return list.stream()
+				.collect(Collectors.toMap(ChangeItem::fullName, ChangeItem::newValue));
 	}
 
 	@Getter
@@ -121,9 +119,9 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigC
 				return;
 			}
 
-			String senderName = this.metricProps.getSenderName();
+			var senderName = this.metricProps.getSenderName();
 			this.metricProps = Utils.extractMetricProps(pluginConfig, reportConfig);
-			Config changedConfig = this.metricProps.asReportConfig();
+			var changedConfig = this.metricProps.asReportConfig();
 
 			this.metricConfig.updateConfigs(changedConfig.getConfigs());
 

@@ -16,6 +16,7 @@ import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.api.config.IConfigFactory;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
+import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -25,34 +26,30 @@ public class PluginConfigManager implements IConfigFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PluginConfigManager.class);
 
 	private Runnable shutdownRunnable;
-	private final Configs configs;
+	@Getter
+	private final Config config;
 	private final Map<Key, PluginSourceConfig> pluginSourceConfigs;
 	private final Map<Key, PluginConfig> pluginConfigs;
 
-	public PluginConfigManager(Configs configs, Map<Key, PluginSourceConfig> pluginSourceConfigs, Map<Key, PluginConfig> pluginConfigs) {
-		this.configs = Objects.requireNonNull(configs, "configs must not be null");
+	public PluginConfigManager(Config config, Map<Key, PluginSourceConfig> pluginSourceConfigs, Map<Key, PluginConfig> pluginConfigs) {
+		this.config = Objects.requireNonNull(config, "configs must not be null");
 		this.pluginSourceConfigs = Objects.requireNonNull(pluginSourceConfigs, "pluginSourceConfigs must not be null");
 		this.pluginConfigs = Objects.requireNonNull(pluginConfigs, "pluginConfigs must not be null");
 	}
 
 	public static PluginConfigManager.Builder builder(Configs configs) {
-		PluginConfigManager pluginConfigManager = new PluginConfigManager(configs, new HashMap<>(), new HashMap<>());
+		var pluginConfigManager = new PluginConfigManager(configs, new HashMap<>(), new HashMap<>());
 		return pluginConfigManager.new Builder();
 	}
 
 	@Override
-	public Config getConfig() {
-		return this.configs;
-	}
-
-	@Override
 	public String getConfig(String property) {
-		return configs.getString(property);
+		return config.getString(property);
 	}
 
 	@Override
 	public String getConfig(String property, String defaultValue) {
-		return configs.getString(property, defaultValue);
+		return config.getString(property, defaultValue);
 	}
 
 	@Override
@@ -61,14 +58,14 @@ public class PluginConfigManager implements IConfigFactory {
 	}
 
 	public synchronized PluginConfig getConfig(String domain, String namespace, String id, PluginConfig oldConfig) {
-		Key key = new Key(domain, namespace, id);
-		PluginConfig pluginConfig = pluginConfigs.get(key);
+		var key = new Key(domain, namespace, id);
+		var pluginConfig = pluginConfigs.get(key);
 		if (pluginConfig != null) {
 			return pluginConfig;
 		}
-		Map<String, String> globalConfig = getGlobalConfig(domain, id);
-		Map<String, String> coverConfig = getCoverConfig(domain, namespace, id);
-		PluginConfig newPluginConfig = PluginConfig.build(domain, id, globalConfig, namespace, coverConfig, oldConfig);
+		var globalConfig = getGlobalConfig(domain, id);
+		var coverConfig = getCoverConfig(domain, namespace, id);
+		var newPluginConfig = PluginConfig.build(domain, id, globalConfig, namespace, coverConfig, oldConfig);
 		pluginConfigs.put(key, newPluginConfig);
 		return newPluginConfig;
 	}
@@ -82,7 +79,7 @@ public class PluginConfigManager implements IConfigFactory {
 	}
 
 	private Map<String, String> getConfigSource(String domain, String namespace, String id) {
-		PluginSourceConfig sourceConfig = pluginSourceConfigs.get(new Key(domain, namespace, id));
+		var sourceConfig = pluginSourceConfigs.get(new Key(domain, namespace, id));
 		if (sourceConfig == null) {
 			return Collections.emptyMap();
 		}
@@ -94,16 +91,16 @@ public class PluginConfigManager implements IConfigFactory {
 	}
 
 	protected synchronized void onChange(Map<String, String> sources) {
-		Set<Key> sourceKeys = keys(sources.keySet());
-		Map<String, String> newSources = buildNewSources(sourceKeys, sources);
-		for (Key sourceKey : sourceKeys) {
-			pluginSourceConfigs.put(sourceKey, PluginSourceConfig.build(sourceKey.getDomain(), sourceKey.getNamespace(), sourceKey.getId(), newSources));
+		var sourceKeys = keys(sources.keySet());
+		var newSources = buildNewSources(sourceKeys, sources);
+		for (var sourceKey : sourceKeys) {
+			pluginSourceConfigs.put(sourceKey, PluginSourceConfig.build(sourceKey.domain(), sourceKey.namespace(), sourceKey.id(), newSources));
 		}
-		Set<Key> changeKeys = buildChangeKeys(sourceKeys);
+		var changeKeys = buildChangeKeys(sourceKeys);
 
-		for (Key changeKey : changeKeys) {
-			final PluginConfig oldConfig = pluginConfigs.remove(changeKey);
-			final PluginConfig newConfig = getConfig(changeKey.getDomain(), changeKey.getNamespace(), changeKey.id, oldConfig);
+		for (var changeKey : changeKeys) {
+			final var oldConfig = pluginConfigs.remove(changeKey);
+			final var newConfig = getConfig(changeKey.domain(), changeKey.namespace(), changeKey.id(), oldConfig);
 			if (oldConfig == null) {
 				continue;
 			}
@@ -117,22 +114,22 @@ public class PluginConfigManager implements IConfigFactory {
 	}
 
 	private Set<Key> keys(Set<String> keys) {
-		Set<Key> propertyKeys = new HashSet<>();
-		for (String k : keys) {
+		var propertyKeys = new HashSet<Key>();
+		for (var k : keys) {
 			if (!ConfigUtils.isPluginConfig(k)) {
 				continue;
 			}
-			PluginProperty property = ConfigUtils.pluginProperty(k);
-			Key key = new Key(property.getDomain(), property.getNamespace(), property.getId());
+			var property = ConfigUtils.pluginProperty(k);
+			var key = new Key(property.domain(), property.namespace(), property.id());
 			propertyKeys.add(key);
 		}
 		return propertyKeys;
 	}
 
 	private Map<String, String> buildNewSources(Set<Key> sourceKeys, Map<String, String> sources) {
-		Map<String, String> newSources = new HashMap<>();
-		for (Key sourceKey : sourceKeys) {
-			PluginSourceConfig pluginSourceConfig = pluginSourceConfigs.get(sourceKey);
+		var newSources = new HashMap<String, String>();
+		for (var sourceKey : sourceKeys) {
+			var pluginSourceConfig = pluginSourceConfigs.get(sourceKey);
 			if (pluginSourceConfig == null) {
 				continue;
 			}
@@ -143,12 +140,12 @@ public class PluginConfigManager implements IConfigFactory {
 	}
 
 	private Set<Key> buildChangeKeys(Set<Key> sourceKeys) {
-		Set<Key> changeKeys = new HashSet<>(sourceKeys);
-		for (Key key : sourceKeys) {
-			if (!ConfigUtils.isGlobal(key.getNamespace())) {
+		var changeKeys = new HashSet<>(sourceKeys);
+		for (var key : sourceKeys) {
+			if (!ConfigUtils.isGlobal(key.namespace())) {
 				continue;
 			}
-			for (Key oldKey : pluginConfigs.keySet()) {
+			for (var oldKey : pluginConfigs.keySet()) {
 				if (!key.id.equals(oldKey.id)) {
 					continue;
 				}
@@ -158,69 +155,20 @@ public class PluginConfigManager implements IConfigFactory {
 		return changeKeys;
 	}
 
-	class Key {
-		private final String domain;
-		private final String namespace;
-		private final String id;
-
-		public Key(String domain, String namespace, String id) {
-			this.domain = domain;
-			this.namespace = namespace;
-			this.id = id;
-		}
-
-		public String getDomain() {
-			return domain;
-		}
-
-		public String getNamespace() {
-			return namespace;
-		}
-
-		public String getId() {
-			return id;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (!(o instanceof Key key)) return false;
-
-			if (!Objects.equals(domain, key.domain)) return false;
-			if (!Objects.equals(namespace, key.namespace)) return false;
-			return Objects.equals(id, key.id);
-		}
-
-		@Override
-		public int hashCode() {
-			int result = domain != null ? domain.hashCode() : 0;
-			result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
-			result = 31 * result + (id != null ? id.hashCode() : 0);
-			return result;
-		}
-
-		@Override
-		public String toString() {
-			return "Key{" +
-					"domain='" + domain + '\'' +
-					", namespace='" + namespace + '\'' +
-					", id='" + id + '\'' +
-					'}';
-		}
-	}
+	record Key(String domain ,String namespace, String id) {}
 
 	public class Builder {
 		public PluginConfigManager build() {
 			synchronized (PluginConfigManager.this) {
-				Map<String, String> sources = configs.getConfigs();
-				Set<Key> sourceKeys = keys(sources.keySet());
-				for (Key sourceKey : sourceKeys) {
-					pluginSourceConfigs.put(sourceKey, PluginSourceConfig.build(sourceKey.getDomain(), sourceKey.getNamespace(), sourceKey.getId(), sources));
+				var sources = config.getConfigs();
+				var sourceKeys = keys(sources.keySet());
+				for (var sourceKey : sourceKeys) {
+					pluginSourceConfigs.put(sourceKey, PluginSourceConfig.build(sourceKey.domain(), sourceKey.namespace(), sourceKey.id(), sources));
 				}
-				for (Key key : pluginSourceConfigs.keySet()) {
-					getConfig(key.getDomain(), key.getNamespace(), key.getId());
+				for (var key : pluginSourceConfigs.keySet()) {
+					getConfig(key.domain(), key.namespace(), key.id());
 				}
-				shutdownRunnable = configs.addChangeListener(new ChangeListener());
+				shutdownRunnable = config.addChangeListener(new ChangeListener());
 			}
 			return PluginConfigManager.this;
 		}
@@ -229,8 +177,8 @@ public class PluginConfigManager implements IConfigFactory {
 	class ChangeListener implements ConfigChangeListener {
 		@Override
 		public void onChange(List<ChangeItem> list) {
-			Map<String, String> sources = new HashMap<>();
-			for (ChangeItem item : list) {
+			var sources = new HashMap<String, String>();
+			for (var item : list) {
 				sources.put(item.getFullName(), item.getNewValue());
 			}
 			PluginConfigManager.this.onChange(sources);

@@ -3,7 +3,6 @@ package com.mawen.agent.mock.log4j2;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -14,13 +13,13 @@ public class JarPathUrlsSupplier implements UrlSupplier{
 
 	@Override
 	public URL[] get() {
-		String dir = System.getProperty(AGENT_SLF4J2_LIB_JAR_PATHs);
+		var dir = System.getProperty(AGENT_SLF4J2_LIB_JAR_PATHs);
 		if (dir == null) {
 			return new URL[0];
 		}
-		String[] paths = dir.split(",");
-		List<URL> urls = new ArrayList<>();
-		for (String path : paths) {
+		var paths = dir.split(",");
+		var urls = new ArrayList<>();
+		for (var path : paths) {
 			if (path.trim().isEmpty()) {
 				continue;
 			}
@@ -31,7 +30,7 @@ public class JarPathUrlsSupplier implements UrlSupplier{
 				// ignored
 			}
 		}
-		URL[] result = new URL[urls.size()];
+		var result = new URL[urls.size()];
 		urls.toArray(result);
 		return result;
 	}

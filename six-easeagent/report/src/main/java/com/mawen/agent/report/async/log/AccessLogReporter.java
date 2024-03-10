@@ -13,11 +13,9 @@ import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 import com.mawen.agent.plugin.api.logging.AccessLogInfo;
 import com.mawen.agent.plugin.utils.common.StringUtils;
-import com.mawen.agent.report.async.AsyncProps;
 import com.mawen.agent.report.async.AsyncReporter;
 import com.mawen.agent.report.async.DefaultAsyncReporter;
 import com.mawen.agent.report.plugin.ReporterRegistry;
-import com.mawen.agent.report.sender.SenderWithEncoder;
 
 import static com.mawen.agent.config.report.ReportConfigConst.*;
 
@@ -31,16 +29,16 @@ public class AccessLogReporter implements ConfigChangeListener {
 	AsyncReporter<AccessLogInfo> asyncReporter;
 
 	public AccessLogReporter(Config configs) {
-		Map<String, String> cfg = ConfigUtils.extractByPrefix(configs.getConfigs(), LOG_ACCESS);
+		var cfg = ConfigUtils.extractByPrefix(configs.getConfigs(), LOG_ACCESS);
 		cfg.putAll(ConfigUtils.extractByPrefix(configs.getConfigs(), OUTPUT_SERVER_V2));
-		cfg.putAll(ConfigUtils.extractByPrefix(configs.getConfigs(),LOG_ASYNC));
+		cfg.putAll(ConfigUtils.extractByPrefix(configs.getConfigs(), LOG_ASYNC));
 
 		this.config = new Configs(cfg);
 		configs.addChangeListener(this);
 
-		AsyncProps asyncProperties = new LogAsyncProps(this.config, LOG_ACCESS);
-		SenderWithEncoder sender = ReporterRegistry.getSender(LOG_ACCESS_SENDER, this.config);
-		this.asyncReporter = DefaultAsyncReporter.create(sender,asyncProperties);
+		var asyncProperties = new LogAsyncProps(this.config, LOG_ACCESS);
+		var sender = ReporterRegistry.getSender(LOG_ACCESS_SENDER, this.config);
+		this.asyncReporter = DefaultAsyncReporter.create(sender, asyncProperties);
 		this.asyncReporter.startFlushThread();
 	}
 
@@ -50,7 +48,7 @@ public class AccessLogReporter implements ConfigChangeListener {
 
 	@Override
 	public void onChange(List<ChangeItem> list) {
-		Map<String, String> changes = filterChanges(list);
+		var changes = filterChanges(list);
 		if (changes.isEmpty()) {
 			return;
 		}
@@ -59,8 +57,8 @@ public class AccessLogReporter implements ConfigChangeListener {
 	}
 
 	public synchronized void refresh(Map<String, String> cfg) {
-		String name = cfg.get(LOG_ACCESS_SENDER_NAME);
-		SenderWithEncoder sender = asyncReporter.getSender();
+		var name = cfg.get(LOG_ACCESS_SENDER_NAME);
+		var sender = asyncReporter.getSender();
 		if (sender != null) {
 			if (StringUtils.isNotEmpty(name) && !sender.name().equals(name)) {
 				try {
@@ -72,12 +70,13 @@ public class AccessLogReporter implements ConfigChangeListener {
 				sender = ReporterRegistry.getSender(LOG_ACCESS_SENDER, config);
 				asyncReporter.setSender(sender);
 			}
-		} else {
+		}
+		else {
 			sender = ReporterRegistry.getSender(LOG_ACCESS_SENDER, config);
 			asyncReporter.setSender(sender);
 		}
 
-		AsyncProps asyncProps = new LogAsyncProps(this.config, LOG_ACCESS);
+		var asyncProps = new LogAsyncProps(this.config, LOG_ACCESS);
 		asyncReporter.closeFlushThread();
 		asyncReporter.setPending(asyncProps.getQueuedMaxItems(), asyncProps.getQueuedMaxSize());
 		asyncReporter.setMessageTimeoutNanos(messageTimeout(asyncProps.getMessageTimeout()));
@@ -86,10 +85,10 @@ public class AccessLogReporter implements ConfigChangeListener {
 
 	private Map<String, String> filterChanges(List<ChangeItem> list) {
 		return list.stream()
-				.filter(it -> it.getFullName().startsWith(LOG_ACCESS)
-						|| it.getFullName().startsWith(LOG_ASYNC)
-						|| it.getFullName().startsWith(OUTPUT_SERVER_V2))
-				.collect(Collectors.toMap(ChangeItem::getFullName,ChangeItem::getNewValue));
+				.filter(it -> it.fullName().startsWith(LOG_ACCESS)
+						|| it.fullName().startsWith(LOG_ASYNC)
+						|| it.fullName().startsWith(OUTPUT_SERVER_V2))
+				.collect(Collectors.toMap(ChangeItem::fullName, ChangeItem::newValue));
 	}
 
 	protected long messageTimeout(long timeout) {

@@ -46,7 +46,7 @@ abstract class BeanUtils {
 
 	TypeElement asTypeElement(Supplier<Class<?>> supplier) {
 		try {
-			Class<?> clazz = supplier.get();
+			var clazz = supplier.get();
 			return getTypeElement(clazz.getCanonicalName());
 		}
 		catch (MirroredTypeException e) {

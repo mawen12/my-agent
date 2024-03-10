@@ -12,7 +12,7 @@ public class AgentFieldReflectAccessor {
 	private static final Map<String, Field> FIELD_MAP = new ConcurrentHashMap<>();
 
 	public static void setFieldValue(Object target, String fieldName, Object fieldValue) {
-		Field field = getFieldFromClass(target.getClass(), fieldName);
+		var field = getFieldFromClass(target.getClass(), fieldName);
 		try {
 			field.set(target,fieldValue);
 		}
@@ -21,7 +21,7 @@ public class AgentFieldReflectAccessor {
 	}
 
 	public static <T> T getFieldValue(Object target, String fieldName) {
-		Field field = getFieldFromClass(target.getClass(), fieldName);
+		var field = getFieldFromClass(target.getClass(), fieldName);
 		if (field == null) {
 			return null;
 		}
@@ -34,7 +34,7 @@ public class AgentFieldReflectAccessor {
 	}
 
 	public static void setStaticFieldValue(Class<?> clazz, String fieldName, Object fieldValue) {
-		Field field = getFieldFromClass(clazz, fieldName);
+		var field = getFieldFromClass(clazz, fieldName);
 		try {
 			field.set(null, fieldValue);
 		}
@@ -43,7 +43,7 @@ public class AgentFieldReflectAccessor {
 	}
 
 	public static <T> T getStaticFieldValue(Class<?> clazz, String fieldName) {
-		Field field = getFieldFromClass(clazz, fieldName);
+		var field = getFieldFromClass(clazz, fieldName);
 		if (field == null) {
 			return null;
 		}
@@ -56,8 +56,8 @@ public class AgentFieldReflectAccessor {
 	}
 
 	public static Field getFieldFromClass(Class<?> clazz, String fieldName) {
-		String key = clazz.getName() + "." + fieldName;
-		Field field = FIELD_MAP.get(key);
+		var key = clazz.getName() + "." + fieldName;
+		var field = FIELD_MAP.get(key);
 		if (field != null) {
 			return field;
 		}
@@ -70,12 +70,12 @@ public class AgentFieldReflectAccessor {
 
 	public static Field innerGetFieldFromClass(Class<?> clazz, String fieldName) {
 		try {
-			Field field = clazz.getDeclaredField(fieldName);
+			var field = clazz.getDeclaredField(fieldName);
 			field.setAccessible(true);
 			return field;
 		}
 		catch (NoSuchFieldException ignored) {
-			Class<?> superclass = clazz.getSuperclass();
+			var superclass = clazz.getSuperclass();
 			if (superclass.equals(Object.class)) {
 				return null;
 			}

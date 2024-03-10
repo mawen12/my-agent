@@ -48,7 +48,7 @@ public class AgentPrometheusExports extends Collector implements Collector.Descr
 
 	@Override
 	public List<MetricFamilySamples> collect() {
-		Map<String, MetricFamilySamples> mfSampleMap = new HashMap<>();
+		var mfSampleMap = new HashMap<String, MetricFamilySamples>();
 		gaugeExports.addToMap(mfSampleMap);
 		counterExports.addToMap(mfSampleMap);
 		meterExports.addToMap(mfSampleMap);
@@ -64,11 +64,11 @@ public class AgentPrometheusExports extends Collector implements Collector.Descr
 
 	protected void addToMap(Map<String, MetricFamilySamples> mfSamplesMap, MetricFamilySamples newMfSamples) {
 		if (newMfSamples != null) {
-			MetricFamilySamples currentMfSamples = mfSamplesMap.get(newMfSamples.name);
+			var currentMfSamples = mfSamplesMap.get(newMfSamples.name);
 			if (currentMfSamples == null) {
 				mfSamplesMap.put(newMfSamples.name, newMfSamples);
 			} else {
-				List<MetricFamilySamples.Sample> samples = new ArrayList<>(currentMfSamples.samples);
+				var samples = new ArrayList<>(currentMfSamples.samples);
 				samples.addAll(newMfSamples.samples);
 				mfSamplesMap.put(newMfSamples.name, new MetricFamilySamples(newMfSamples.name, currentMfSamples.type, currentMfSamples.help, samples));
 			}
@@ -101,12 +101,12 @@ public class AgentPrometheusExports extends Collector implements Collector.Descr
 		private final Class<?> clazz;
 
 		public void addToMap(Map<String, MetricFamilySamples> map) {
-			Map<String, Object> values = new HashMap<>();
-			SortedMap<String, T> gaugeSortedMap = getMetric();
-			for (String s : gaugeSortedMap.keySet()) {
+			var values = new HashMap<String, Object>();
+			var gaugeSortedMap = getMetric();
+			for (var s : gaugeSortedMap.keySet()) {
 				writeValue(MetricName.metricNameFor(s), gaugeSortedMap, values);
-				for (Map.Entry<String, Object> entry : values.entrySet()) {
-					MetricFamilySamples.Sample sample = doubleValue(s, entry.getValue(), entry.getKey(), clazz);
+				for (var entry : values.entrySet()) {
+					var sample = doubleValue(s, entry.getValue(), entry.getKey(), clazz);
 					AgentPrometheusExports.this.addToMap(map,
 							new MetricFamilySamples(sample.name, type, getHelpMessage(sample.name, clazz),
 									Collections.singletonList(sample)));

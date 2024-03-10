@@ -60,9 +60,9 @@ public class PluginMetricsConfig implements MetricsConfig {
 
 		@Override
 		public void onChange(IPluginConfig oldConfig, IPluginConfig newConfig) {
-			int oldInterval = PluginMetricsConfig.this.interval;
+			var oldInterval = PluginMetricsConfig.this.interval;
 			set(newConfig);
-			Runnable runnable = callback;
+			var runnable = callback;
 			if (oldInterval != PluginMetricsConfig.this.interval && runnable != null) {
 				runnable.run();
 			}

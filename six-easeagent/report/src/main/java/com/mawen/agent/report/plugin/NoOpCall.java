@@ -15,7 +15,7 @@ public class NoOpCall<V> implements Call<V> {
 	private static final Map<Class<?>, NoOpCall> INSTANCE_MAP = new ConcurrentHashMap<>();
 
 	public static <T> NoOpCall<T> getInstance(Class<?> clazz) {
-		NoOpCall<T> b = INSTANCE_MAP.get(clazz);
+		var b = INSTANCE_MAP.get(clazz);
 		if (b != null) {
 			return b;
 		}

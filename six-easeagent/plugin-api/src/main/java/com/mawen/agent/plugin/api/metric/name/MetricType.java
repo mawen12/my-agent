@@ -1,7 +1,5 @@
 package com.mawen.agent.plugin.api.metric.name;
 
-import java.sql.Time;
-
 import com.mawen.agent.plugin.api.metric.Counter;
 import com.mawen.agent.plugin.api.metric.Gauge;
 import com.mawen.agent.plugin.api.metric.Histogram;

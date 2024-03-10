@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -18,6 +19,7 @@ import org.yaml.snakeyaml.Yaml;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/25
  */
+@Getter
 public class YamlReader {
 	private static final DumperOptions DUMPER_OPTIONS;
 
@@ -39,24 +41,20 @@ public class YamlReader {
 		return this;
 	}
 
-	public Map<String, Object> getYaml() {
-		return yaml;
-	}
-
 	public static YamlReader merge(YamlReader target, YamlReader source) {
-		Map<String, Object> targetMap = target.yaml;
-		Map<String, Object> sourceMap = source.yaml;
+		var targetMap = target.yaml;
+		var sourceMap = source.yaml;
 
 		merge(targetMap, sourceMap);
 
-		YamlReader result = new YamlReader();
+		var result = new YamlReader();
 		result.yaml = new HashMap<>(targetMap);
 		return result;
 	}
 
 	private static void merge(Map<String, Object> target, Map<String, Object> source) {
 		source.forEach((key, value) -> {
-			Object existing = target.get(key);
+			var existing = target.get(key);
 			if (value instanceof Map && existing instanceof Map) {
 				Map<String, Object> result = new LinkedHashMap<>((Map<String, Object>) existing);
 				merge(result, (Map<String, Object>) value);
@@ -72,8 +70,8 @@ public class YamlReader {
 			return Collections.emptyMap();
 		}
 
-		final Deque<String> keyStack = new LinkedList<>();
-		final Map<String, String> resultMap = new HashMap<>();
+		final var keyStack = new LinkedList<String>();
+		final var resultMap = new HashMap<String, String>();
 
 		compress(yaml, keyStack, resultMap);
 
@@ -90,8 +88,8 @@ public class YamlReader {
 				return;
 			}
 
-			if (v instanceof List) {
-				String value = ((List<Object>) v).stream()
+			if (v instanceof List list) {
+				var value = ((List<Object>) v).stream()
 						.map(String::valueOf)
 						.collect(Collectors.joining(","));
 

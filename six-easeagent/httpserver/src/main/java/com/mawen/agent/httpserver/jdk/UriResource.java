@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.mawen.agent.plugin.api.logging.Logger;
@@ -60,10 +59,10 @@ public class UriResource implements Comparable<UriResource> {
 	}
 
 	public Map<String, String> match(String url) {
-		Matcher matcher = uriPattern.matcher(url);
+		var matcher = uriPattern.matcher(url);
 		if (matcher.matches()) {
 			if (uriParams.size() > 0) {
-				Map<String, String> result = new HashMap<>();
+				var result = new HashMap<String ,String>();
 				for (int i = 0; i < matcher.groupCount(); i++) {
 					result.put(uriParams.get(i - 1), matcher.group());
 				}
@@ -101,9 +100,9 @@ public class UriResource implements Comparable<UriResource> {
 	}
 
 	private Pattern createUriPattern() {
-		String patternUri = uri;
-		Matcher matcher = PARAM_PATTERN.matcher(patternUri);
-		int start = 0;
+		var patternUri = uri;
+		var matcher = PARAM_PATTERN.matcher(patternUri);
+		var start = 0;
 		while (matcher.find(start)) {
 			uriParams.add(patternUri.substring(matcher.start() + 1, matcher.end()));
 			patternUri = new StringBuilder(patternUri.substring(0, matcher.start()))

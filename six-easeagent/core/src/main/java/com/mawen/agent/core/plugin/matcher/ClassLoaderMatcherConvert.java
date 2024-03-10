@@ -22,7 +22,7 @@ public class ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher,
 
 	@Override
 	public ElementMatcher<ClassLoader> convert(IClassLoaderMatcher source) {
-		boolean negate = false;
+		var negate = false;
 		ElementMatcher<ClassLoader> matcher;
 		if (source instanceof NegateClassLoaderMatcher) {
 			negate = true;
@@ -32,23 +32,13 @@ public class ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher,
 		if (ALL.equals(source)) {
 			matcher = any();
 		} else {
-			switch (source.getClassLoaderName()) {
-				case BOOTSTRAP_NAME:
-					matcher = ElementMatchers.isBootstrapClassLoader();
-					break;
-				case EXTERNAL_NAME:
-					matcher = ElementMatchers.isExtensionClassLoader();
-					break;
-				case SYSTEM_NAME:
-					matcher = ElementMatchers.isSystemClassLoader();
-					break;
-				case AGENT_NAME:
-					matcher = agentLoaderMatcher;
-					break;
-				default:
-					matcher = new NameMatcher(source.getClassLoaderName());
-					break;
-			}
+			matcher = switch (source.getClassLoaderName()) {
+				case BOOTSTRAP_NAME -> ElementMatchers.isBootstrapClassLoader();
+				case EXTERNAL_NAME -> ElementMatchers.isExtensionClassLoader();
+				case SYSTEM_NAME -> ElementMatchers.isSystemClassLoader();
+				case AGENT_NAME -> agentLoaderMatcher;
+				default -> new NameMatcher(source.getClassLoaderName());
+			};
 		}
 
 		if (negate) {
@@ -58,13 +48,7 @@ public class ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher,
 		}
 	}
 
-	static class NameMatcher implements ElementMatcher<ClassLoader> {
-
-		final String className;
-
-		public NameMatcher(String className) {
-			this.className = className;
-		}
+	static record NameMatcher(String className) implements ElementMatcher<ClassLoader> {
 
 		@Override
 		public boolean matches(ClassLoader target) {

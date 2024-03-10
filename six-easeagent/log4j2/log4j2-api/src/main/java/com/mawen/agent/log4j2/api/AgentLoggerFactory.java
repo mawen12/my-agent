@@ -76,10 +76,7 @@ public class AgentLoggerFactory<T extends AgentLogger> {
 		return mdc;
 	}
 
-	public static class Builder<T extends AgentLogger> {
-		private final ClassLoader classLoader;
-		private final Function<Logger, T> loggerSupplier;
-		private final Class<T> tClass;
+	public record Builder<T extends AgentLogger>(ClassLoader classLoader, Function<Logger, T> loggerSupplier, Class<T> tClass) {
 
 		public Builder(@Nonnull ClassLoader classLoader, @Nonnull Function<Logger, T> loggerSupplier, @Nonnull Class<T> tClass) {
 			this.classLoader = classLoader;

@@ -50,16 +50,16 @@ class GenerateProviderBean {
 	}
 
 	JavaFile apply() {
-		List<? extends Element> executes = utils.asTypeElement(() -> InterceptorProvider.class).getEnclosedElements();
+		var executes = utils.asTypeElement(() -> InterceptorProvider.class).getEnclosedElements();
 
-		Set<MethodSpec> methods = new LinkedHashSet<>();
-		for (Element e : executes) {
-			ExecutableElement pExecute = (ExecutableElement) e;
+		var methods = new LinkedHashSet<MethodSpec>();
+		for (var e : executes) {
+			var pExecute = (ExecutableElement) e;
 			if (pExecute.toString().startsWith("getInterceptorProvider")) {
 				// getInterceptorProvider method generate
-				ParameterizedTypeName returnType = ParameterizedTypeName.get(Supplier.class, Interceptor.class);
+				var returnType = ParameterizedTypeName.get(Supplier.class, Interceptor.class);
 				// final MethodSpec getInterceptorProvider = MethodSpec.methodBuilder("getInterceptorProvider");
-				final MethodSpec getInterceptorProvider = MethodSpec.overriding(pExecute)
+				final var getInterceptorProvider = MethodSpec.overriding(pExecute)
 						.addModifiers(Modifier.PUBLIC)
 						.returns(returnType)
 						.addCode("return " + this.interceptorClass + "::new;")
@@ -68,7 +68,7 @@ class GenerateProviderBean {
 			}
 			else if (pExecute.toString().startsWith("getAdviceTo")) {
 				// getAdviceTo method generate
-				final MethodSpec getAdviceTo = MethodSpec.overriding(pExecute)
+				final var getAdviceTo = MethodSpec.overriding(pExecute)
 						.addModifiers(Modifier.PUBLIC)
 						.returns(String.class)
 						.addStatement("return \"$L\" + \"$L\" + \"$L\"", this.point, ":", this.qualifier)
@@ -77,7 +77,7 @@ class GenerateProviderBean {
 			}
 			else if (pExecute.toString().startsWith("getPluginClassName")) {
 				// getPluginClassName method generate
-				final MethodSpec getPluginClassName = MethodSpec.overriding(pExecute)
+				final var getPluginClassName = MethodSpec.overriding(pExecute)
 						.addModifiers(Modifier.PUBLIC)
 						.returns(String.class)
 						.addStatement("return \"$L\"", this.pluginClass)
@@ -86,15 +86,15 @@ class GenerateProviderBean {
 			}
 		}
 
-		final TypeSpec.Builder specBuild = TypeSpec
+		final var specBuild = TypeSpec
 				.classBuilder(this.interceptorClass + this.providerClassExtension)
 				.addSuperinterface(InterceptorProvider.class)
 				.addModifiers(Modifier.PUBLIC);
-		for (MethodSpec method : methods) {
+		for (var method : methods) {
 			specBuild.addMethod(method);
 		}
 
-		final TypeSpec spec = specBuild.build();
+		final var spec = specBuild.build();
 
 		return JavaFile.builder(packageName, spec).build();
 	}

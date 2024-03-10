@@ -40,7 +40,7 @@ public class KeySender {
 			return;
 		}
 
-		String loggerName = prepareAppenderAndLogger();
+		var loggerName = prepareAppenderAndLogger();
 		if (metricProps.getSenderName().equals(CONSOLE_APPEND)) {
 			this.isConsole = true;
 			this.consoleLogger = LoggerFactory.getLogger(loggerName);

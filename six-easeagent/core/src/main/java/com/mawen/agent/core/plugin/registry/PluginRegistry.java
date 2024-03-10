@@ -2,7 +2,6 @@ package com.mawen.agent.core.plugin.registry;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -19,14 +18,8 @@ import com.mawen.agent.plugin.Points;
 import com.mawen.agent.plugin.api.logging.Logger;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.interceptor.InterceptorProvider;
-import com.mawen.agent.plugin.matcher.IClassMatcher;
-import com.mawen.agent.plugin.matcher.IMethodMatcher;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.matcher.ElementMatcher;
-import net.bytebuddy.matcher.ElementMatcher.Junction;
 
 import static com.mawen.agent.core.plugin.interceptor.ProviderChain.*;
 
@@ -54,30 +47,30 @@ public class PluginRegistry {
 	}
 
 	public static ClassTransformation register(Points points) {
-		String pointClassName = points.getClass().getCanonicalName();
-		IClassMatcher classMatcher = points.getClassMatcher();
-		boolean HasDynamicField = points.isAddDynamicField();
-		Junction<TypeDescription> innerClassMatcher = ClassMatcherConvert.INSTANCE.convert(classMatcher);
-		ElementMatcher<ClassLoader> loaderMatcher = ClassLoaderMatcherConvert.INSTANCE.convert(points.getClassLoaderMatcher());
+		var pointClassName = points.getClass().getCanonicalName();
+		var classMatcher = points.getClassMatcher();
+		var HasDynamicField = points.isAddDynamicField();
+		var innerClassMatcher = ClassMatcherConvert.INSTANCE.convert(classMatcher);
+		var loaderMatcher = ClassLoaderMatcherConvert.INSTANCE.convert(points.getClassLoaderMatcher());
 
-		Set<IMethodMatcher> methodMatchers = points.getMethodMatcher();
-		Set<MethodTransformation> mInfo = methodMatchers.stream().map(matcher -> {
-			Junction<MethodDescription> bMethodMatcher = MethodMatcherConvert.INSTANCE.convert(matcher);
-			String qualifier = getMethodQualifier(pointClassName, matcher.getQualifier());
-			Integer index = QUALIFIER_TO_INDEX.get(qualifier);
+		var methodMatchers = points.getMethodMatcher();
+		var mInfo = methodMatchers.stream().map(matcher -> {
+			var bMethodMatcher = MethodMatcherConvert.INSTANCE.convert(matcher);
+			var qualifier = getMethodQualifier(pointClassName, matcher.getQualifier());
+			var index = QUALIFIER_TO_INDEX.get(qualifier);
 			if (index == null) {
 				return null;
 			}
-			Builder providerBuilder = INTERCEPTOR_PROVIDERS.get(index);
-			MethodTransformation mt = new MethodTransformation(index, bMethodMatcher, providerBuilder);
+			var providerBuilder = INTERCEPTOR_PROVIDERS.get(index);
+			var mt = new MethodTransformation(index, bMethodMatcher, providerBuilder);
 			if (INDEX_TO_METHOD_TRANSFORMATION.putIfAbsent(index, mt) != null) {
 				log.error("There are duplicate in Points: {}", qualifier);
 			}
 			return mt;
 		}).filter(Objects::nonNull).collect(Collectors.toSet());
 
-		AgentPlugin plugin = POINTS_TO_PLUGIN.get(pointClassName);
-		int order = plugin.order();
+		var plugin = POINTS_TO_PLUGIN.get(pointClassName);
+		var order = plugin.order();
 
 		return ClassTransformation.builder()
 				.classMatcher(innerClassMatcher)
@@ -88,9 +81,9 @@ public class PluginRegistry {
 	}
 
 	public static int register(InterceptorProvider provider) {
-		String qualifier = provider.getAdviceTo();
+		var qualifier = provider.getAdviceTo();
 
-		AgentPlugin plugin = PLUGIN_CLASSNAME_TO_PLUGIN.get(provider.getPluginClassName());
+		var plugin = PLUGIN_CLASSNAME_TO_PLUGIN.get(provider.getPluginClassName());
 		if (plugin == null) {
 			throw new RuntimeException();
 		}
@@ -98,7 +91,7 @@ public class PluginRegistry {
 		QUALIFIER_TO_PLUGIN.putIfAbsent(qualifier, plugin);
 		POINTS_TO_PLUGIN.putIfAbsent(getPointsClassName(qualifier), plugin);
 
-		Integer index = QUALIFIER_TO_INDEX.get(provider.getAdviceTo());
+		var index = QUALIFIER_TO_INDEX.get(provider.getAdviceTo());
 		if (index == null) {
 			synchronized (QUALIFIER_TO_INDEX) {
 				index = QUALIFIER_TO_INDEX.get(provider.getAdviceTo());

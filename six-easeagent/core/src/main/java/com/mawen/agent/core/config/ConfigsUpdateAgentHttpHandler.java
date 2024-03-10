@@ -24,18 +24,18 @@ public abstract class ConfigsUpdateAgentHttpHandler extends AgentHttpHandler {
 	protected ConfigManagerMXBean mxBeanConfig;
 
 	static Map<String, String> toConfigMap(Map<String, Object> map) {
-		Map<String, String> config = new HashMap<>(Math.max(map.size(),8));
+		var config = new HashMap<String, String>(Math.max(map.size(),8));
 		map.forEach((key, value) -> config.put(key, String.valueOf(value)));
 		return config;
 	}
 
 	@Override
 	public Response process(RouterNanoHTTPD.UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
-		String body = this.buildRequestBody(session);
+		var body = this.buildRequestBody(session);
 		if (StringUtils.isEmpty(body)) {
 			return Response.newFixedLengthResponse(Status.BAD_REQUEST,AgentHttpServer.JSON_TYPE, (String) null );
 		}
-		Map<String, Object> map = JsonUtil.toMap(body);
+		var map = JsonUtil.toMap(body);
 		if (map == null) {
 			return Response.newFixedLengthResponse(Status.BAD_REQUEST,AgentHttpServer.JSON_TYPE, (String) null );
 		}
@@ -43,8 +43,8 @@ public abstract class ConfigsUpdateAgentHttpHandler extends AgentHttpHandler {
 	}
 
 	public Response processJsonConfig(Map<String, Object> map, Map<String, String> urlParams) {
-		Map<String, String> config = toConfigMap(map);
-		Response response = processConfig(config, urlParams, null);
+		var config = toConfigMap(map);
+		var response = processConfig(config, urlParams, null);
 		return response != null ? response : Response.newFixedLengthResponse(Status.OK, AgentHttpServer.JSON_TYPE, (String) null);
 	}
 }

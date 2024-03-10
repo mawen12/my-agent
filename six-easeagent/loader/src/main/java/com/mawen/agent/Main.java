@@ -4,28 +4,21 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.CodeSource;
-import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import org.springframework.boot.loader.LaunchedURLClassLoader;
-import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.JarFileArchive;
 
 /**
@@ -47,14 +40,14 @@ public class Main {
 	private static ClassLoader loader;
 
 	public static void premain(final String args, final Instrumentation inst) throws Exception {
-		File jar = getArchiveFileContains();
-		final JarFileArchive archive = new JarFileArchive(jar);
+		var jar = getArchiveFileContains();
+		final var archive = new JarFileArchive(jar);
 
 		// custom classloader
-		ArrayList<URL> urls = nestArchiveUrls(archive, LIB);
+		var urls = nestArchiveUrls(archive, LIB);
 		urls.addAll(nestArchiveUrls(archive, PLUGINS));
 		urls.addAll(nestArchiveUrls(archive, SLf4j2));
-		File p = new File(jar.getParent() + File.separator + "plugins");
+		var p = new File(jar.getParent() + File.separator + "plugins");
 		if (p.exists()) {
 			urls.addAll(directoryPluginUrls(p));
 		}
@@ -62,16 +55,16 @@ public class Main {
 		loader = new CompoundableClassLoader(urls.toArray(new URL[0]));
 
 		// install bootstrap jar
-		final ArrayList<URL> bootUrls = nestArchiveUrls(archive, BOOTSTRAP);
+		final var bootUrls = nestArchiveUrls(archive, BOOTSTRAP);
 		bootUrls.forEach(url -> installBootstrapJar(url, inst));
 
 		// init slf4j2 dir
 		initAgentSlf4j2Dir(archive, loader);
 
 		// init slf4j mdc and call Bootstrap#premain
-		final Attributes attributes = archive.getManifest().getMainAttributes();
-		final String loggingProperty = attributes.getValue(LOGGING_PROPERTY);
-		final String bootstrap = attributes.getValue("Bootstrap-Class");
+		final var attributes = archive.getManifest().getMainAttributes();
+		final var loggingProperty = attributes.getValue(LOGGING_PROPERTY);
+		final var bootstrap = attributes.getValue("Bootstrap-Class");
 		switchLoggingProperty(loader, loggingProperty, () -> {
 			initAgentSlf4jMDC(loader);
 			loader.loadClass(bootstrap)
@@ -82,16 +75,16 @@ public class Main {
 	}
 
 	private static File getArchiveFileContains() throws URISyntaxException {
-		final ProtectionDomain protectionDomain = Main.class.getProtectionDomain();
-		final CodeSource codeSource = protectionDomain.getCodeSource();
-		final URI location = (codeSource == null ? null : codeSource.getLocation().toURI());
-		final String path = (location == null ? null : location.getSchemeSpecificPart());
+		final var protectionDomain = Main.class.getProtectionDomain();
+		final var codeSource = protectionDomain.getCodeSource();
+		final var location = (codeSource == null ? null : codeSource.getLocation().toURI());
+		final var path = (location == null ? null : location.getSchemeSpecificPart());
 
 		if (path == null) {
 			throw new IllegalStateException("Unable to determine code source archive");
 		}
 
-		final File root = new File(path);
+		final var root = new File(path);
 		if (!root.exists() || root.isDirectory()) {
 			throw new IllegalStateException("Unable to determine code source archive from " + root);
 		}
@@ -99,13 +92,12 @@ public class Main {
 	}
 
 	private static ArrayList<URL> nestArchiveUrls(JarFileArchive archive, String prefix) throws IOException {
-		ArrayList<Archive> archives = Lists.newArrayList(
+		var archives = Lists.newArrayList(
 				archive.getNestedArchives(entry -> !entry.isDirectory() && entry.getName().startsWith(prefix),
 						entry -> true
 				));
 
-		final ArrayList<URL> urls = new ArrayList<>(archives.size());
-
+		final var urls = new ArrayList<URL>(archives.size());
 
 		archives.forEach(item -> {
 			try {
@@ -124,19 +116,19 @@ public class Main {
 			return new ArrayList<>();
 		}
 
-		File[] files = directory.listFiles();
+		var files = directory.listFiles();
 		if (files == null) {
 			return new ArrayList<>();
 		}
 
-		final ArrayList<URL> urls = new ArrayList<>(files.length);
+		final var urls = new ArrayList<URL>(files.length);
 
 		Arrays.stream(files).forEach(item -> {
 			if (!item.getName().endsWith("jar")) {
 				return;
 			}
 			try {
-				URL pUrl = item.toURI().toURL();
+				var pUrl = item.toURI().toURL();
 				urls.add(pUrl);
 			}
 			catch (MalformedURLException e) {
@@ -149,7 +141,7 @@ public class Main {
 
 	private static void installBootstrapJar(URL url, Instrumentation inst) {
 		try {
-			JarFile file = JarUtils.getNestedJarFile(url);
+			var file = JarUtils.getNestedJarFile(url);
 			inst.appendToBootstrapClassLoaderSearch(file);
 		}
 		catch (IOException e) {
@@ -158,22 +150,22 @@ public class Main {
 	}
 
 	private static void initAgentSlf4j2Dir(JarFileArchive archive, final ClassLoader bootstrapLoader) throws Exception {
-		final URL[] slf4j2Urls = nestArchiveUrls(archive, SLf4j2).toArray(new URL[0]);
-		final ClassLoader slf4j2Loader = new URLClassLoader(slf4j2Urls, null);
-		Class<?> classLoaderSupplier = bootstrapLoader.loadClass("com.mawen.agent.log4j2.FinalClassLoaderSupplier");
-		Field field = classLoaderSupplier.getDeclaredField("CLASSLOADER");
+		final var slf4j2Urls = nestArchiveUrls(archive, SLf4j2).toArray(new URL[0]);
+		final var slf4j2Loader = new URLClassLoader(slf4j2Urls, null);
+		var classLoaderSupplier = bootstrapLoader.loadClass("com.mawen.agent.log4j2.FinalClassLoaderSupplier");
+		var field = classLoaderSupplier.getDeclaredField("CLASSLOADER");
 		field.set(null, slf4j2Loader);
 	}
 
 	private static void switchLoggingProperty(ClassLoader loader, String hostKey, Callable<Void> callable) throws Exception {
-		final Thread t = Thread.currentThread();
-		final ClassLoader ccl = t.getContextClassLoader();
+		final var t = Thread.currentThread();
+		final var ccl = t.getContextClassLoader();
 
 		t.setContextClassLoader(loader);
 
 		// get config from system properties
-		final String host = System.getProperty(hostKey);
-		final String agent = getLogConfigPath();
+		final var host = System.getProperty(hostKey);
+		final var agent = getLogConfigPath();
 
 		// Redirect config of host to agent
 		System.setProperty(hostKey, agent);
@@ -194,7 +186,7 @@ public class Main {
 	}
 
 	private static String getLogConfigPath() {
-		String logConfigPath = System.getProperty(AGENT_LOG_CONF);
+		var logConfigPath = System.getProperty(AGENT_LOG_CONF);
 		if (Strings.isNullOrEmpty(logConfigPath)) {
 			logConfigPath = System.getenv(AGENT_LOG_CONF_ENV_KEY);
 		}
@@ -238,13 +230,13 @@ public class Main {
 				return super.loadClass(name, resolve);
 			}
 			catch (ClassNotFoundException e) {
-				for (WeakReference<ClassLoader> external : externals) {
+				for (var external : externals) {
 					try {
-						ClassLoader cl = external.get();
+						var cl = external.get();
 						if (cl == null) {
 							continue;
 						}
-						final Class<?> aClass = cl.loadClass(name);
+						final var aClass = cl.loadClass(name);
 						if (resolve) {
 							resolveClass(aClass);
 						}
@@ -261,11 +253,11 @@ public class Main {
 
 		@Override
 		public URL findResource(String name) {
-			URL url = super.findResource(name);
+			var url = super.findResource(name);
 			if (url == null) {
-				for (WeakReference<ClassLoader> external : externals) {
+				for (var external : externals) {
 					try {
-						ClassLoader cl = external.get();
+						var cl = external.get();
 						url = cl.getResource(name);
 						if (url != null) {
 							return url;

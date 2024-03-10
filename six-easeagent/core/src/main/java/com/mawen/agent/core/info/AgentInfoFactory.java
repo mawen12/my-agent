@@ -2,7 +2,6 @@ package com.mawen.agent.core.info;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import com.mawen.agent.log4j2.Logger;
@@ -28,9 +27,9 @@ public class AgentInfoFactory {
 	 * @return return version in file
 	 */
 	private static String loadVersion(ClassLoader loader, String file) {
-		try (InputStream in = loader.getResourceAsStream(file)) {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-			String version = reader.readLine();
+		try (var in = loader.getResourceAsStream(file)) {
+			var reader = new BufferedReader(new InputStreamReader(in));
+			var version = reader.readLine();
 			reader.close();
 			return version;
 		}

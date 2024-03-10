@@ -2,10 +2,8 @@ package com.mawen.agent.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.instrument.Instrumentation;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -42,19 +40,19 @@ public final class AppendBootstrapClassLoaderSearch {
 	);
 
 	static Set<String> by(Instrumentation inst, ClassInjector.UsingInstrumentation.Target target) throws IOException {
-		Set<String> names = findClassAnnotationAutoService(AppendBootstrapLoader.class);
+		var names = findClassAnnotationAutoService(AppendBootstrapLoader.class);
 		ClassInjector.UsingInstrumentation.of(TMP_FILE, target, inst).inject(types(names));
 		return names;
 	}
 
 	private static Set<String> findClassAnnotationAutoService(Class<?> clazz) throws IOException {
-		final ClassLoader loader = AppendBootstrapClassLoaderSearch.class.getClassLoader();
+		final var loader = AppendBootstrapClassLoaderSearch.class.getClassLoader();
 
 		return FluentIterable.from(Collections.list(loader.getResources("/META-INF/services/" + clazz.getName())))
 				.transform(input -> {
 					try {
-						URLConnection connection = input.openConnection();
-						InputStream inputStream = connection.getInputStream();
+						var connection = input.openConnection();
+						var inputStream = connection.getInputStream();
 						return new InputStreamReader(inputStream, StandardCharsets.UTF_8);
 					}
 					catch (IOException e) {
@@ -76,9 +74,9 @@ public final class AppendBootstrapClassLoaderSearch {
 	}
 
 	private static Map<TypeDescription, byte[]> types(Set<String> names) {
-		ClassLoader loader = AppendBootstrapClassLoaderSearch.class.getClassLoader();
-		ClassFileLocator locator = ClassFileLocator.ForClassLoader.of(loader);
-		TypePool pool = TypePool.Default.of(locator);
+		var loader = AppendBootstrapClassLoaderSearch.class.getClassLoader();
+		var locator = ClassFileLocator.ForClassLoader.of(loader);
+		var pool = TypePool.Default.of(locator);
 
 		return Maps.transformValues(Maps.uniqueIndex(names, input -> pool.describe(input).resolve()),
 				input -> {

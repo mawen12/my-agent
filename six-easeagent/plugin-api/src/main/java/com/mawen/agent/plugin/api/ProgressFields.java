@@ -45,7 +45,7 @@ public class ProgressFields {
 	}
 
 	private static void buildForwardedHeaderSet(String value) {
-		String[] split = StringUtils.split(value, ",");
+		var split = StringUtils.split(value, ",");
 		forwardHeaderSet.clear();
 		if (split == null || split.length == 0) {
 			return;
@@ -78,8 +78,8 @@ public class ProgressFields {
 			return new Fields(keyPrefix, Collections.emptySet(), Collections.emptyMap(), Collections.emptyMap());
 		}
 		Map<String, String> keyValues = new HashMap<>();
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			String key = entry.getKey().replace(keyPrefix, "");
+		for (var entry : map.entrySet()) {
+			var key = entry.getKey().replace(keyPrefix, "");
 			keyValues.put(key, entry.getValue());
 		}
 		return new Fields(keyPrefix, Collections.unmodifiableSet(new HashSet<>(map.values())), keyValues, map);
@@ -103,8 +103,8 @@ public class ProgressFields {
 				map.entrySet().removeIf(entry -> StringUtils.isEmpty(entry.getValue()));
 				return build(keyPrefix, map);
 			}
-			Map<String, String> newMap = new HashMap<>(this.map);
-			for (Map.Entry<String, String> entry : map.entrySet()) {
+			var newMap = new HashMap<>(this.map);
+			for (var entry : map.entrySet()) {
 				if (StringUtils.isEmpty(entry.getValue())) {
 					newMap.remove(entry.getKey());
 				} else {
@@ -120,7 +120,7 @@ public class ProgressFields {
 		private final Map<String, String> serverTags = new HashMap<>();
 
 		public Change putAll(Map<String, String> map) {
-			for (Map.Entry<String, String> entry : map.entrySet()) {
+			for (var entry : map.entrySet()) {
 				put(entry.getKey(), entry.getValue());
 			}
 			return this;

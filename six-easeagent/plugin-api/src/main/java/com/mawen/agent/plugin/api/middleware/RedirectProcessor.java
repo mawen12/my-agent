@@ -31,20 +31,20 @@ public class RedirectProcessor {
 	}
 
 	public static void setTagsIfRedirected(Redirect key, Span span, String uris) {
-		String remote = getRemote(key, uris);
+		var remote = getRemote(key, uris);
 		if (!StringUtils.isEmpty(remote)) {
 			span.tag(MiddlewareConstants.REDIRECTED_LABEL_REMOTE_TAG_NAME, remote);
 		}
 	}
 
 	public static void setTagsIfRedirected(Redirect key, Tags tags) {
-		String remote = INSTANCE.getRedirected(key);
+		var remote = INSTANCE.getRedirected(key);
 		if (remote == null) {
 			return;
 		}
-		Map<String, String> serviceTags = INSTANCE.getTags();
+		var serviceTags = INSTANCE.getTags();
 		if (serviceTags != null && !serviceTags.isEmpty()) {
-			for (Map.Entry<String, String> entry : serviceTags.entrySet()) {
+			for (var entry : serviceTags.entrySet()) {
 				tags.put(entry.getKey(), entry.getValue());
 			}
 		}
@@ -62,7 +62,7 @@ public class RedirectProcessor {
 		if (!key.hasConfig()) {
 			return null;
 		}
-		String remote = INSTANCE.getRedirected(key);
+		var remote = INSTANCE.getRedirected(key);
 		if (remote == null) {
 			return null;
 		}
@@ -76,15 +76,13 @@ public class RedirectProcessor {
 
 	// all
 	public void init() {
-		for (Redirect redirect : Redirect.values()) { // init
+		for (var redirect : Redirect.values()) { // init
 			// ignore
 		}
 	}
 
 	private synchronized void setRedirected(Redirect key, String uris) {
-		Map<Redirect, String> uriMap = new HashMap<>(this.redirectedUris);
-		uriMap.put(key, uris);
-		this.redirectedUris = uriMap;
+		this.redirectedUris = Map.of(key, uris);
 	}
 
 	private synchronized String getRedirected(Redirect key) {
@@ -96,14 +94,14 @@ public class RedirectProcessor {
 	}
 
 	protected static Map<String, String> getServiceTags(String env) {
-		String str = SystemEnv.get(env);
+		var str = SystemEnv.get(env);
 		if (StringUtils.isEmpty(env)) {
 			return Collections.emptyMap();
 		}
 		try {
-			Map<String, String> map = JsonUtil.toObject(str, new TypeReference<Map<String, String>>() {});
-			Map<String, String> result = new HashMap<>();
-			for (Map.Entry<String, String> entry : map.entrySet()) {
+			var map = JsonUtil.toObject(str, new TypeReference<Map<String, String>>() {});
+			var result = new HashMap<String, String>();
+			for (var entry : map.entrySet()) {
 				if (StringUtils.isEmpty(entry.getKey()) || StringUtils.isEmpty(entry.getValue())) {
 					continue;
 				}

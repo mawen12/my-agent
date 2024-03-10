@@ -14,7 +14,7 @@ public abstract class AutoRefreshConfigSupplier<T extends AutoRefreshPluginConfi
 	private final Type type;
 
 	public AutoRefreshConfigSupplier() {
-		Type superClass = getClass().getGenericSuperclass();
+		var superClass = getClass().getGenericSuperclass();
 		if (superClass instanceof Class<?>) { // sanity check, should never happen
 			throw new IllegalArgumentException("Internal error: TypeReference constructed without actual type information");
 		}

@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.mawen.agent.plugin.api.config.IPluginConfig;
-import com.mawen.agent.plugin.api.metric.name.NameFactory;
 import com.mawen.agent.plugin.api.metric.name.Tags;
 import com.mawen.agent.plugin.bridge.Agent;
 
@@ -43,8 +42,8 @@ public class ServiceMetricRegistry {
 	 * @return the type of ServiceMetric by the Supplier
 	 */
 	public static <T extends ServiceMetric> T getOrCreate(String domain, String namespace, String id, Tags tags, ServiceMetricSupplier<T> supplier) {
-		Key key = new Key(domain, namespace, id, tags, supplier.getType());
-		ServiceMetric metric = INSTANCES.get(key);
+		var key = new Key(domain, namespace, id, tags, supplier.getType());
+		var metric = INSTANCES.get(key);
 		if (metric != null) {
 			return (T) metric;
 		}
@@ -53,10 +52,10 @@ public class ServiceMetricRegistry {
 			if (metric != null) {
 				return (T) metric;
 			}
-			IPluginConfig config = Agent.getConfig(domain, namespace, id);
-			NameFactory nameFactory = supplier.newNameFactory();
-			MetricRegistry metricRegistry = Agent.newMetricRegistry(config, nameFactory, tags);
-			T newMetric = supplier.newInstance(metricRegistry, nameFactory);
+			var config = Agent.getConfig(domain, namespace, id);
+			var nameFactory = supplier.newNameFactory();
+			var metricRegistry = Agent.newMetricRegistry(config, nameFactory, tags);
+			var newMetric = supplier.newInstance(metricRegistry, nameFactory);
 			INSTANCES.put(key, newMetric);
 			return newMetric;
 		}

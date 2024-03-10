@@ -38,8 +38,8 @@ public class StringSequence implements CharSequence {
 
 	@Override
 	public StringSequence subSequence(int start, int end) {
-		int subSequenceStart = this.start + start;
-		int subSequenceEnd = this.start + end;
+		var subSequenceStart = this.start + start;
+		var subSequenceEnd = this.start + end;
 		if (subSequenceStart > this.end) {
 			throw new StringIndexOutOfBoundsException(subSequenceStart);
 		}
@@ -83,8 +83,8 @@ public class StringSequence implements CharSequence {
 	}
 
 	boolean startsWith(String prefix, int offset) {
-		int prefixLength = prefix.length();
-		int length = length();
+		var prefixLength = prefix.length();
+		var length = length();
 		if (length - prefixLength - offset < 0) {
 			return false;
 		}
@@ -94,9 +94,8 @@ public class StringSequence implements CharSequence {
 	@Override
 	public final boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof StringSequence that)) return false;
+		if (!(o instanceof StringSequence other)) return false;
 
-		CharSequence other = (CharSequence) o;
 		int n = length();
 		if (n != other.length()) {
 			return false;
@@ -113,9 +112,9 @@ public class StringSequence implements CharSequence {
 
 	@Override
 	public int hashCode() {
-		int hashVal = this.hash;
+		var hashVal = this.hash;
 		if (hashVal == 0 && length() > 0) {
-			for (int i = this.start; i < this.end; i++) {
+			for (var i = this.start; i < this.end; i++) {
 				hashVal = 31 * hashVal + this.source.charAt(i);
 			}
 			this.hash = hashVal;

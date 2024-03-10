@@ -48,8 +48,8 @@ public class InterceptorPluginDecorator implements Interceptor {
 
 	@Override
 	public void before(MethodInfo methodInfo, Context context) {
-		IPluginConfig cfg = getConfig();
-		InitializeContext innerContext = (InitializeContext) context;
+		var cfg = getConfig();
+		var innerContext = (InitializeContext) context;
 		innerContext.pushConfig(config);
 		if (cfg == null || cfg.enabled() || cfg instanceof NoOpIPluginConfig) {
 			innerContext.pushRetBound();
@@ -62,8 +62,8 @@ public class InterceptorPluginDecorator implements Interceptor {
 
 	@Override
 	public void after(MethodInfo methodInfo, Context context) {
-		IPluginConfig cfg = getConfig();
-		InitializeContext innerContext = (InitializeContext) context;
+		var cfg = getConfig();
+		var innerContext = (InitializeContext) context;
 		try {
 			if (cfg == null || cfg.enabled() || cfg instanceof NoOpIPluginConfig) {
 				try {
@@ -87,8 +87,8 @@ public class InterceptorPluginDecorator implements Interceptor {
 
 	@Override
 	public int order() {
-		int pluginOrder = this.plugin.order();
-		int interceptorOrder = this.interceptor.order();
+		var pluginOrder = this.plugin.order();
+		var interceptorOrder = this.interceptor.order();
 		return (interceptorOrder << 8) + pluginOrder;
 	}
 

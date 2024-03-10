@@ -20,7 +20,7 @@ public class AgentHttpServer extends RouterNanoHTTPD {
 	}
 
 	public void addHttpRoutes(List<AgentHttpHandler> agentHttpHandlers) {
-		for (AgentHttpHandler agentHttpHandler : agentHttpHandlers) {
+		for (var agentHttpHandler : agentHttpHandlers) {
 			this.addRoute(agentHttpHandler.getPath(), agentHttpHandler.getClass());
 		}
 	}

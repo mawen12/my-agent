@@ -61,7 +61,7 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 
 	@Override
 	public AgentForAdvice include(ClassLoader... classLoader) {
-		LinkedHashSet<ClassFileLocator> classFileLocators = Arrays.stream(classLoader)
+		var classFileLocators = Arrays.stream(classLoader)
 				.map(ClassFileLocator.ForClassLoader::of)
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 
@@ -102,12 +102,12 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 
 	@Override
 	public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader, JavaModule module) {
-		ClassFileLocator.Compound classFileLocator = new ClassFileLocator.Compound(this.classFileLocator, locationStrategy.classFileLocator(classLoader, module));
+		var classFileLocator = new ClassFileLocator.Compound(this.classFileLocator, locationStrategy.classFileLocator(classLoader, module));
 
-		TypePool typePool = poolStrategy.typePool(classFileLocator, classLoader);
+		var typePool = poolStrategy.typePool(classFileLocator, classLoader);
 
-		AsmVisitorWrapper.ForDeclaredMethods asmVisitorWrapper = new AsmVisitorWrapper.ForDeclaredMethods();
-		for (Entry entry : entries) {
+		var asmVisitorWrapper = new AsmVisitorWrapper.ForDeclaredMethods();
+		for (var entry : entries) {
 			asmVisitorWrapper = asmVisitorWrapper.invokable(entry.getMatcher().resolve(typeDescription),
 					entry.resolve(advice, typePool, classFileLocator)
 							.withAssigner(assigner)

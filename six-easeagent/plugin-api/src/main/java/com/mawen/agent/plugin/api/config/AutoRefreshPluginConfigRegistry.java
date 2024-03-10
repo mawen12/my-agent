@@ -1,7 +1,6 @@
 package com.mawen.agent.plugin.api.config;
 
 import java.lang.reflect.Type;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -38,8 +37,8 @@ public class AutoRefreshPluginConfigRegistry {
 
 	public static <C extends AutoRefreshPluginConfig> C getOrCreate(String domain, String namespace,
 	                                                                String id, AutoRefreshConfigSupplier<C> supplier) {
-		Key key = new Key(domain, namespace, id, supplier.getType());
-		AutoRefreshPluginConfig autoRefreshConfig = configs.get(key);
+		var key = new Key(domain, namespace, id, supplier.getType());
+		var autoRefreshConfig = configs.get(key);
 		if (autoRefreshConfig != null) {
 			triggerChange(domain,namespace, id,autoRefreshConfig);
 			return (C) autoRefreshConfig;
@@ -50,7 +49,7 @@ public class AutoRefreshPluginConfigRegistry {
 				triggerChange(domain, namespace,id,autoRefreshConfig);
 				return (C) autoRefreshConfig;
 			}
-			C newConfig = supplier.newInstance();
+			var newConfig = supplier.newInstance();
 			triggerChange(domain, namespace, id, newConfig);
 			configs.put(key, newConfig);
 			return newConfig;
@@ -58,49 +57,11 @@ public class AutoRefreshPluginConfigRegistry {
 	}
 
 	private static <C extends AutoRefreshPluginConfig> void triggerChange(String domain, String namespace, String id, C newConfig) {
-		IPluginConfig config = Agent.getConfig(domain, namespace, id);
+		var config = Agent.getConfig(domain, namespace, id);
 		newConfig.onChange(null,config);
 		config.addChangeListener(newConfig);
 	}
 
-	static class Key {
-		private final String domain;
-		private final String namespace;
-		private final String id;
-		private final Type type;
-
-		public Key(String domain, String namespace, String id, Type type) {
-			this.domain = domain;
-			this.namespace = namespace;
-			this.id = id;
-			this.type = type;
-		}
-
-		@Override
-		public final boolean equals(Object o) {
-			if (this == o) return true;
-			if (!(o instanceof Key key)) return false;
-
-			return Objects.equals(domain, key.domain) && Objects.equals(namespace, key.namespace) && Objects.equals(id, key.id) && Objects.equals(type, key.type);
-		}
-
-		@Override
-		public int hashCode() {
-			int result = Objects.hashCode(domain);
-			result = 31 * result + Objects.hashCode(namespace);
-			result = 31 * result + Objects.hashCode(id);
-			result = 31 * result + Objects.hashCode(type);
-			return result;
-		}
-
-		@Override
-		public String toString() {
-			return "Key{" +
-					"domain='" + domain + '\'' +
-					", namespace='" + namespace + '\'' +
-					", id='" + id + '\'' +
-					", type=" + type +
-					'}';
-		}
+	record Key(String domain, String namespace, String id, Type type) {
 	}
 }

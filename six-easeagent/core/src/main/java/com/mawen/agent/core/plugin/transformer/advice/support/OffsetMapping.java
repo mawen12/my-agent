@@ -1078,8 +1078,7 @@ public interface OffsetMapping {
 						case Renderer.ForReturnTypeName.SYMBOL -> renderers.add(Renderer.ForReturnTypeName.INSTANCE);
 						case Renderer.ForJavaSignature.SYMBOL -> renderers.add(Renderer.ForJavaSignature.INSTANCE);
 						case Renderer.ForPropertyName.SYMBOL -> renderers.add(Renderer.ForPropertyName.INSTANCE);
-						default ->
-								throw new IllegalStateException("Illegal sort descriptor " + pattern.charAt(to + 1) + " for " + pattern);
+						default -> throw new IllegalStateException("Illegal sort descriptor " + pattern.charAt(to + 1) + " for " + pattern);
 					}
 					from = to + 2;
 				}

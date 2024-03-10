@@ -91,7 +91,7 @@ public class MetricRegistryImpl implements MetricRegistry {
 
 	@Override
 	public Gauge gauge(String name, MetricSupplier<Gauge> supplier) {
-		Metric metric = metricCache.get(name);
+		var metric = metricCache.get(name);
 		if (metric != null) {
 			return MetricInstance.GAUGE.to(name, metric);
 		}
@@ -100,8 +100,8 @@ public class MetricRegistryImpl implements MetricRegistry {
 			if (metric != null) {
 				return MetricInstance.GAUGE.to(name, metric);
 			}
-			com.codahale.metrics.Gauge result = metricRegistry.gauge(name, new GaugeSupplier(supplier));
-			Gauge g = ((GaugeImpl) result).getG();
+			var result = metricRegistry.gauge(name, new GaugeSupplier(supplier));
+			var g = ((GaugeImpl) result).g();
 			metricCache.putIfAbsent(name, g);
 			return g;
 		}
@@ -118,7 +118,7 @@ public class MetricRegistryImpl implements MetricRegistry {
 	}
 
 	private <T extends Metric> T getOrAdd(String name, MetricInstance<T> instance, MetricBuilder<T> builder) {
-		Metric metric = metricCache.get(name);
+		var metric = metricCache.get(name);
 		if (metric != null) {
 			return instance.to(name, metric);
 		}
@@ -127,7 +127,7 @@ public class MetricRegistryImpl implements MetricRegistry {
 			if (metric != null) {
 				return instance.to(name, metric);
 			}
-			T t = builder.newMetric(name);
+			var t = builder.newMetric(name);
 			metricCache.putIfAbsent(name, t);
 			return t;
 		}
@@ -143,7 +143,7 @@ public class MetricRegistryImpl implements MetricRegistry {
 
 		@Override
 		public com.codahale.metrics.Gauge newMetric() {
-			Gauge newGauge = supplier.newMetric();
+			var newGauge = supplier.newMetric();
 			return new GaugeImpl(newGauge);
 		}
 	}

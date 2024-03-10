@@ -12,12 +12,10 @@ import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.report.tracing.ReportSpan;
-import com.mawen.agent.report.async.AsyncProps;
 import com.mawen.agent.report.async.trace.SDKAsyncReporter;
 import com.mawen.agent.report.async.trace.TraceAsyncProps;
 import com.mawen.agent.report.encoder.span.GlobalExtrasSupplier;
 import com.mawen.agent.report.plugin.ReporterRegistry;
-import com.mawen.agent.report.sender.SenderWithEncoder;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -37,11 +35,11 @@ public class TraceReport {
 	}
 
 	private RefreshableReporter<ReportSpan> initSpanRefreshableReporter(Config reportConfig) {
-		SenderWithEncoder sender = ReporterRegistry.getSender(ReportConfigConst.TRACE_SENDER, reportConfig);
+		var sender = ReporterRegistry.getSender(ReportConfigConst.TRACE_SENDER, reportConfig);
 
-		AsyncProps traceProperties = new TraceAsyncProps(reportConfig);
+		var traceProperties = new TraceAsyncProps(reportConfig);
 
-		GlobalExtrasSupplier extrasSupplier = new GlobalExtrasSupplier() {
+		var extrasSupplier = new GlobalExtrasSupplier() {
 
 			Config gConfig = Agent.getConfig();
 			AutoRefreshConfigItem<String> serviceName = new AutoRefreshConfigItem<>(gConfig, ConfigConst.SERVICE_NAME, Config::getString);
@@ -57,7 +55,7 @@ public class TraceReport {
 			}
 		};
 
-		SDKAsyncReporter<ReportSpan> reporter = SDKAsyncReporter.builderSDKAsyncReporter(sender, traceProperties, extrasSupplier);
+		var reporter = SDKAsyncReporter.builderSDKAsyncReporter(sender, traceProperties, extrasSupplier);
 
 		reporter.startFlushThread();
 
@@ -68,7 +66,7 @@ public class TraceReport {
 
 		@Override
 		public void onChange(List<ChangeItem> list) {
-			Map<String, String> cfg = filterChanges(list);
+			var cfg = filterChanges(list);
 
 			if (cfg.isEmpty()) {
 				return;
@@ -78,7 +76,7 @@ public class TraceReport {
 		}
 
 		private Map<String, String> filterChanges(List<ChangeItem> list) {
-			return list.stream().collect(Collectors.toMap(ChangeItem::getFullName, ChangeItem::getNewValue));
+			return list.stream().collect(Collectors.toMap(ChangeItem::fullName, ChangeItem::newValue));
 		}
 	}
 }

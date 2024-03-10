@@ -1,6 +1,5 @@
 package com.mawen.agent.plugin.tools.metrics;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,7 @@ import com.mawen.agent.plugin.utils.common.JsonUtil;
 public class HttpLog {
 
 	public AccessLogInfo prepare(String system, String serviceName, Long beginTime, Span span, AccessLogServerInfo serverInfo) {
-		AccessLogInfo accessLog = prepare(system, serviceName, beginTime, serverInfo);
+		var accessLog = prepare(system, serviceName, beginTime, serverInfo);
 		if (span == null) {
 			return accessLog;
 		}
@@ -31,7 +30,7 @@ public class HttpLog {
 	}
 
 	private AccessLogInfo prepare(String system, String serviceName, Long beginTime, AccessLogServerInfo serverInfo) {
-		AccessLogInfo accessLog = new AccessLogInfo();
+		var accessLog = new AccessLogInfo();
 		accessLog.setSystem(system);
 		accessLog.setService(serviceName);
 		accessLog.setHostName(HostAddress.localhost());
@@ -47,12 +46,12 @@ public class HttpLog {
 	}
 
 	private Map<String, String> getQueries(AccessLogServerInfo serverInfo) {
-		Map<String, String> serviceTags = ProgressFields.getServiceTags();
-		Map<String, String> meshTags = RedirectProcessor.tags();
+		var serviceTags = ProgressFields.getServiceTags();
+		var meshTags = RedirectProcessor.tags();
 		if (serviceTags.isEmpty() && meshTags.isEmpty()) {
 			return serverInfo.findQueries();
 		}
-		Map<String, String> queries = new HashMap<>(meshTags);
+		var queries = new HashMap<>(meshTags);
 		queries.putAll(serviceTags);
 		queries.putAll(serverInfo.findQueries());
 		return queries;
@@ -60,11 +59,7 @@ public class HttpLog {
 
 	public String getLogString(AccessLogInfo accessLog, boolean success, Long beginTime, AccessLogServerInfo serverInfo ) {
 		this.finish(accessLog, success, beginTime, serverInfo);
-
-		List<AccessLogInfo> list = new ArrayList<>(1);
-		list.add(accessLog);
-
-		return JsonUtil.toJson(list);
+		return JsonUtil.toJson(List.of(accessLog));
 	}
 
 	public void finish(AccessLogInfo accessLog, boolean success, Long beginTime, AccessLogServerInfo serverInfo) {
@@ -72,7 +67,7 @@ public class HttpLog {
 		if (!success) {
 			accessLog.setStatusCode("500");
 		}
-		long now = SystemClock.now();
+		var now = SystemClock.now();
 		accessLog.setTimestamp(now);
 		accessLog.setRequestTime(now - beginTime);
 		accessLog.setCpuElapsedTime(System.nanoTime() - accessLog.getCpuElapsedTime());

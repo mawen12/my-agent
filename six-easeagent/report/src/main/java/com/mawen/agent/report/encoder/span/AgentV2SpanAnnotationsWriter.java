@@ -1,6 +1,5 @@
 package com.mawen.agent.report.encoder.span;
 
-import com.mawen.agent.plugin.report.tracing.Annotation;
 import com.mawen.agent.plugin.report.tracing.ReportSpan;
 import zipkin2.internal.JsonEscaper;
 import zipkin2.internal.WriteBuffer;
@@ -17,7 +16,7 @@ public class AgentV2SpanAnnotationsWriter implements WriteBuffer.Writer<ReportSp
 	static final String ENDPOINT_FIELD_NAME = ",\"endpoint\":";
 
 	int annotationSizeInBytes(long timestamp, String value, int endpointSizeInBytes) {
-		int sizeInBytes = 0;
+		var sizeInBytes = 0;
 
 		sizeInBytes += TIMESTAMP_FIELD_NAME.length();
 		sizeInBytes += sizeInBytes + WriteBuffer.asciiSizeInBytes(timestamp);
@@ -48,8 +47,8 @@ public class AgentV2SpanAnnotationsWriter implements WriteBuffer.Writer<ReportSp
 
 	@Override
 	public int sizeInBytes(ReportSpan value) {
-		int tagCount = 0;
-		int sizeInBytes = 0;
+		var tagCount = 0;
+		var sizeInBytes = 0;
 		if (!value.annotations().isEmpty()) {
 			sizeInBytes += ANNOTATION_FIELD_NAME.length() + 1;
 			tagCount = value.annotations().size();
@@ -58,7 +57,7 @@ public class AgentV2SpanAnnotationsWriter implements WriteBuffer.Writer<ReportSp
 			}
 
 			for (int i = 0; i < tagCount; i++) {
-				Annotation a = value.annotations().get(i);
+				var a = value.annotations().get(i);
 				sizeInBytes += annotationSizeInBytes(a.timestamp(), a.value(), 0);
 			}
 		}
@@ -73,7 +72,7 @@ public class AgentV2SpanAnnotationsWriter implements WriteBuffer.Writer<ReportSp
 			int length = value.annotations().size();
 
 			while (i < length) {
-				Annotation a = value.annotations().get(i++);
+				var a = value.annotations().get(i++);
 				writeAnnotation(a.timestamp(), a.value(), null, buffer);
 				if (i < length) {
 					buffer.writeByte(44); // , for array item

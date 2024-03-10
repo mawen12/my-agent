@@ -13,7 +13,7 @@ public class ThreadUtils {
 	}
 
 	public static <V> V callWithClassLoader(ClassLoader use, Supplier<V> runnable) {
-		ClassLoader old = Thread.currentThread().getContextClassLoader();
+		var old = Thread.currentThread().getContextClassLoader();
 		try {
 			Thread.currentThread().setContextClassLoader(use);
 			return runnable.get();

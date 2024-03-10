@@ -1,6 +1,5 @@
 package com.mawen.agent.mock.utils;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -13,8 +12,8 @@ public class MockSystemEnv {
 
 	private static Map<String, String> getEnvironments() {
 		try {
-			Class<?> systemEnv = Thread.currentThread().getContextClassLoader().loadClass("com.mawen.agent.plugin.utils.SystemEnv");
-			Field environments = systemEnv.getDeclaredField("ENVIRONMENTS");
+			var systemEnv = Thread.currentThread().getContextClassLoader().loadClass("com.mawen.agent.plugin.utils.SystemEnv");
+			var environments = systemEnv.getDeclaredField("ENVIRONMENTS");
 			environments.setAccessible(true);
 			return (Map<String, String>) environments.get(null);
 		}

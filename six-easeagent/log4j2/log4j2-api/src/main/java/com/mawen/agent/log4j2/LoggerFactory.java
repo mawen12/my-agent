@@ -48,12 +48,8 @@ public class LoggerFactory {
 		return getLogger(clazz.getName());
 	}
 
-	public static class NoopLogger implements Logger {
-		private final String name;
+	public record NoopLogger(String name) implements Logger {
 
-		public NoopLogger(String name) {
-			this.name = name;
-		}
 
 		@Override
 		public String getName() {

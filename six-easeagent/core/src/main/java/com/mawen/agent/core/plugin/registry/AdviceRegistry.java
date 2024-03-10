@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.mawen.agent.core.plugin.Dispatcher;
-import com.mawen.agent.core.plugin.matcher.MethodTransformation;
 import com.mawen.agent.core.plugin.transformer.advice.AgentAdvice;
 import com.mawen.agent.core.plugin.transformer.advice.AgentJavaConstantValue;
 import com.mawen.agent.core.plugin.transformer.advice.MethodIdentityJavaConstant;
@@ -19,7 +18,6 @@ import com.mawen.agent.plugin.utils.common.WeakConcurrentMap;
 import lombok.Getter;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.implementation.bytecode.StackManipulation;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -35,12 +33,12 @@ public class AdviceRegistry {
 			MethodDescription instrumentedMethod,
 			AgentAdvice.Dispatcher.Resolved.ForMethodEnter methodEnter,
 			AgentAdvice.Dispatcher.Resolved.ForMethodExit methodExit) {
-		String clazz = instrumentedType.getName();
-		String method = instrumentedMethod.getName();
-		String methodDescriptor = instrumentedMethod.getDescriptor();
-		String key = clazz.concat(":").concat(method).concat(methodDescriptor);
-		PointcutsUniqueId newIdentity = new PointcutsUniqueId();
-		PointcutsUniqueId pointcutsUniqueId = methodsSet.putIfAbsent(key, newIdentity);
+		var clazz = instrumentedType.getName();
+		var method = instrumentedMethod.getName();
+		var methodDescriptor = instrumentedMethod.getDescriptor();
+		var key = clazz.concat(":").concat(method).concat(methodDescriptor);
+		var newIdentity = new PointcutsUniqueId();
+		var pointcutsUniqueId = methodsSet.putIfAbsent(key, newIdentity);
 
 		Integer pointcutIndex;
 		boolean merge = false;
@@ -65,13 +63,13 @@ public class AdviceRegistry {
 			updateStackManipulation(methodExit, pointcutsUniqueId.getUniqueId());
 		}
 
-		MethodTransformation methodTransformation = PluginRegistry.getMethodTransformation(pointcutIndex);
+		var methodTransformation = PluginRegistry.getMethodTransformation(pointcutIndex);
 		if (methodTransformation == null) {
 			log.error("MethodTransformation get fail for {}", pointcutIndex);
 			return 0;
 		}
-		int uniqueId = pointcutsUniqueId.getUniqueId();
-		AgentInterceptorChain chain = methodTransformation.getAgentInterceptorChain(uniqueId, clazz, method, methodDescriptor);
+		var uniqueId = pointcutsUniqueId.getUniqueId();
+		var chain = methodTransformation.getAgentInterceptorChain(uniqueId, clazz, method, methodDescriptor);
 
 		try {
 			pointcutsUniqueId.lock();
@@ -96,10 +94,10 @@ public class AdviceRegistry {
 	}
 
 	static Integer getPointcutIndex(AgentAdvice.Dispatcher.Resolved resolved) {
-		int index = 0;
-		Map<Integer, OffsetMapping> map = resolved.getOffsetMapping();
-		for (Map.Entry<Integer, OffsetMapping> entry : map.entrySet()) {
-			OffsetMapping om = entry.getValue();
+		var index = 0;
+		var map = resolved.getOffsetMapping();
+		for (var entry : map.entrySet()) {
+			var om = entry.getValue();
 			if (!(om instanceof OffsetMapping.ForStackManipulation f)) {
 				continue;
 			}
@@ -115,11 +113,11 @@ public class AdviceRegistry {
 	}
 
 	static Integer updateStackManipulation(AgentAdvice.Dispatcher.Resolved resolved, Integer value) {
-		int index = 0;
-		Map<Integer, OffsetMapping> map = resolved.getOffsetMapping();
+		var index = 0;
+		var map = resolved.getOffsetMapping();
 
-		for (Map.Entry<Integer, OffsetMapping> entry : map.entrySet()) {
-			OffsetMapping om = entry.getValue();
+		for (var entry : map.entrySet()) {
+			var om = entry.getValue();
 			if (!(om instanceof OffsetMapping.ForStackManipulation f)) {
 				continue;
 			}
@@ -130,8 +128,8 @@ public class AdviceRegistry {
 
 			index = oldValue.getPointcutIndex();
 
-			MethodIdentityJavaConstant constant = new MethodIdentityJavaConstant(value);
-			StackManipulation stackManipulation = new AgentJavaConstantValue(constant, index);
+			var constant = new MethodIdentityJavaConstant(value);
+			var stackManipulation = new AgentJavaConstantValue(constant, index);
 			map.put(entry.getKey(), f.with(stackManipulation));
 			break;
 		}

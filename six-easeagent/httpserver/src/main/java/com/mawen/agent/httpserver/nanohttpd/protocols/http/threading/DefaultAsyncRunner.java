@@ -25,7 +25,7 @@ public class DefaultAsyncRunner implements IAsyncRunner {
 
 	@Override
 	public void closeAll() {
-		for (ClientHandler clientHandler : new ArrayList<>(this.running)) {
+		for (var clientHandler : new ArrayList<>(this.running)) {
 			clientHandler.close();
 		}
 	}

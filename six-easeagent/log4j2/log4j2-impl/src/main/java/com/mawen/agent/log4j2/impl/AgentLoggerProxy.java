@@ -44,8 +44,8 @@ public class AgentLoggerProxy implements LocationAwareLogger, Serializable {
 
 	@Override
 	public void log(final Marker marker, final String fqcn, final int level, final String message, final Object[] params, Throwable throwable) {
-		final Level log4jLevel = getLevel(level);
-		final org.apache.logging.log4j.Marker log4jMarker = getMarker(marker);
+		final var log4jLevel = getLevel(level);
+		final var log4jMarker = getMarker(marker);
 
 		if (!logger.isEnabled(log4jLevel, log4jMarker, message, params)) {
 			return;
@@ -382,28 +382,22 @@ public class AgentLoggerProxy implements LocationAwareLogger, Serializable {
 	}
 
 	private static Level getLevel(final int i) {
-		switch (i) {
-			case TRACE_INT:
-				return Level.TRACE;
-			case DEBUG_INT:
-				return Level.DEBUG;
-			case INFO_INT:
-				return Level.INFO;
-			case WARN_INT:
-				return Level.WARN;
-			case ERROR_INT:
-				return Level.ERROR;
-			default:
-				return Level.ERROR;
-		}
+		return switch (i) {
+			case TRACE_INT -> Level.TRACE;
+			case DEBUG_INT -> Level.DEBUG;
+			case INFO_INT -> Level.INFO;
+			case WARN_INT -> Level.WARN;
+			case ERROR_INT -> Level.ERROR;
+			default -> Level.ERROR;
+		};
 	}
 
 	private static org.apache.logging.log4j.Marker getMarker(final Marker marker) {
 		if (marker == null) {
 			return null;
 		}
-		else if (marker instanceof Log4jMarker) {
-			return ((Log4jMarker) marker).getLog4jMarker();
+		else if (marker instanceof Log4jMarker log4jMarker) {
+			return log4jMarker.getLog4jMarker();
 		}
 		else {
 			final Log4jMarkerFactory factory = (Log4jMarkerFactory) StaticMarkerBinder.SINGLETON.getMarkerFactory();
