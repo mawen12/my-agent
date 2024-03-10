@@ -6,6 +6,7 @@ import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -73,7 +74,7 @@ public class Bootstrap {
 
 		@Override
 		public void onTransformation(TypeDescription typeDescription, ClassLoader classLoader, JavaModule javaModule, boolean b, DynamicType dynamicType) {
-			log.debug("onTransformation: {} loaded: {} from classloader {}", typeDescription, b, classLoader);
+			log.info("onTransformation: {} loaded: {} from classloader {}", typeDescription, b, classLoader);
 		}
 
 		@Override
@@ -151,7 +152,7 @@ public class Bootstrap {
 		long installBegin = System.currentTimeMillis();
 		builder.installOn(inst);
 		log.info("installBegin use time: {}ms", (System.currentTimeMillis() - installBegin));
-		log.info("Initialization has took: {}ns", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - begin));
+		log.info("Initialization has took: {}ms", TimeUnit.MILLISECONDS.toMillis(System.nanoTime() - begin));
 	}
 
 	private static void initHttpServer(Configs cfg) {

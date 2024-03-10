@@ -7,6 +7,8 @@ import com.mawen.agent.plugin.matcher.ClassMatcher;
 import com.mawen.agent.plugin.matcher.IClassMatcher;
 import com.mawen.agent.plugin.matcher.IMethodMatcher;
 import com.mawen.agent.plugin.matcher.MethodMatcher;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RestClient;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>

@@ -301,14 +301,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>${junit.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>io.prometheus</groupId>
                 <artifactId>simpleclient_dropwizard</artifactId>
                 <version>${prometheus.version}</version>
@@ -403,7 +395,7 @@
         <kafka.version>3.0.0</kafka.version>
 
         <!-- JUnit 依赖版本 -->
-        <junit.version>5.10.0</junit.version>
+        <junit.version>4.13.1</junit.version>
 
         <lombok.version>1.18.30</lombok.version>
         <mockito.version>5.10.0</mockito.version>

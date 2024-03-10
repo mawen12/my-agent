@@ -1,9 +1,10 @@
 package com.mawen.agent.log4j2.impl;
 
 import com.mawen.agent.log4j2.MDC;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
+
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>

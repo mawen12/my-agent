@@ -53,7 +53,7 @@ public class DynamicFieldTransformer implements AgentBuilder.Transformer {
 						.intercept(FieldAccessor.ofField(this.fieldName));
 			}
 			catch (Exception e) {
-				log.debug("Type:{} add extend field again!",typeDescription.getName());
+				log.warn("Type:{} add extend field again!",typeDescription.getName());
 			}
 			return transformer.transform(builder, typeDescription, classLoader, javaModule);
 		}

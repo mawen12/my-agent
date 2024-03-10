@@ -63,6 +63,12 @@
             <artifactId>loader</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.mawen</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

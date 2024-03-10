@@ -7,9 +7,11 @@ import com.mawen.agent.plugin.annotation.AdviceTo;
 import com.mawen.agent.plugin.api.Context;
 import com.mawen.agent.plugin.api.logging.Logger;
 import com.mawen.agent.plugin.api.middleware.Redirect;
+import com.mawen.agent.plugin.api.middleware.RedirectProcessor;
 import com.mawen.agent.plugin.api.middleware.ResourceConfig;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.elasticsearch.ElasticsearchPlugin;
+import com.mawen.agent.plugin.elasticsearch.ElasticsearchRedirectPlugin;
 import com.mawen.agent.plugin.elasticsearch.advice.SpringElasticsearchAdvice;
 import com.mawen.agent.plugin.enums.Order;
 import com.mawen.agent.plugin.interceptor.MethodInfo;
@@ -20,7 +22,7 @@ import com.mawen.agent.plugin.utils.common.StringUtils;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/4
  */
-@AdviceTo(value = SpringElasticsearchAdvice.class, plugin = ElasticsearchPlugin.class)
+@AdviceTo(value = SpringElasticsearchAdvice.class, plugin = ElasticsearchRedirectPlugin.class)
 public class SpringElasticsearchInterceptor implements NonReentrantInterceptor {
 
 	private static final Logger LOGGER = Agent.getLogger(SpringElasticsearchInterceptor.class);
@@ -43,6 +45,8 @@ public class SpringElasticsearchInterceptor implements NonReentrantInterceptor {
 		}
 		else if (method.equals("setEndpoints") || method.equals("setUris")) {
 			LOGGER.info("Redirect Elasticsearch uris: {} to {}", methodInfo.getArgs()[0], config.getUris());
+			methodInfo.changeArg(0, uris);
+			RedirectProcessor.redirected(Redirect.ELASTICSEARCH,config.getUris());
 		}
 	}
 

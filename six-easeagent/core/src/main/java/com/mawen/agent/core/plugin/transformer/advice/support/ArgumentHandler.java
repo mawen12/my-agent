@@ -165,7 +165,7 @@ public interface ArgumentHandler {
 					}
 					for (ParameterDescription parameter : method.getParameters()) {
 						Type type = Type.getType(parameter.getType().asErasure().getDescriptor());
-						methodVisitor.visitVarInsn(type.getOpcode(Opcodes.ALOAD), parameter.getOffset());
+						methodVisitor.visitVarInsn(type.getOpcode(Opcodes.ILOAD), parameter.getOffset());
 						methodVisitor.visitVarInsn(type.getOpcode(Opcodes.ISTORE), method.getStackSize()
 								+ exitType.getStackSize().getSize()
 								+ StackSize.of(namedTypes.values())

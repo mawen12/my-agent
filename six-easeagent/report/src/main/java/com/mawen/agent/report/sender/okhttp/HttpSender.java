@@ -125,9 +125,7 @@ public class HttpSender implements Sender{
 		}
 		catch (Exception e) {
 			// log rate-limit
-			if (log.isDebugEnabled()) {
-				log.debug("tracing send fail!");
-			}
+			log.warn("tracing send fail!");
 			return NoOpCall.getInstance(Void.class);
 		}
 

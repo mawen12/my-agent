@@ -1310,22 +1310,22 @@ public class AgentAdvice extends Advice {
 
 			@Override
 			public boolean isAlive() {
-				return false;
-			}
-
-			@Override
-			public TypeDefinition getAdviceType() {
-				return null;
+				return true;
 			}
 
 			@Override
 			public boolean isBinary() {
-				return false;
+				return true;
+			}
+
+			@Override
+			public TypeDefinition getAdviceType() {
+				return adviceMethod.getReturnType().asErasure();
 			}
 
 			@Override
 			public Map<String, TypeDefinition> getNamedTypes() {
-				return null;
+				return namedTypes;
 			}
 
 			@Override
@@ -1586,10 +1586,10 @@ public class AgentAdvice extends Advice {
 										new Factory.Illegal<>(Enter.class),
 										new Factory.Illegal<>(Return.class)), userFactories),
 								adviceMethod.getDeclaredAnnotations().ofType(OnMethodEnter.class).getValue(SUPPRESS_ENTER).resolve(TypeDescription.class),
-								adviceMethod.getDeclaredAnnotations().ofType(OnMethodExit.class).getValue(SKIP_ON).resolve(TypeDescription.class),
+								adviceMethod.getDeclaredAnnotations().ofType(OnMethodEnter.class).getValue(SKIP_ON).resolve(TypeDescription.class),
 								classReader);
 						this.namedTypes = namedTypes;
-						this.prependLineNumber = adviceMethod.getDeclaredAnnotations().ofType(OnMethodExit.class).getValue(PREPEND_LINE_NUMBER).resolve(Boolean.class);
+						this.prependLineNumber = adviceMethod.getDeclaredAnnotations().ofType(OnMethodEnter.class).getValue(PREPEND_LINE_NUMBER).resolve(Boolean.class);
 					}
 
 					protected static Resolved.ForMethodEnter of(MethodDescription.InDefinedShape adviceMethod,

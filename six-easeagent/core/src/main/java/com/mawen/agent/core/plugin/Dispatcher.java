@@ -8,6 +8,7 @@ import com.mawen.agent.plugin.api.InitializeContext;
 import com.mawen.agent.plugin.interceptor.AgentInterceptorChain;
 import com.mawen.agent.plugin.interceptor.MethodInfo;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**

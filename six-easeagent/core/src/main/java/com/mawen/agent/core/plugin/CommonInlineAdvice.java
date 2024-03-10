@@ -19,11 +19,11 @@ public class CommonInlineAdvice {
 
 	@Advice.OnMethodEnter(suppress = NoExceptionHandler.class)
 	public static MethodInfo enter(@Index int index,
-			@Advice.This(optional = true) Object invoker,
-			@Advice.Origin("#t") String type,
-			@Advice.Origin("#m") String method,
-			@Advice.AllArguments(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object[] args,
-			@Advice.Local(CONTEXT) InitializeContext context) {
+	                               @Advice.This(optional = true) Object invoker,
+	                               @Advice.Origin("#t") String type,
+	                               @Advice.Origin("#m") String method,
+	                               @Advice.AllArguments(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object[] args,
+	                               @Advice.Local(CONTEXT) InitializeContext context) {
 		context = Agent.initializeContextSupplier.getContext();
 		if (context.isNoop()) {
 			return null;
@@ -45,10 +45,10 @@ public class CommonInlineAdvice {
 
 	@Advice.OnMethodExit(onThrowable = Exception.class, suppress = NoExceptionHandler.class)
 	public static void exit(@Index int index,
-			@Advice.Enter MethodInfo methodInfo,
-			@Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object result,
-			@Advice.Thrown(readOnly = false, typing = Assigner.Typing.DYNAMIC) Throwable throwable,
-			@Advice.Local(CONTEXT) InitializeContext context) {
+	                        @Advice.Enter MethodInfo methodInfo,
+	                        @Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object result,
+	                        @Advice.Thrown(readOnly = false, typing = Assigner.Typing.DYNAMIC) Throwable throwable,
+	                        @Advice.Local(CONTEXT) InitializeContext context) {
 		if (context.isNoop()) {
 			return;
 		}
@@ -63,10 +63,10 @@ public class CommonInlineAdvice {
 
 	@Advice.OnMethodExit(suppress = NoExceptionHandler.class)
 	public static void exit(@Index int index,
-			@Advice.This(optional = true) Object invoker,
-			@Advice.Enter MethodInfo methodInfo,
-			@Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object result,
-			@Advice.Local(CONTEXT) InitializeContext context) {
+	                        @Advice.This(optional = true) Object invoker,
+	                        @Advice.Enter MethodInfo methodInfo,
+	                        @Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object result,
+	                        @Advice.Local(CONTEXT) InitializeContext context) {
 		if (context.isNoop()) {
 			return;
 		}

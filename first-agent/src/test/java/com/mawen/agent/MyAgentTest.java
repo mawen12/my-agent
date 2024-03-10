@@ -1,7 +1,5 @@
 package com.mawen.agent;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class MyAgentTest {
 
 	// add VM options: -javaagent:/Users/mawen/Documents/GitHub/mawen12/my-agent/first-agent/target/first-agent.jar

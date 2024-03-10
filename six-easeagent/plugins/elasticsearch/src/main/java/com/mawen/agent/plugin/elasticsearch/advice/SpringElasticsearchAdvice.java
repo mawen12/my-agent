@@ -3,6 +3,8 @@ package com.mawen.agent.plugin.elasticsearch.advice;
 import java.util.Set;
 
 import com.mawen.agent.plugin.Points;
+import com.mawen.agent.plugin.annotation.AdviceTo;
+import com.mawen.agent.plugin.elasticsearch.ElasticsearchRedirectPlugin;
 import com.mawen.agent.plugin.matcher.IClassMatcher;
 import com.mawen.agent.plugin.matcher.IMethodMatcher;
 import com.mawen.agent.plugin.matcher.MethodMatcher;

@@ -1,7 +1,6 @@
 
-## Class not found
 
-### Exception in thread "main" java.lang.NoClassDefFoundError: org/springframework/boot/loader/LaunchedURLClassLoader
+## Exception in thread "main" java.lang.NoClassDefFoundError: org/springframework/boot/loader/LaunchedURLClassLoader
 
 use `maven-shade-plugin` set `org.springframework` to `springframework` in `loader/pom.xml`.
 

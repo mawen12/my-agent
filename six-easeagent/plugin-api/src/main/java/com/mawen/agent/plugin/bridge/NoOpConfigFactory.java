@@ -29,12 +29,12 @@ public class NoOpConfigFactory implements IConfigFactory {
 
 	@Override
 	public String getConfig(String property, String defaultValue) {
-		return "";
+		return defaultValue;
 	}
 
 	@Override
 	public IPluginConfig getConfig(String domain, String namespace, String name) {
-		return null;
+		return new NoOpIPluginConfig(domain, namespace, name);
 	}
 
 	static class NoOpConfig implements Config {
