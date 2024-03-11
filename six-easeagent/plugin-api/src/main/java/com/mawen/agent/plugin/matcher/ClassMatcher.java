@@ -71,7 +71,7 @@ public class ClassMatcher implements IClassMatcher {
 		}
 
 		public ClassMatcherBuilder hasSuperClass(String className) {
-			if (this.name != null && this.name.length() > 0) {
+			if (this.name != null && !this.name.isEmpty()) {
 				if (this.matchType.equals(ClassMatch.SUPER_CLASS)) {
 					// replace
 					return this.name(className).matchType(ClassMatch.SUPER_CLASS);
@@ -96,7 +96,7 @@ public class ClassMatcher implements IClassMatcher {
 		}
 
 		public ClassMatcherBuilder hasInterface(String className) {
-			if (this.name != null && this.name.length() > 0) {
+			if (this.name != null && !this.name.isEmpty()) {
 				// and operate
 				ClassMatcherBuilder builder = new ClassMatcherBuilder();
 				builder.hasSuperClass(className).matchType(ClassMatch.INTERFACE);

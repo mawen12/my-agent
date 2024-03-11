@@ -49,7 +49,8 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 	public AgentForAdvice(AgentAdvice.WithCustomMapping advice) {
 		this(
 				advice,
-				Advice.ExceptionHandler.Default.SUPPRESSING, Assigner.DEFAULT,
+				Advice.ExceptionHandler.Default.SUPPRESSING,
+				Assigner.DEFAULT,
 				ClassFileLocator.NoOp.INSTANCE,
 				AgentBuilder.PoolStrategy.Default.FAST,
 				AgentBuilder.LocationStrategy.ForClassLoader.STRONG,

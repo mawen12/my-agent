@@ -354,11 +354,8 @@ public interface OffsetMapping {
 				throw new IllegalStateException("Cannot write to constant value: " + stackManipulation);
 			}
 
-			@AllArgsConstructor
 			@HashCodeAndEqualsPlugin.Enhance
-			public static class Writable implements Target {
-				private final StackManipulation read;
-				private final StackManipulation write;
+			public record Writable(StackManipulation read, StackManipulation write) implements Target {
 
 				@Override
 				public StackManipulation resolveRead() {
@@ -1416,8 +1413,8 @@ public interface OffsetMapping {
 
 			@Override
 			public OffsetMapping make(ParameterDescription.InDefinedShape target, AnnotationDescription.Loadable<Advice.Local> annotation, AdviceType adviceType) {
-				String name = annotation.getValue(LOCAL_VALUE).resolve(String.class);
-				TypeDefinition namedType = namedTypes.get(name);
+				var name = annotation.getValue(LOCAL_VALUE).resolve(String.class);
+				var namedType = namedTypes.get(name);
 				if (namedType == null) {
 					throw new IllegalStateException("Named local variable is unknown: " + name);
 				}

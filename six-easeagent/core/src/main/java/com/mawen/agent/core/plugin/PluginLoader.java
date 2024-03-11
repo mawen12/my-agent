@@ -47,6 +47,19 @@ public class PluginLoader {
 		return ab;
 	}
 
+	public static void pluginLoad() {
+		for (var plugin : BaseLoader.loadOrdered(AgentPlugin.class)) {
+			log.info("Loading plugin {}:{} [class {}]", plugin.getDomain(), plugin.getNamespace(), plugin.getClass().getName());
+
+			try {
+				PluginRegistry.register(plugin);
+			}
+			catch (Exception e) {
+				log.error("Unable to load extension {}:{} [class {}]", plugin.getDomain(), plugin.getNamespace(), plugin.getClass().getName(), e);
+			}
+		}
+	}
+
 	public static void providerLoad() {
 		for (var provider : BaseLoader.load(InterceptorProvider.class)) {
 			log.debug("loading provider: {}", provider.getClass().getName());
@@ -82,32 +95,11 @@ public class PluginLoader {
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
-	public static void pluginLoad() {
-		for (var plugin : BaseLoader.loadOrdered(AgentPlugin.class)) {
-			log.info("Loading plugin {}:{} [class {}]",
-					plugin.getDomain(),
-					plugin.getNamespace(),
-					plugin.getClass().getName());
-
-			try {
-				PluginRegistry.register(plugin);
-			}
-			catch (Exception e) {
-				log.error("Unable to load extension {}:{} [class {}]",
-						plugin.getDomain(),
-						plugin.getNamespace(),
-						plugin.getClass().getName(),
-						e
-				);
-			}
-		}
-	}
-
 	public static AgentBuilder.Transformer compound(boolean hasDynamicField,
-			Iterable<MethodTransformation> transformers) {
-		List<AgentBuilder.Transformer> agentTransformers = StreamSupport.stream(transformers.spliterator(), false)
+	                                                Iterable<MethodTransformation> transformers) {
+		var agentTransformers = StreamSupport.stream(transformers.spliterator(), false)
 				.map(ForAdviceTransformer::new)
-				.collect(Collectors.toList());
+				.collect(Collectors.<AgentBuilder.Transformer>toList());
 
 		if (hasDynamicField) {
 			agentTransformers.add(new DynamicFieldTransformer(AgentDynamicFieldAccessor.DYNAMIC_FIELD_NAME));

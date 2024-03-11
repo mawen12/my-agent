@@ -79,7 +79,7 @@ public class Bootstrap {
 
 		@Override
 		public void onError(String s, ClassLoader classLoader, JavaModule javaModule, boolean b, Throwable throwable) {
-			log.debug("Just for Debug-log, transform ends exceptionally, which is sometimes normal and sometimes there is an error: {} error:{} loaded: {} from classLoader {}",
+			log.warn("Just for Debug-log, transform ends exceptionally, which is sometimes normal and sometimes there is an error: {} error:{} loaded: {} from classLoader {}",
 					s, throwable, b, classLoader);
 		}
 
@@ -226,14 +226,14 @@ public class Bootstrap {
 				.or(nameStartsWith("javax."))
 				.or(nameStartsWith("net.bytebuddy."))
 				.or(nameStartsWith("com\\.sun\\.proxy\\.\\$Proxy.+"))
-				.or(nameStartsWith("java\\.lang\\.invoke\\.BoundMethodHandler\\$Species_L.+"))
+				.or(nameStartsWith("java\\.lang\\.invoke\\.BoundMethodHandle\\$Species_L.+"))
 				.or(nameStartsWith("org.junit."))
 				.or(nameStartsWith("junit."))
 				.or(nameStartsWith("com.intellij."));
 
 		// config used here to avoid warning of unused
 		if (!test && cfg != null) {
-			builder = ignored.or(nameStartsWith("com.mawen.agent"));
+			builder = ignored.or(nameStartsWith("com.mawen.agent."));
 		} else {
 			builder = ignored;
 		}

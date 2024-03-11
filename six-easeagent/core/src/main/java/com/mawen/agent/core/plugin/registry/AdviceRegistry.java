@@ -41,7 +41,7 @@ public class AdviceRegistry {
 		var pointcutsUniqueId = methodsSet.putIfAbsent(key, newIdentity);
 
 		Integer pointcutIndex;
-		boolean merge = false;
+		var merge = false;
 
 		if (pointcutsUniqueId != null) {
 			newIdentity.tryRelease();

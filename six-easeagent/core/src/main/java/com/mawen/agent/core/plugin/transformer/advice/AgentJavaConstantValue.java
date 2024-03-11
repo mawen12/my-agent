@@ -1,7 +1,6 @@
 package com.mawen.agent.core.plugin.transformer.advice;
 
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.bytecode.constant.JavaConstantValue;
 import net.bytebuddy.jar.asm.MethodVisitor;
@@ -11,11 +10,16 @@ import net.bytebuddy.jar.asm.MethodVisitor;
  * @since 2024/3/6
  */
 @Getter
-@SuperBuilder
 public class AgentJavaConstantValue extends JavaConstantValue {
 
 	private final MethodIdentityJavaConstant constant;
 	private final int pointcutIndex;
+
+	public AgentJavaConstantValue(MethodIdentityJavaConstant constant, int pointcutIndex) {
+		super(constant);
+		this.constant = constant;
+		this.pointcutIndex = pointcutIndex;
+	}
 
 	@Override
 	public Size apply(MethodVisitor methodVisitor, Implementation.Context implementationContext) {

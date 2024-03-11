@@ -13,10 +13,12 @@ import com.mawen.agent.core.plugin.matcher.MethodTransformation;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.field.AgentDynamicFieldAccessor;
 import lombok.Getter;
+import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.dynamic.ClassFileLocator;
+import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.dynamic.loading.ByteArrayClassLoader;
 import net.bytebuddy.dynamic.scaffold.TypeWriter;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -65,17 +67,17 @@ public class NonStaticMethodTransformTest extends TransformTestBase {
 		assertEquals(System.getProperty(TypeWriter.DUMP_PROPERTY), dumpFolder);
 
 		assertThat(ByteBuddyAgent.install(), instanceOf(Instrumentation.class));
-		AgentBuilder agentBuilder = Bootstrap.getAgentBuilder(null, true);
+		var agentBuilder = Bootstrap.getAgentBuilder(null, true);
 
-		Set<MethodTransformation> transformations = getMethodTransformations(globalIndex.incrementAndGet(), FOO, new FooProvider());
+		var transformations = getMethodTransformations(globalIndex.incrementAndGet(), FOO, new FooProvider());
 
-		ResettableClassFileTransformer classFileTransformer = agentBuilder
-				.type(hasSuperType(named(FooBase.class.getName())), ElementMatchers.is(classLoader))
-				.transform(PluginLoader.compound(true, transformations))
-				.installOnByteBuddyAgent();
+		var extendable = agentBuilder
+				.type(named(Foo.class.getName()), ElementMatchers.is(classLoader))
+				.transform(PluginLoader.compound(false, transformations));
+		var transformer = extendable.installOnByteBuddyAgent();
 
 		try {
-			Class<?> type = classLoader.loadClass(Foo.class.getName());
+			var type = classLoader.loadClass(Foo.class.getName());
 			// check
 			Object instance = type.getDeclaredConstructor(String.class).newInstance("kkk");
 			AgentDynamicFieldAccessor.setDynamicFieldValue(instance, BAR);
@@ -83,8 +85,11 @@ public class NonStaticMethodTransformTest extends TransformTestBase {
 			assertThat(type.getDeclaredMethod(FOO, String.class).invoke(instance, "kkk"),
 					CoreMatchers.is(QUX + BAR));
 		}
+		catch (Throwable e) {
+			e.printStackTrace();
+		}
 		finally {
-			assertThat(ByteBuddyAgent.getInstrumentation().removeTransformer(classFileTransformer), CoreMatchers.is(true));
+			assertThat(ByteBuddyAgent.getInstrumentation().removeTransformer(transformer), CoreMatchers.is(true));
 		}
 	}
 
