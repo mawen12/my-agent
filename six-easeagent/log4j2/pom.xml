@@ -12,6 +12,11 @@
     <artifactId>log4j2</artifactId>
     <packaging>pom</packaging>
 
+    <modules>
+        <module>log4j2-api</module>
+        <module>log4j2-impl</module>
+    </modules>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>

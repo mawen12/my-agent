@@ -4,6 +4,8 @@ import com.mawen.model.Article;
 import com.mawen.service.ArticleService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,4 +34,8 @@ public class ArticleController {
         return articleService.findById(id);
     }
 
+    @GetMapping("/{pageNumber}/{pageSize}")
+    public Page<Article> finalByPage(@PathVariable("pageNumber") int pageNumber, @PathVariable("pageSize") int pageSize) {
+        return articleService.findAll(PageRequest.of(pageNumber, pageSize));
+    }
 }

@@ -14,7 +14,9 @@
     <packaging>pom</packaging>
     <description>Easeagent copy</description>
     <modules>
-        <module>log4j2/log4j2-impl</module>
+        <module>core</module>
+        <module>loader</module>
+        <module>log4j2</module>
         <module>plugin-api</module>
         <module>mock</module>
         <module>config</module>

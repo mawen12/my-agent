@@ -5,6 +5,8 @@ import com.mawen.repository.ArticleRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,5 +28,7 @@ public class ArticleService {
         return articleRepository.findById(id).orElse(null);
     }
 
-
+    public Page<Article> findAll(PageRequest request) {
+        return articleRepository.findAll(request);
+    }
 }

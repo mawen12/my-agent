@@ -17,10 +17,6 @@
         <module>fourth-jvm-hook</module>
         <module>fifth-jvm-profiler</module>
         <module>six-easeagent</module>
-        <module>six-easeagent/core</module>
-        <module>six-easeagent/loader</module>
-        <module>six-easeagent/log4j2</module>
-        <module>six-easeagent/log4j2/log4j2-api</module>
         <module>demo</module>
     </modules>
 
@@ -111,7 +107,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
+                <version>${version.slf4j}</version>
             </dependency>
 
             <dependency>
@@ -332,7 +328,7 @@
         <maven.compiler.target>8</maven.compiler.target>
 
         <!-- Maven 插件依赖 -->
-        <java.version>8</java.version>
+        <java.version>17</java.version>
         <file.encoding>UTF-8</file.encoding>
         <maven-clean.version>3.2.0</maven-clean.version>
         <maven-compiler.version>3.10.0</maven-compiler.version>
@@ -340,7 +336,7 @@
         <maven-install.version>3.1.0</maven-install.version>
         <maven-war.version>3.3.2</maven-war.version>
         <maven-jar.version>3.3.0</maven-jar.version>
-        <maven-shade.version>3.5.1</maven-shade.version>
+        <maven-shade.version>3.5.0</maven-shade.version>
 
         <!-- Byte Buddy 依赖版本 -->
         <buddy.version>1.11.21</buddy.version>
@@ -354,7 +350,7 @@
         <reactor.version>2023.0.2</reactor.version>
         <spring-cloud.version>2023.0.0</spring-cloud.version>
 
-        <slf4j.version>1.7.21</slf4j.version>
+        <version.slf4j>1.7.21</version.slf4j>
         <log4j.version>2.17.1</log4j.version>
         <servlet.version>4.0.1</servlet.version>
 

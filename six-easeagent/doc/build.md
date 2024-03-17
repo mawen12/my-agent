@@ -23,6 +23,6 @@ Extracting the default configuration file.
 
 ```shell
 $ cd $AGNET_PATH
-$ jar xf agent.jar agent.properties agent-log4j2.xml
+$ jar xf agent-dep.jar agent.properties agent-log4j2.xml
 ```
 

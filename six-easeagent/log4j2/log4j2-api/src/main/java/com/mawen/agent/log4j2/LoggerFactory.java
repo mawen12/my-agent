@@ -50,7 +50,6 @@ public class LoggerFactory {
 
 	public record NoopLogger(String name) implements Logger {
 
-
 		@Override
 		public String getName() {
 			return name;

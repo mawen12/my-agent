@@ -43,31 +43,48 @@ public class Slf4jLogger extends java.util.logging.Logger {
 
 	@Override
 	public void log(Level level, String msg) {
-		doLog(level,msg,null);
+		switch (level.intValue()) {
+			case ERROR_VALUE -> logger.error(msg);
+			case WARN_VALUE -> logger.warn(msg);
+			case INFO_VALUE -> logger.info(msg);
+			case DEBUG_VALUE -> logger.debug(msg);
+			case TRACE_VALUE -> logger.trace(msg);
+			default -> {}
+		}
 	}
 
 	@Override
 	public void log(Level level, String msg, Object param1) {
-		doLog(level,msg,param1);
+		switch (level.intValue()) {
+			case ERROR_VALUE -> logger.error(msg, param1);
+			case WARN_VALUE -> logger.warn(msg, param1);
+			case INFO_VALUE -> logger.info(msg, param1);
+			case DEBUG_VALUE -> logger.debug(msg, param1);
+			case TRACE_VALUE -> logger.trace(msg, param1);
+			default -> {}
+		}
 	}
 
 	@Override
 	public void log(Level level, String msg, Object[] params) {
-		doLog(level, msg, params);
+		switch (level.intValue()) {
+			case ERROR_VALUE -> logger.error(msg, params);
+			case WARN_VALUE -> logger.warn(msg, params);
+			case INFO_VALUE -> logger.info(msg, params);
+			case DEBUG_VALUE -> logger.debug(msg, params);
+			case TRACE_VALUE -> logger.trace(msg, params);
+			default -> {}
+		}
 	}
 
 	@Override
 	public void log(Level level, String msg, Throwable thrown) {
-		doLog(level,msg,thrown);
-	}
-
-	protected void doLog(Level level, String msg, Object object) {
 		switch (level.intValue()) {
-			case ERROR_VALUE -> logger.error(msg, object);
-			case WARN_VALUE -> logger.warn(msg, object);
-			case INFO_VALUE -> logger.info(msg, object);
-			case DEBUG_VALUE -> logger.debug(msg, object);
-			case TRACE_VALUE -> logger.trace(msg, object);
+			case ERROR_VALUE -> logger.error(msg, thrown);
+			case WARN_VALUE -> logger.warn(msg, thrown);
+			case INFO_VALUE -> logger.info(msg, thrown);
+			case DEBUG_VALUE -> logger.debug(msg, thrown);
+			case TRACE_VALUE -> logger.trace(msg, thrown);
 			default -> {}
 		}
 	}

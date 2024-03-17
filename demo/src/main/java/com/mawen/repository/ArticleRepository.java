@@ -2,6 +2,8 @@ package com.mawen.repository;
 
 import com.mawen.model.Article;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +14,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ArticleRepository extends ElasticsearchRepository<Article, String> {
 
-
+	Page<Article> findAll(Pageable pageable);
 
 }
