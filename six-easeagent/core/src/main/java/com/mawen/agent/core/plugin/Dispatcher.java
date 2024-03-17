@@ -34,10 +34,6 @@ public final class Dispatcher implements AppendBootstrapLoader {
 		return chain.doAfter(info, pos, ctx);
 	}
 
-	public static AgentInterceptorChain exit(int index, AgentInterceptorChain chain) {
-		return chains.putIfAbsent(index, chain);
-	}
-
 	public static AgentInterceptorChain register(int index, AgentInterceptorChain chain) {
 		return chains.putIfAbsent(index, chain);
 	}

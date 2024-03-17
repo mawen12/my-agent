@@ -1,7 +1,7 @@
 package com.mawen.agent.core.plugin;
 
 import com.mawen.agent.core.plugin.annotation.Index;
-import com.mawen.agent.core.plugin.transformer.advice.support.NoExceptionHandler;
+import com.mawen.agent.core.plugin.transformer.advice.AgentAdvice;
 import com.mawen.agent.plugin.api.InitializeContext;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.interceptor.MethodInfo;
@@ -17,7 +17,7 @@ public class CommonInlineAdvice {
 	private static final String CONTEXT = "agent_context";
 	private static final String POS = "agent_pos";
 
-	@Advice.OnMethodEnter(suppress = NoExceptionHandler.class)
+	@Advice.OnMethodEnter(suppress = AgentAdvice.NoExceptionHandler.class)
 	public static MethodInfo enter(@Index int index,
 	                               @Advice.This(optional = true) Object invoker,
 	                               @Advice.Origin("#t") String type,
@@ -29,7 +29,7 @@ public class CommonInlineAdvice {
 			return null;
 		}
 
-		var methodInfo = MethodInfo.builder()
+		MethodInfo methodInfo = MethodInfo.builder()
 				.invoker(invoker)
 				.type(type)
 				.method(method)
@@ -43,7 +43,7 @@ public class CommonInlineAdvice {
 		return methodInfo;
 	}
 
-	@Advice.OnMethodExit(onThrowable = Exception.class, suppress = NoExceptionHandler.class)
+	@Advice.OnMethodExit(onThrowable = Exception.class, suppress = AgentAdvice.NoExceptionHandler.class)
 	public static void exit(@Index int index,
 	                        @Advice.Enter MethodInfo methodInfo,
 	                        @Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object result,
@@ -52,7 +52,6 @@ public class CommonInlineAdvice {
 		if (context.isNoop()) {
 			return;
 		}
-
 		methodInfo.throwable(throwable);
 		methodInfo.retValue(result);
 		Dispatcher.exit(index, methodInfo, context);
@@ -61,7 +60,7 @@ public class CommonInlineAdvice {
 		}
 	}
 
-	@Advice.OnMethodExit(suppress = NoExceptionHandler.class)
+	@Advice.OnMethodExit(suppress = AgentAdvice.NoExceptionHandler.class)
 	public static void exit(@Index int index,
 	                        @Advice.This(optional = true) Object invoker,
 	                        @Advice.Enter MethodInfo methodInfo,
@@ -70,7 +69,6 @@ public class CommonInlineAdvice {
 		if (context.isNoop()) {
 			return;
 		}
-
 		methodInfo.setInvoker(invoker);
 		methodInfo.setRetValue(result);
 		Dispatcher.exit(index, methodInfo, context);

@@ -12,43 +12,37 @@ import lombok.Builder;
 @Builder
 public class MethodInfo {
 
+	/**
+	 * The this reference of the instrumented method
+	 */
 	private Object invoker;
 
+	/**
+	 * instrumented type name
+	 */
 	private String type;
 
+	/**
+	 * instrumented method name
+	 */
 	private String method;
 
+	/**
+	 * The arguments of instrumented method. If no args exist,args=null
+	 */
 	private Object[] args;
 
+	/**
+	 * Throwable is existed if method throws exception. Otherwise, it is null.
+	 */
 	private Throwable throwable;
 
+	/**
+	 * The return value of instrumented method
+	 */
 	private Object retValue;
 
 	private boolean changed;
-
-	public Object getInvoker() {
-		return invoker;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public String getMethod() {
-		return method;
-	}
-
-	public Object[] getArgs() {
-		return args;
-	}
-
-	public Throwable getThrowable() {
-		return throwable;
-	}
-
-	public Object getRetValue() {
-		return retValue;
-	}
 
 	public boolean isChanged() {
 		return changed;
@@ -58,22 +52,44 @@ public class MethodInfo {
 		return this.throwable == null;
 	}
 
+	public Object getInvoker() {
+		return this.invoker;
+	}
+
+	public String getType() {
+		return this.type;
+	}
+
+	public String getMethod() {
+		return this.method;
+	}
+
+	public Object[] getArgs() {
+		return this.args;
+	}
+
 	public int argSize() {
 		return this.args == null ? 0 : this.args.length;
 	}
 
-	public void setInvoker(Object invoker) {
-		this.invoker = invoker;
-		this.changed = true;
+	public Throwable getThrowable() {
+		return this.throwable;
 	}
 
-	public void setType(String type) {
-		this.type = type;
-		this.changed = true;
+	public Object getRetValue() {
+		return this.retValue;
 	}
 
 	public void setMethod(String method) {
 		this.method = method;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public void setInvoker(Object invoker) {
+		this.invoker = invoker;
 		this.changed = true;
 	}
 
@@ -101,6 +117,7 @@ public class MethodInfo {
 		this.changed = true;
 	}
 
+
 	public void throwable(Throwable throwable) {
 		this.throwable = throwable;
 	}
@@ -109,37 +126,54 @@ public class MethodInfo {
 		this.retValue = retValue;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
+	public boolean equals(final Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (!(o instanceof MethodInfo)) {
+			return false;
+		}
+		final MethodInfo other = (MethodInfo) o;
+		if (!Objects.equals(this.getInvoker(), other.getInvoker())) {
+			return false;
+		}
 
-		if (o == null || getClass() != o.getClass()) return false;
+		if (!Objects.equals(this.getType(), other.getType())) {
+			return false;
+		}
 
-		MethodInfo that = (MethodInfo) o;
-		return Objects.equals(invoker, that.invoker)
-				&& Objects.equals(type, that.type)
-				&& Objects.equals(method, that.method)
-				&& Arrays.equals(args, that.args)
-				&& Objects.equals(throwable, that.throwable)
-				&& Objects.equals(retValue, that.retValue);
+		if (!Objects.equals(this.getMethod(), other.getMethod())) {
+			return false;
+		}
+		if (!java.util.Arrays.deepEquals(this.getArgs(), other.getArgs())) {
+			return false;
+		}
+		if (!Objects.equals(this.getThrowable(), other.getThrowable())) {
+			return false;
+		}
+
+		return Objects.equals(this.getRetValue(), other.getRetValue());
 	}
 
-	@Override
 	public int hashCode() {
-		int result = Objects.hash(invoker, type, method, throwable, retValue);
-		result = 31 * result + Arrays.hashCode(args);
+		final int PRIME = 59;
+		int result = 1;
+		final Object invoker = this.getInvoker();
+		result = result * PRIME + (invoker == null ? 43 : invoker.hashCode());
+		final Object method = this.getMethod();
+		result = result * PRIME + (method == null ? 43 : method.hashCode());
+		result = result * PRIME + java.util.Arrays.deepHashCode(this.getArgs());
+		final Object throwable = this.getThrowable();
+		result = result * PRIME + (throwable == null ? 43 : throwable.hashCode());
+		final Object retValue = this.getRetValue();
+		result = result * PRIME + (retValue == null ? 43 : retValue.hashCode());
 		return result;
 	}
 
-	@Override
 	public String toString() {
-		return "MethodInfo{" +
-				"invoker=" + invoker +
-				", type='" + type + '\'' +
-				", method='" + method + '\'' +
-				", args=" + Arrays.deepToString(args) +
-				", throwable=" + throwable +
-				", retValue=" + retValue +
-				'}';
+		return "MethodInfo(invoker=" + this.getInvoker()
+				+ ", type:" + this.getType() + ", method=" + this.getMethod()
+				+ ", args=" + java.util.Arrays.deepToString(this.getArgs())
+				+ ", throwable=" + this.getThrowable() + ", retValue=" + this.getRetValue() + ")";
 	}
 }

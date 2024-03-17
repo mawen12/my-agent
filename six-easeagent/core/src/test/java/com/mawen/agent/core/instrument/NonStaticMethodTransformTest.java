@@ -33,6 +33,8 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 /**
+ * failed
+ *
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/9
  */
@@ -73,7 +75,7 @@ public class NonStaticMethodTransformTest extends TransformTestBase {
 
 		var extendable = agentBuilder
 				.type(named(Foo.class.getName()), ElementMatchers.is(classLoader))
-				.transform(PluginLoader.compound(false, transformations));
+				.transform(PluginLoader.compound(true, transformations));
 		var transformer = extendable.installOnByteBuddyAgent();
 
 		try {

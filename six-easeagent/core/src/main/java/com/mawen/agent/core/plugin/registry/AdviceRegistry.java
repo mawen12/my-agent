@@ -10,7 +10,6 @@ import com.mawen.agent.core.plugin.Dispatcher;
 import com.mawen.agent.core.plugin.transformer.advice.AgentAdvice;
 import com.mawen.agent.core.plugin.transformer.advice.AgentJavaConstantValue;
 import com.mawen.agent.core.plugin.transformer.advice.MethodIdentityJavaConstant;
-import com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.interceptor.AgentInterceptorChain;
@@ -98,7 +97,7 @@ public class AdviceRegistry {
 		var map = resolved.getOffsetMapping();
 		for (var entry : map.entrySet()) {
 			var om = entry.getValue();
-			if (!(om instanceof OffsetMapping.ForStackManipulation f)) {
+			if (!(om instanceof AgentAdvice.OffsetMapping.ForStackManipulation f)) {
 				continue;
 			}
 
@@ -118,7 +117,7 @@ public class AdviceRegistry {
 
 		for (var entry : map.entrySet()) {
 			var om = entry.getValue();
-			if (!(om instanceof OffsetMapping.ForStackManipulation f)) {
+			if (!(om instanceof AgentAdvice.OffsetMapping.ForStackManipulation f)) {
 				continue;
 			}
 

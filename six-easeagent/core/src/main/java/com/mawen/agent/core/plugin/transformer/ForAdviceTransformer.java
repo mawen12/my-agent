@@ -8,7 +8,6 @@ import com.mawen.agent.core.plugin.transformer.advice.AgentAdvice;
 import com.mawen.agent.core.plugin.transformer.advice.AgentForAdvice;
 import com.mawen.agent.core.plugin.transformer.advice.AgentJavaConstantValue;
 import com.mawen.agent.core.plugin.transformer.advice.MethodIdentityJavaConstant;
-import com.mawen.agent.core.plugin.transformer.advice.support.OffsetMapping;
 import com.mawen.agent.core.plugin.transformer.classloader.CompoundClassLoader;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.description.type.TypeDescription;
@@ -31,7 +30,7 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
 		var stackManipulation = new AgentJavaConstantValue(value, methodTransformation.getIndex());
 		var typeDescription = value.getTypeDescription();
 
-		var factory = new OffsetMapping.ForStackManipulation.Factory<>(Index.class,
+		var factory = new AgentAdvice.OffsetMapping.ForStackManipulation.Factory<>(Index.class,
 				stackManipulation, typeDescription.asGenericType());
 
 		var agentForAdvice = new AgentForAdvice(AgentAdvice.withCustomMapping().bind(factory));

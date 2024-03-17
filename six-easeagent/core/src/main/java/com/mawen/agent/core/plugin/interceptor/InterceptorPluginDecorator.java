@@ -53,7 +53,7 @@ public class InterceptorPluginDecorator implements Interceptor {
 		innerContext.pushConfig(config);
 		if (cfg == null || cfg.enabled() || cfg instanceof NoOpIPluginConfig) {
 			innerContext.pushRetBound();
-			this.interceptor.before(methodInfo, innerContext);
+			this.interceptor.before(methodInfo, context);
 		}
 		else if (logger.isDebugEnabled()) {
 			logger.debug("plugin.{}.{}.{} is not enabled", config.domain(), config.namespace(), config.id());
@@ -67,7 +67,7 @@ public class InterceptorPluginDecorator implements Interceptor {
 		try {
 			if (cfg == null || cfg.enabled() || cfg instanceof NoOpIPluginConfig) {
 				try {
-					this.interceptor.after(methodInfo, innerContext);
+					this.interceptor.after(methodInfo, context);
 				}
 				finally {
 					innerContext.popToBound();

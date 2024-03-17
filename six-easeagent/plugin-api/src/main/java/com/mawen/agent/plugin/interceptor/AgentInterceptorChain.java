@@ -39,7 +39,7 @@ public class AgentInterceptorChain {
 			// set error message to context;
 			logger.debug("Interceptor before execute exception:" + e.getMessage());
 		}
-		this.doBefore(methodInfo,pos + 1,context);
+		this.doBefore(methodInfo, pos + 1, context);
 	}
 
 	public Object doAfter(MethodInfo methodInfo, int pos, InitializeContext context) {
@@ -48,7 +48,7 @@ public class AgentInterceptorChain {
 		}
 		var interceptor = interceptors.get(pos);
 		try {
-			interceptor.after(methodInfo,context);
+			interceptor.after(methodInfo, context);
 		}
 		catch (Throwable e) {
 			// set error message to context;
