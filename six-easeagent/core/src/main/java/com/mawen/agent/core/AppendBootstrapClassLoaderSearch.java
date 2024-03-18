@@ -41,7 +41,8 @@ public final class AppendBootstrapClassLoaderSearch {
 
 	static Set<String> by(Instrumentation inst, ClassInjector.UsingInstrumentation.Target target) throws IOException {
 		var names = findClassAnnotationAutoService(AppendBootstrapLoader.class);
-		ClassInjector.UsingInstrumentation.of(TMP_FILE, target, inst).inject(types(names));
+		Map<TypeDescription, byte[]> types = types(names);
+		ClassInjector.UsingInstrumentation.of(TMP_FILE, target, inst).inject(types);
 		return names;
 	}
 
@@ -78,7 +79,9 @@ public final class AppendBootstrapClassLoaderSearch {
 		var locator = ClassFileLocator.ForClassLoader.of(loader);
 		var pool = TypePool.Default.of(locator);
 
-		return Maps.transformValues(Maps.uniqueIndex(names, input -> pool.describe(input).resolve()),
+		Map<TypeDescription, String> map = Maps.uniqueIndex(names, input -> pool.describe(input).resolve());
+
+		return Maps.transformValues(map,
 				input -> {
 					try {
 						return locator.locate(input).resolve();

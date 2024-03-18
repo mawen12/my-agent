@@ -8,30 +8,12 @@ import com.mawen.agent.plugin.api.logging.Mdc;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/24
  */
-public class NoOpLoggerFactory implements ILoggerFactory {
-	public static final NoOpLoggerFactory INSTANCE = new NoOpLoggerFactory();
-	public static final NoOpMdc NO_OP_MDC_INSTANCE = new NoOpMdc();
+public enum NoOpLoggerFactory implements ILoggerFactory {
+	INSTANCE;
 
 	@Override
 	public Logger getLogger(String name) {
 		return new NoOpLogger(name);
-	}
-
-	public static class NoOpMdc implements Mdc {
-		@Override
-		public void put(String key, String value) {
-			// NOP
-		}
-
-		@Override
-		public void remove(String key) {
-			// NOP
-		}
-
-		@Override
-		public String get(String key) {
-			return null;
-		}
 	}
 
 	public static class NoOpLogger implements Logger {

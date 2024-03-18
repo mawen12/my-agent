@@ -203,6 +203,32 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>package</phase> <!-- copy reosurces hanpped in package phase -->
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>/opt/agent</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <filtering>false</filtering>
+                                    <directory>${project.basedir}/target</directory>
+                                    <includes>
+                                        <include>agent-dep.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

@@ -47,21 +47,21 @@ public final class NoOpMetrics {
 
 		@Override
 		public Reporter reporter(IPluginConfig config) {
-			return NoOpReporter.NO_OP_REPORTER;
+			return NoOpReporter.INSTANCE;
 		}
 	}
 
-	public static final class NoopGauge<T> implements Gauge<T> {
-		private static final NoopGauge INSTANCE = new NoopGauge();
+	public enum NoopGauge implements Gauge<Object> {
+		INSTANCE;
 
 		@Override
-		public T getValue() {
+		public Object getValue() {
 			return null;
 		}
 	}
 
-	public static final class NoopSnapshot implements Snapshot {
-		private static final NoopSnapshot INSTANCE = new NoopSnapshot();
+	public enum NoopSnapshot implements Snapshot {
+		INSTANCE;
 		private static final long[] EMPTY_LONG_ARRAY = new long[0];
 
 		@Override
@@ -192,8 +192,8 @@ public final class NoOpMetrics {
 		}
 	}
 
-	public static final class NoopHistogram implements Histogram {
-		private static final NoopHistogram INSTANCE = new NoopHistogram();
+	public enum NoopHistogram implements Histogram {
+		INSTANCE;
 
 		@Override
 		public void update(int value) {
@@ -221,8 +221,8 @@ public final class NoOpMetrics {
 		}
 	}
 
-	public static final class NoopCounter implements Counter {
-		private static final NoopCounter INSTANCE = new NoopCounter();
+	public enum NoopCounter implements Counter {
+		INSTANCE;
 
 		@Override
 		public void inc() {
@@ -255,8 +255,8 @@ public final class NoOpMetrics {
 		}
 	}
 
-	public static final class NoopMeter implements Meter {
-		private static final NoopMeter INSTANCE = new NoopMeter();
+	public enum NoopMeter implements Meter {
+		INSTANCE;
 
 		@Override
 		public void mark() {
@@ -299,8 +299,8 @@ public final class NoOpMetrics {
 		}
 	}
 
-	public static final class NoopMetricsRegistry implements MetricRegistry {
-		private static final NoopMetricsRegistry INSTANCE = new NoopMetricsRegistry();
+	public enum NoopMetricsRegistry implements MetricRegistry {
+		INSTANCE;
 
 		@Override
 		public boolean remove(String name) {

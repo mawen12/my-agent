@@ -12,7 +12,8 @@ import com.mawen.agent.plugin.report.tracing.ReportSpan;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/23
  */
-public class NoOpAgentReporter implements AgentReport {
+public enum NoOpAgentReporter implements AgentReport {
+	INSTANCE;
 
 	@Override
 	public void report(ReportSpan span) {
@@ -34,7 +35,7 @@ public class NoOpAgentReporter implements AgentReport {
 		return new MetricReporterFactory() {
 			@Override
 			public Reporter reporter(IPluginConfig config) {
-				return NoOpReporter.NO_OP_REPORTER;
+				return NoOpReporter.INSTANCE;
 			}
 		};
 	}

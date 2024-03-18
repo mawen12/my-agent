@@ -11,13 +11,16 @@ import com.mawen.agent.plugin.utils.ImmutableMap;
 import com.mawen.agent.plugin.utils.SystemEnv;
 import com.mawen.agent.plugin.utils.common.JsonUtil;
 import com.mawen.agent.plugin.utils.common.StringUtils;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/26
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ConfigFactory {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigFactory.class);
+	private static final Logger log = LoggerFactory.getLogger(ConfigFactory.class);
 
 	private static final String CONFIG_PROP_FILE = "agent.properties";
 	private static final String CONFIG_YAML_FILE = "agent.yaml";
@@ -88,10 +91,21 @@ public class ConfigFactory {
 		return envCfg;
 	}
 
-	private ConfigFactory() {}
-
 	/**
 	 * Get config file path from system properties or environment variables
+	 *
+	 * <p>Agent Config:
+	 * <pre>
+	 * 	1.{@code -Dagent.config.path=/agent/agent.properties}
+	 * 	2.{@code export AGENT_CONFIG_PATH=/agent/agent.properties}
+	 * </pre>
+	 *
+	 * <p>OTEL Config:
+	 * <pre>
+	 * 	1.{@code -Dotel.javagent.configuration-file=/agent/agent.properties}
+	 * 	2.{@code export OTEL_JAVAAGENT_CONFIGURATION_FILE=/agent/agent.properties}
+	 * </pre>
+	 *
 	 */
 	public static String getConfigPath() {
 		// get config path from -Dagent.config.path=/agent/agent.properties || export AGENT_CONFIG_PATH=/agent/agent.properties
@@ -115,7 +129,7 @@ public class ConfigFactory {
 		// override by user special config file
 		if (StringUtils.isNotEmpty(pathname)) {
 			var configFromOuterFile = ConfigLoader.loadFromFile(new File(pathname));
-			LOGGER.info("Loaded user special config file: {}", pathname);
+			log.info("Loaded user special config file: {}", pathname);
 			configs.mergeConfigs(configFromOuterFile);
 		}
 
@@ -125,9 +139,7 @@ public class ConfigFactory {
 		// check environment cfg override
 		configs.updateConfigsNotNotify(updateEnvCfg());
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Loaded conf:\n{}", configs.toPrettyDisplay());
-		}
+		log.debugIfEnabled("Loaded conf:\n{}", configs.toPrettyDisplay());
 		return configs;
 	}
 

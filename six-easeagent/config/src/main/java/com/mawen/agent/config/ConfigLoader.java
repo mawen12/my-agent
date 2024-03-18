@@ -5,9 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.mawen.agent.config.yaml.YamlReader;
 import com.mawen.agent.log4j2.Logger;
@@ -18,18 +19,18 @@ import com.mawen.agent.log4j2.LoggerFactory;
  * @since 2024/2/26
  */
 public class ConfigLoader {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigLoader.class);
+	private static final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
 
 	private static boolean checkYaml(String filename) {
 		return filename.endsWith(".yaml") || filename.endsWith(".yml");
 	}
 
-	static GlobalConfigs loadFromFile(File file) {
-		try (var in = new FileInputStream(file)) {
-			return ConfigLoader.loadFromStream(in, file.getAbsolutePath());
+	static GlobalConfigs loadFromClasspath(ClassLoader classLoader, String file) {
+		try (var in = classLoader.getResourceAsStream(file)) {
+			return ConfigLoader.loadFromStream(in, file);
 		}
 		catch (IOException e) {
-			LOGGER.warn("Load config file failure: {}", file.getAbsolutePath());
+			log.warn("Load config file: {} by classloader: {} failure: {}", file, classLoader.toString(), e);
 		}
 		return new GlobalConfigs(Collections.emptyMap());
 	}
@@ -42,7 +43,7 @@ public class ConfigLoader {
 					map = new YamlReader().load(in).compress();
 				}
 				catch (Exception e) {
-					LOGGER.warn("Wrong Yaml format, load config file failure: {}", filename);
+					log.warn("Wrong Yaml format, load config file failure: {}", filename);
 					map = Collections.emptyMap();
 				}
 			} else {
@@ -57,19 +58,18 @@ public class ConfigLoader {
 	private static Map<String, String> extractPropsMap(InputStream in) throws IOException {
 		var properties = new Properties();
 		properties.load(in);
-		var map = new HashMap<String, String>();
-		for (String one : properties.stringPropertyNames()) {
-			map.put(one, properties.getProperty(one));
-		}
-		return map;
+
+		return properties.stringPropertyNames()
+				.stream()
+				.collect(Collectors.toMap(Function.identity(), name -> String.valueOf(properties.getProperty(name))));
 	}
 
-	static GlobalConfigs loadFromClasspath(ClassLoader classLoader, String file) {
-		try (var in = classLoader.getResourceAsStream(file)) {
-			return ConfigLoader.loadFromStream(in, file);
+	static GlobalConfigs loadFromFile(File file) {
+		try (var in = new FileInputStream(file)) {
+			return ConfigLoader.loadFromStream(in, file.getAbsolutePath());
 		}
 		catch (IOException e) {
-			LOGGER.warn("Load config file: {} by classloader: {} failure: {}", file, classLoader.toString(), e);
+			log.warn("Load config file failure: {}", file.getAbsolutePath());
 		}
 		return new GlobalConfigs(Collections.emptyMap());
 	}

@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
 import com.mawen.agent.plugin.utils.common.StringUtils;
+import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -22,6 +23,7 @@ public class ProgressFields {
 	public static final String OBSERVABILITY_TRACINGS_SERVICE_TAGS_CONFIG = "observability.tracings.service.tags";
 	private static volatile Fields responseHoldTagFields = build(OBSERVABILITY_TRACINGS_TAG_RESPONSE_HEADERS_CONFIG, Collections.emptyMap());
 	private static volatile Fields serviceTags = build(OBSERVABILITY_TRACINGS_SERVICE_TAGS_CONFIG, Collections.emptyMap());
+	@Getter
 	private static final Set<String> forwardHeaderSet = new HashSet<>();
 
 	public static Consumer<Map<String, String>> changeListener() {
@@ -59,10 +61,6 @@ public class ProgressFields {
 
 	private static void setServiceTags(Map<String, String> tags) {
 		serviceTags = serviceTags.rebuild(tags);
-	}
-
-	public static Set<String> getForwardHeaderSet() {
-		return forwardHeaderSet;
 	}
 
 	public static String[] getResponseHoldTagFields() {

@@ -13,7 +13,7 @@ import com.mawen.agent.plugin.bridge.AgentInfo;
  * @since 2024/3/5
  */
 public class AgentInfoFactory {
-	private static final Logger logger = LoggerFactory.getLogger(AgentInfoFactory.class);
+	private static final Logger log = LoggerFactory.getLogger(AgentInfoFactory.class);
 	private static final String AGENT_TYPE = "Agent";
 	private static final String VERSION_FILE = "version.txt";
 
@@ -34,7 +34,7 @@ public class AgentInfoFactory {
 			return version;
 		}
 		catch (IOException e) {
-			logger.warn("Load config file:{} by classloader:{} failure: {}",file, loader.toString(), e);
+			log.warn("Load version file:{} by classloader:{} failure: {}",file, loader.toString(), e);
 		}
 		return "";
 	}

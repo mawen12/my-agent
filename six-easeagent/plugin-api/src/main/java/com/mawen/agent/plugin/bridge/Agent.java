@@ -37,11 +37,11 @@ public final class Agent {
 	public static MetricRegistrySupplier metricRegistrySupplier = NoOpMetrics.NO_OP_METRIC_SUPPLIER;
 	public static IContextManager initializeContextSupplier = () -> NoOpContext.NO_OP_CONTEXT;
 	public static ILoggerFactory loggerFactory = NoOpLoggerFactory.INSTANCE;
-	public static Mdc loggerMdc = NoOpLoggerFactory.NO_OP_MDC_INSTANCE;
-	public static IConfigFactory configFactory = new NoOpConfigFactory();
-	public static AgentReport agentReport = new NoOpAgentReporter();
+	public static Mdc loggerMdc = NoOpMdc.INSTANCE;
+	public static IConfigFactory configFactory = NoOpConfigFactory.INSTANCE;
+	public static AgentReport agentReport = NoOpAgentReporter.INSTANCE;
 
-	public static IDispatcher dispatcher = new NoOpDispatcher();
+	public static IDispatcher dispatcher = NoOpDispatcher.INSTANCE;
 
 	public static Supplier<URLClassLoader> agentClassLoader = () -> null;
 
@@ -50,14 +50,14 @@ public final class Agent {
 	}
 
 	/**
-	 * @see {@link ILoggerFactory#getLogger(Class)}
+	 * @see ILoggerFactory#getLogger(Class)
 	 */
 	public static Logger getLogger(Class clazz) {
 		return loggerFactory.getLogger(clazz);
 	}
 
 	/**
-	 * @see {@link MetricRegistrySupplier#newMetricRegistry(IPluginConfig, NameFactory, Tags)}
+	 * @see MetricRegistrySupplier#newMetricRegistry(IPluginConfig, NameFactory, Tags)
 	 */
 	public static MetricRegistry newMetricRegistry(IPluginConfig config, NameFactory nameFactory, Tags tags) {
 		return metricRegistrySupplier.newMetricRegistry(config, nameFactory, tags);
@@ -68,10 +68,10 @@ public final class Agent {
 	}
 
 	/**
-	 * @see {@link MetricRegistrySupplier#reporter(IPluginConfig)}
+	 * @see MetricRegistrySupplier#reporter(IPluginConfig)
 	 */
 	public static Reporter metricReporter(IPluginConfig config) {
-		return metricReporter(config);
+		return metricRegistrySupplier.reporter(config);
 	}
 
 	public static Config getConfig() {

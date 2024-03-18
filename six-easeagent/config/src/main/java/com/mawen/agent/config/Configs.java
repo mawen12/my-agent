@@ -14,23 +14,23 @@ import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.api.config.ChangeItem;
 import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.api.config.ConfigChangeListener;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/25
  */
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Configs implements Config {
-	private static final Logger LOGGER = LoggerFactory.getLogger(Configs.class);
+	private static final Logger log = LoggerFactory.getLogger(Configs.class);
 
 	protected Map<String ,String> source;
 	protected ConfigNotifier notifier;
 
-	protected Configs() {
-	}
-
 	public Configs(Map<String, String> source) {
 		this.source = new TreeMap<>(source);
-		notifier = new ConfigNotifier("");
+		this.notifier = new ConfigNotifier("");
 	}
 
 	@Override
@@ -172,7 +172,7 @@ public class Configs implements Config {
 			}
 		});
 		if (!items.isEmpty()) {
-			LOGGER.info("change items: {}",items);
+			log.info("change items: {}",items);
 			this.source = dump;
 			this.notifier.handleChanges(items);
 		}
@@ -184,6 +184,6 @@ public class Configs implements Config {
 	}
 
 	protected boolean hasText(String text) {
-		return text != null && text.trim().length() > 0;
+		return text != null && !text.trim().isEmpty();
 	}
 }

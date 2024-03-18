@@ -10,6 +10,7 @@ public class MockSystemEnv {
 
 	private static final Map<String, String> SETTER = getEnvironments();
 
+	@SuppressWarnings("all")
 	private static Map<String, String> getEnvironments() {
 		try {
 			var systemEnv = Thread.currentThread().getContextClassLoader().loadClass("com.mawen.agent.plugin.utils.SystemEnv");

@@ -23,6 +23,36 @@ public interface Logger {
 
 	void trace(String msg, Throwable t);
 
+	default void traceIfEnabled(String msg) {
+		if (isTraceEnabled()) {
+			trace(msg);
+		}
+	}
+
+	default void traceIfEnabled(String format, Object arg) {
+		if (isTraceEnabled()) {
+			trace(format, arg);
+		}
+	}
+
+	default void traceIfEnabled(String format, Object arg1, Object arg2) {
+		if (isTraceEnabled()) {
+			trace(format, arg1, arg2);
+		}
+	}
+
+	default void traceIfEnabled(String format, Object... arguments) {
+		if (isTraceEnabled()) {
+			trace(format, arguments);
+		}
+	}
+
+	default void traceIfEnabled(String msg, Throwable t) {
+		if (isTraceEnabled()) {
+			trace(msg, t);
+		}
+	}
+
 	boolean isDebugEnabled();
 
 	void debug(String msg);
@@ -34,6 +64,36 @@ public interface Logger {
 	void debug(String format, Object... arguments);
 
 	void debug(String msg, Throwable t);
+
+	default void debugIfEnabled(String msg) {
+		if (isDebugEnabled()) {
+			debug(msg);
+		}
+	}
+
+	default void debugIfEnabled(String format, Object arg) {
+		if (isDebugEnabled()) {
+			debug(format, arg);
+		}
+	}
+
+	default void debugIfEnabled(String format, Object arg1, Object arg2) {
+		if (isDebugEnabled()) {
+			debug(format, arg1, arg2);
+		}
+	}
+
+	default void debugIfEnabled(String format, Object... arguments) {
+		if (isDebugEnabled()) {
+			debug(format, arguments);
+		}
+	}
+
+	default void debugIfEnabled(String msg, Throwable t) {
+		if (isDebugEnabled()) {
+			debug(msg, t);
+		}
+	}
 
 	boolean isInfoEnabled();
 
@@ -47,6 +107,36 @@ public interface Logger {
 
 	void info(String msg, Throwable t);
 
+	default void infoIfEnabled(String msg) {
+		if (isInfoEnabled()) {
+			info(msg);
+		}
+	}
+
+	default void infoIfEnabled(String format, Object arg) {
+		if (isInfoEnabled()) {
+			info(format, arg);
+		}
+	}
+
+	default void infoIfEnabled(String format, Object arg1, Object arg2) {
+		if (isInfoEnabled()) {
+			info(format, arg1, arg2);
+		}
+	}
+
+	default void infoIfEnabled(String format, Object... arguments) {
+		if (isInfoEnabled()) {
+			info(format, arguments);
+		}
+	}
+
+	default void infoIfEnabled(String msg, Throwable t) {
+		if (isInfoEnabled()) {
+			info(msg, t);
+		}
+	}
+
 	boolean isWarnEnabled();
 
 	void warn(String msg);
@@ -59,6 +149,36 @@ public interface Logger {
 
 	void warn(String msg, Throwable t);
 
+	default void warnIfEnabled(String msg) {
+		if (isWarnEnabled()) {
+			warn(msg);
+		}
+	}
+
+	default void warnIfEnabled(String format, Object arg) {
+		if (isWarnEnabled()) {
+			warn(format, arg);
+		}
+	}
+
+	default void warnIfEnabled(String format, Object arg1, Object arg2) {
+		if (isWarnEnabled()) {
+			warn(format, arg1, arg2);
+		}
+	}
+
+	default void warnIfEnabled(String format, Object... arguments) {
+		if (isWarnEnabled()) {
+			warn(format, arguments);
+		}
+	}
+
+	default void warnIfEnabled(String msg, Throwable t) {
+		if (isWarnEnabled()) {
+			warn(msg, t);
+		}
+	}
+
 	boolean isErrorEnabled();
 
 	void error(String msg);
@@ -70,4 +190,34 @@ public interface Logger {
 	void error(String format, Object... arguments);
 
 	void error(String msg, Throwable t);
+
+	default void errorIfEnabled(String msg) {
+		if (isErrorEnabled()) {
+			error(msg);
+		}
+	}
+
+	default void errorIfEnabled(String format, Object arg) {
+		if (isErrorEnabled()) {
+			error(format, arg);
+		}
+	}
+
+	default void errorIfEnabled(String format, Object arg1, Object arg2) {
+		if (isErrorEnabled()) {
+			error(format, arg1, arg2);
+		}
+	}
+
+	default void errorIfEnabled(String format, Object... arguments) {
+		if (isErrorEnabled()) {
+			error(format, arguments);
+		}
+	}
+
+	default void errorIfEnabled(String msg, Throwable t) {
+		if (isErrorEnabled()) {
+			error(msg, t);
+		}
+	}
 }

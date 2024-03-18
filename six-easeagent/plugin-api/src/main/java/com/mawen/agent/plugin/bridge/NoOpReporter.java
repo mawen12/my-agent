@@ -7,8 +7,8 @@ import com.mawen.agent.plugin.report.EncodedData;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/23
  */
-public class NoOpReporter implements Reporter {
-	public static final NoOpReporter NO_OP_REPORTER = new NoOpReporter();
+public enum NoOpReporter implements Reporter {
+	INSTANCE;
 
 	@Override
 	public void report(String msg) {

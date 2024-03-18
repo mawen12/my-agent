@@ -15,7 +15,8 @@ import com.mawen.agent.plugin.api.config.IPluginConfig;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/24
  */
-public class NoOpConfigFactory implements IConfigFactory {
+public enum NoOpConfigFactory implements IConfigFactory {
+	INSTANCE;
 
 	@Override
 	public Config getConfig() {
@@ -37,9 +38,8 @@ public class NoOpConfigFactory implements IConfigFactory {
 		return new NoOpIPluginConfig(domain, namespace, name);
 	}
 
-	static class NoOpConfig implements Config {
-		static final NoOpConfig INSTANCE = new NoOpConfig();
-		private final Map<String, String> source = new HashMap<>();
+	enum NoOpConfig implements Config {
+		INSTANCE;
 
 		@Override
 		public boolean hasPath(String path) {

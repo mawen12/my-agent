@@ -29,7 +29,7 @@ import org.springframework.boot.loader.archive.JarFileArchive;
  * @since 2024/2/21
  */
 public class Main {
-	private static final ClassLoader BOOTSTRAP_CLASS_LOADER = null;
+	public static final ClassLoader BOOTSTRAP_CLASS_LOADER = null;
 	private static final String LIB = "lib/";
 	private static final String BOOTSTRAP = "boot/";
 	private static final String SLf4j2 = "log4j2/";
@@ -139,7 +139,6 @@ public class Main {
 		return urls;
 	}
 
-
 	private static void installBootstrapJar(URL url, Instrumentation inst) {
 		try {
 			var file = JarUtils.getNestedJarFile(url);
@@ -211,66 +210,4 @@ public class Main {
 			// ignored
 		}
 	}
-
-	public static class CompoundableClassLoader extends LaunchedURLClassLoader {
-		private final Set<WeakReference<ClassLoader>> externals = new CopyOnWriteArraySet<>();
-
-		CompoundableClassLoader(URL[] urls) {
-			super(urls, Main.BOOTSTRAP_CLASS_LOADER);
-		}
-
-		public void add(ClassLoader cl) {
-			if (cl != null && !Objects.equals(cl, this)) {
-				externals.add(new WeakReference<>(cl));
-			}
-		}
-
-		@Override
-		protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-			try {
-				return super.loadClass(name, resolve);
-			}
-			catch (ClassNotFoundException e) {
-				for (var external : externals) {
-					try {
-						var cl = external.get();
-						if (cl == null) {
-							continue;
-						}
-						final var aClass = cl.loadClass(name);
-						if (resolve) {
-							resolveClass(aClass);
-						}
-						return aClass;
-					}
-					catch (ClassNotFoundException ex) {
-						// ignored
-					}
-				}
-
-				throw e;
-			}
-		}
-
-		@Override
-		public URL findResource(String name) {
-			var url = super.findResource(name);
-			if (url == null) {
-				for (var external : externals) {
-					try {
-						var cl = external.get();
-						url = cl.getResource(name);
-						if (url != null) {
-							return url;
-						}
-					}
-					catch (Exception e) {
-						// ignored
-					}
-				}
-			}
-			return url;
-		}
-	}
-
 }

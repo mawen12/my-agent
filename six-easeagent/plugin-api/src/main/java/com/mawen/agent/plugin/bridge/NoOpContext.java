@@ -29,8 +29,8 @@ public class NoOpContext {
 	public static final EmptyAsyncContext NO_OP_ASYNC_CONTEXT = EmptyAsyncContext.INSTANCE;
 	public static final NoopRequestContext NO_OP_PROGRESS_CONTEXT = NoopRequestContext.INSTANCE;
 
-	public static class NoopContext implements InitializeContext {
-		private static final NoopContext INSTANCE = new NoopContext();
+	public enum NoopContext implements InitializeContext {
+		INSTANCE;
 		private static final Iterator<String> EMPTY_KEYS = new Iterator<String>() {
 			@Override
 			public boolean hasNext() {
@@ -214,8 +214,8 @@ public class NoOpContext {
 		}
 	}
 
-	public static class EmptyAsyncContext implements AsyncContext {
-		private static final EmptyAsyncContext INSTANCE = new EmptyAsyncContext();
+	public enum EmptyAsyncContext implements AsyncContext {
+		INSTANCE;
 
 		@Override
 		public boolean isNoop() {
@@ -248,8 +248,8 @@ public class NoOpContext {
 		}
 	}
 
-	public static class NoopRequestContext implements RequestContext {
-		private static final NoopRequestContext INSTANCE = new NoopRequestContext();
+	public enum NoopRequestContext implements RequestContext {
+		INSTANCE;
 
 		@Override
 		public boolean isNoop() {

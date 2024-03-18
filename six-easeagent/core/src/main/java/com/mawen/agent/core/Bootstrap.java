@@ -1,10 +1,15 @@
 package com.mawen.agent.core;
 
+import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.lang.management.ManagementFactory;
 import java.net.URLClassLoader;
 import java.util.concurrent.TimeUnit;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
 import com.mawen.agent.config.ConfigAware;
@@ -38,6 +43,8 @@ import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 import com.mawen.agent.report.AgentReportAware;
 import com.mawen.agent.report.DefaultAgentReport;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.description.type.TypeDescription;
@@ -53,6 +60,7 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/5
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Bootstrap {
 
 	private static final Logger log = LoggerFactory.getLogger(Bootstrap.class);
@@ -61,42 +69,14 @@ public class Bootstrap {
 	private static final String AGENT_MIDDLEWARE_UPDATE = "agent.middleware.update";
 	private static final int DEF_AGENT_SERVER_PORT = 9900;
 
-	private static final AgentBuilder.Listener LISTENER = new AgentBuilder.Listener() {
-		@Override
-		public void onDiscovery(String s, ClassLoader classLoader, JavaModule javaModule, boolean b) {
-			// ignored
-		}
-
-		@Override
-		public void onTransformation(TypeDescription typeDescription, ClassLoader classLoader, JavaModule javaModule, boolean b, DynamicType dynamicType) {
-			log.info("onTransformation: {} loaded: {} from classloader {}", typeDescription, b, classLoader);
-		}
-
-		@Override
-		public void onIgnored(TypeDescription typeDescription, ClassLoader classLoader, JavaModule javaModule, boolean b) {
-			// ignored
-		}
-
-		@Override
-		public void onError(String s, ClassLoader classLoader, JavaModule javaModule, boolean b, Throwable throwable) {
-			log.warn("Just for Debug-log, transform ends exceptionally, which is sometimes normal and sometimes there is an error: {} error:{} loaded: {} from classLoader {}",
-					s, throwable, b, classLoader);
-		}
-
-		@Override
-		public void onComplete(String s, ClassLoader classLoader, JavaModule javaModule, boolean b) {
-			// ignored
-		}
-	};
+	private static final AgentBuilder.Listener LISTENER = new AgentListener();
 
 	static final String MX_BEAN_OBJECT_NAME = "com.mawen.agent:type=ConfigManager";
 
 	private static ContextManager contextManager;
 
-	private Bootstrap(){}
 
-	@SneakyThrows
-	public static void start(String args, Instrumentation inst, String javaAgentJarPath) {
+	public static void start(String args, Instrumentation inst, String javaAgentJarPath) throws IOException {
 		var begin = System.nanoTime();
 		System.setProperty(ConfigConst.AGENT_JAR_PATH, javaAgentJarPath);
 
@@ -113,13 +93,12 @@ public class Bootstrap {
 		}
 
 		var classLoader = Bootstrap.class.getClassLoader();
-		var agentInfo = AgentInfoFactory.loadAgentInfo(classLoader);
-		Agent.agentInfo = agentInfo;
+		Agent.agentInfo = AgentInfoFactory.loadAgentInfo(classLoader);
 		var cfg = ConfigFactory.loadConfigs(configPath, classLoader);
-		wrapConfig(cfg);
+		wrapConfig(cfg, classLoader);
 
 		// loader check
-		GlobalAgentHolder.setAgentLoader((URLClassLoader) Bootstrap.class.getClassLoader());
+		GlobalAgentHolder.setAgentLoader((URLClassLoader) classLoader);
 		Agent.agentClassLoader = GlobalAgentHolder::getAgentLoader;
 
 		// init context/api
@@ -242,23 +221,30 @@ public class Bootstrap {
 		return builder;
 	}
 
-	@SneakyThrows
-	static void registerMBeans(ConfigManagerMXBean conf) {
-		var begin = System.currentTimeMillis();
-		var mbs = ManagementFactory.getPlatformMBeanServer();
-		var mxBeanName = new ObjectName(MX_BEAN_OBJECT_NAME);
-		mbs.registerMBean(conf, mxBeanName);
-		log.info("Register {} as MBean {}, use time: {}",
-				conf.getClass().getName(), mxBeanName, (System.currentTimeMillis() - begin));
-	}
-
+	@Deprecated
 	private static ElementMatcher<ClassLoader> protectedLoaders() {
 		return isBootstrapClassLoader().or(is(Bootstrap.class.getClassLoader()));
 	}
 
-	private static void wrapConfig(GlobalConfigs conf) {
-		var wrappedConfigManager = new WrappedConfigManager(Bootstrap.class.getClassLoader(), conf);
+	private static void wrapConfig(GlobalConfigs conf, ClassLoader classLoader) {
+		var wrappedConfigManager = new WrappedConfigManager(classLoader, conf);
 		registerMBeans(wrappedConfigManager);
 		GlobalAgentHolder.setWrappedConfigManager(wrappedConfigManager);
+	}
+
+	private static void registerMBeans(ConfigManagerMXBean conf) {
+		var begin = System.currentTimeMillis();
+		ObjectName mxBeanName = null;
+		try {
+			var mbs = ManagementFactory.getPlatformMBeanServer();
+			mxBeanName = new ObjectName(MX_BEAN_OBJECT_NAME);
+			mbs.registerMBean(conf, mxBeanName);
+			log.info("Register {} as MBean {}, use time: {}",
+					conf.getClass().getName(), mxBeanName, (System.currentTimeMillis() - begin));
+		}
+		catch (Exception e) {
+			log.warn("Register {} as MBean failed, {}", e);
+			throw new RuntimeException(e);
+		}
 	}
 }

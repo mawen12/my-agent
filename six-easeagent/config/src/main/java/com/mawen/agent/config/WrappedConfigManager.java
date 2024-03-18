@@ -10,15 +10,7 @@ import com.mawen.agent.plugin.async.ThreadUtils;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/26
  */
-public class WrappedConfigManager implements ConfigManagerMXBean{
-
-	private final ClassLoader customClassLoader;
-	private final ConfigManagerMXBean conf;
-
-	public WrappedConfigManager(ClassLoader customClassLoader, ConfigManagerMXBean conf) {
-		this.customClassLoader = customClassLoader;
-		this.conf = conf;
-	}
+public record WrappedConfigManager(ClassLoader customClassLoader, ConfigManagerMXBean conf) implements ConfigManagerMXBean{
 
 	@Override
 	public void updateConfigs(Map<String, String> configs) {

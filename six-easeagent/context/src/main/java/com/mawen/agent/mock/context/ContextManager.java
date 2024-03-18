@@ -26,6 +26,7 @@ import com.mawen.agent.plugin.api.trace.TracingProvider;
 import com.mawen.agent.plugin.api.trace.TracingSupplier;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.bridge.NoOpLoggerFactory;
+import com.mawen.agent.plugin.bridge.NoOpMdc;
 import com.mawen.agent.plugin.bridge.NoOpMetrics;
 import com.mawen.agent.plugin.bridge.NoOpReporter;
 import com.mawen.agent.plugin.bridge.NoOpTracer;
@@ -36,7 +37,7 @@ import com.mawen.agent.plugin.utils.NoNull;
  * @since 2024/3/4
  */
 public class ContextManager implements IContextManager {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ContextManager.class.getName());
+	private static final Logger log = LoggerFactory.getLogger(ContextManager.class.getName());
 
 	private static final ThreadLocal<SessionContext> LOCAL_SESSION_CONTEXT = ThreadLocal.withInitial(SessionContext::new);
 	private final PluginConfigManager pluginConfigManager;
@@ -52,22 +53,25 @@ public class ContextManager implements IContextManager {
 	}
 
 	public static ContextManager build(Configs configs) {
-		LOGGER.info("build context manager.");
+		log.info("build context manager.");
 		ProgressFieldsManager.init(configs);
 		PluginConfigManager pluginConfigManager = PluginConfigManager.builder(configs).build();
+
 		LoggerFactoryImpl loggerFactory = LoggerFactoryImpl.build();
 		ILoggerFactory iLoggerFactory = NoOpLoggerFactory.INSTANCE;
-		Mdc mdc = NoOpLoggerFactory.NO_OP_MDC_INSTANCE;
+		Mdc mdc = NoOpMdc.INSTANCE;
 		if (loggerFactory != null) {
 			iLoggerFactory = loggerFactory;
 			mdc = new LoggerMdc(loggerFactory.factory().mdc());
 		}
+
 		ContextManager contextManager = new ContextManager(configs, pluginConfigManager, iLoggerFactory, mdc);
 		Agent.loggerFactory = contextManager.globalContext.loggerFactory();
 		Agent.loggerMdc = contextManager.globalContext.mdc();
 		Agent.initializeContextSupplier = contextManager;
 		Agent.metricRegistrySupplier = contextManager.globalContext.metric();
 		Agent.configFactory = contextManager.pluginConfigManager;
+
 		return contextManager;
 	}
 
@@ -77,12 +81,12 @@ public class ContextManager implements IContextManager {
 	}
 
 	public void setTracing(@Nonnull TracingProvider tracing) {
-		LOGGER.info("set tracing supplier function.");
+		log.info("set tracing supplier function.");
 		this.tracingSupplier = tracing.tracingSupplier();
 	}
 
 	public void setMetric(@Nonnull MetricProvider metric) {
-		LOGGER.info("set metric supplier function");
+		log.info("set metric supplier function");
 		this.metric = metric.metricSupplier();
 	}
 
@@ -111,7 +115,7 @@ public class ContextManager implements IContextManager {
 
 		@Override
 		public Reporter reporter(IPluginConfig config) {
-			return NoNull.of(metric.reporter(config), NoOpReporter.NO_OP_REPORTER);
+			return NoNull.of(metric.reporter(config), NoOpReporter.INSTANCE);
 		}
 	}
 }

@@ -39,8 +39,8 @@ public class NoOpTracer {
 		return NoNull.of(extractor, NO_OP_EXTRACTOR);
 	}
 
-	public static class NoopSpan implements Span {
-		private static final NoopSpan INSTANCE = new NoopSpan();
+	public enum NoopSpan implements Span {
+		INSTANCE;
 
 		@Override
 		public boolean isNoop() {
@@ -168,8 +168,8 @@ public class NoOpTracer {
 		}
 	}
 
-	public static class NoopScope implements Scope {
-		private static final NoopScope INSTANCE = new NoopScope();
+	public enum NoopScope implements Scope {
+		INSTANCE;
 
 		@Override
 		public void close() {
@@ -182,8 +182,8 @@ public class NoOpTracer {
 		}
 	}
 
-	public static class NoopTracing implements ITracing {
-		private static final NoopTracing INSTANCE = new NoopTracing();
+	public enum NoopTracing implements ITracing {
+		INSTANCE;
 
 		@Override
 		public SpanContext exportAsync() {
@@ -251,8 +251,9 @@ public class NoOpTracer {
 		}
 	}
 
-	public static class EmptyMessagingTracing implements MessagingTracing<MessagingRequest> {
-		private static final EmptyMessagingTracing INSTANCE = new EmptyMessagingTracing();
+	public enum EmptyMessagingTracing implements MessagingTracing<MessagingRequest> {
+		INSTANCE;
+
 		private static final Function<MessagingRequest, Boolean> NOOP_SAMPLER = r -> null;
 
 		@Override
@@ -296,8 +297,8 @@ public class NoOpTracer {
 		}
 	}
 
-	public static class EmptyMessage implements Message {
-		private static final EmptyMessage INSTANCE = new EmptyMessage();
+	public enum EmptyMessage implements Message<Object> {
+		INSTANCE;
 		private static final Object OBJ_INSTANCE = new Object();
 
 		@Override
@@ -306,8 +307,8 @@ public class NoOpTracer {
 		}
 	}
 
-	public static class EmptyExtractor implements Extractor<MessagingRequest> {
-		private static final EmptyExtractor INSTANCE = new EmptyExtractor();
+	public enum EmptyExtractor implements Extractor<MessagingRequest> {
+		INSTANCE;
 
 		@Override
 		public Message extract(MessagingRequest request) {
@@ -315,8 +316,8 @@ public class NoOpTracer {
 		}
 	}
 
-	public static class EmptyInjector implements Injector<MessagingRequest> {
-		private static final EmptyInjector INSTANCE = new EmptyInjector();
+	public enum EmptyInjector implements Injector<MessagingRequest> {
+		INSTANCE;
 
 		@Override
 		public void inject(Span span, MessagingRequest request) {
@@ -324,8 +325,8 @@ public class NoOpTracer {
 		}
 	}
 
-	public static class EmptySpanContext implements SpanContext {
-		private static final EmptySpanContext INSTANCE = new EmptySpanContext();
+	public enum EmptySpanContext implements SpanContext {
+		INSTANCE;
 
 		@Override
 		public boolean isNoop() {
