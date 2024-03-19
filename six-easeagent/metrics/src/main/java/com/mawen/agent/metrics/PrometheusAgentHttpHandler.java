@@ -23,7 +23,7 @@ import io.prometheus.client.exporter.common.TextFormat;
  */
 public class PrometheusAgentHttpHandler extends AgentHttpHandler {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(PrometheusAgentHttpHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(PrometheusAgentHttpHandler.class);
 
 	@Override
 	public String getPath() {
@@ -43,7 +43,7 @@ public class PrometheusAgentHttpHandler extends AgentHttpHandler {
 			writer.flush();
 		}
 		catch (IOException e) {
-			LOGGER.warn("write data error. {}", e.getMessage());
+			log.warn("write data error. {}", e.getMessage());
 		}
 		var data = stringWriter.toString();
 		return Response.newFixedLengthResponse(Status.OK, AgentHttpServer.JSON_TYPE, data);

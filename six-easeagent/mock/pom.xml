@@ -17,6 +17,7 @@
         <module>config-mock</module>
         <module>context-mock</module>
         <module>utils-mock</module>
+        <module>report-mock</module>
     </modules>
 
 </project>

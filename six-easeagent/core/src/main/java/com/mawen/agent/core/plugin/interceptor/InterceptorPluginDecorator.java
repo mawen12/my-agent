@@ -54,9 +54,8 @@ public class InterceptorPluginDecorator implements Interceptor {
 		if (cfg == null || cfg.enabled() || cfg instanceof NoOpIPluginConfig) {
 			innerContext.pushRetBound();
 			this.interceptor.before(methodInfo, context);
-		}
-		else if (logger.isDebugEnabled()) {
-			logger.debug("plugin.{}.{}.{} is not enabled", config.domain(), config.namespace(), config.id());
+		} else {
+			logger.debugIfEnabled("plugin.{}.{}.{} is not enabled", config.domain(), config.namespace(), config.id());
 		}
 	}
 
@@ -90,9 +89,5 @@ public class InterceptorPluginDecorator implements Interceptor {
 		var pluginOrder = this.plugin.order();
 		var interceptorOrder = this.interceptor.order();
 		return (interceptorOrder << 8) + pluginOrder;
-	}
-
-	public static Supplier<Interceptor> getInterceptorSupplier(final AgentPlugin plugin, final Supplier<Interceptor> supplier) {
-		return () -> new InterceptorPluginDecorator(supplier.get(), plugin);
 	}
 }

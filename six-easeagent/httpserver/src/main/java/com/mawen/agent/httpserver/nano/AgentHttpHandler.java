@@ -25,8 +25,6 @@ import com.mawen.agent.httpserver.nanohttpd.router.RouterNanoHTTPD;
  */
 public abstract class AgentHttpHandler extends RouterNanoHTTPD.DefaultHandler {
 
-	public abstract String getPath();
-
 	protected String text;
 	protected Set<Method> methods = new HashSet<>(Arrays.asList(Method.PUT, Method.POST));
 
@@ -72,4 +70,6 @@ public abstract class AgentHttpHandler extends RouterNanoHTTPD.DefaultHandler {
 			throw new RuntimeException(e);
 		}
 	}
+
+	public abstract String getPath();
 }

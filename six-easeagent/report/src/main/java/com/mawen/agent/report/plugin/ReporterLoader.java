@@ -1,6 +1,5 @@
 package com.mawen.agent.report.plugin;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -15,56 +14,54 @@ import org.slf4j.LoggerFactory;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/29
  */
-public class ReporterLoader {
-	static Logger logger = LoggerFactory.getLogger(ReporterLoader.class);
-
-	private ReporterLoader(){}
+public abstract class ReporterLoader {
+	private static final Logger log = LoggerFactory.getLogger(ReporterLoader.class);
 
 	public static void load() {
-		encoderLoad();
-		senderLoad();
+		log.info("Loading reporters >>>");
+		encodersLoad();
+		sendersLoad();
+		log.info("Loaded reporters <<<");
 	}
 
-	public static void encoderLoad() {
+	public static void encodersLoad() {
 		for (var encoder : load(Encoder.class)) {
-			try {
-				var constructor = encoder.getClass().getConstructor();
-				Supplier<Encoder<?>> encoderSupplier = () -> {
-					try {
-						return constructor.newInstance();
-					}
-					catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-						logger.warn("unable to load sender: {}", encoder.name());
-						return null;
-					}
-				};
-				ReporterRegistry.registryEncoder(encoder.name(),encoderSupplier);
-			}
-			catch (NoSuchMethodException e) {
-				logger.warn("Sender load fail:{}", e.getMessage());
-			}
+			var supplier = encoderLoad(encoder);
+			ReporterRegistry.registryEncoder(encoder.name(), supplier);
 		}
 	}
 
-	public static void senderLoad() {
+	public static void sendersLoad() {
 		for (var sender : load(Sender.class)) {
-			try {
-				var constructor = sender.getClass().getConstructor();
-				Supplier<Sender> senderSupplier = () -> {
-					try {
-						return constructor.newInstance();
-					}
-					catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-						logger.warn("unable to load sender: {}", sender.name());
-						return null;
-					}
-				};
-				ReporterRegistry.registrySender(sender.name(),senderSupplier);
-			}
-			catch (NoSuchMethodException e) {
-				logger.warn("Sender load fail: {}", e.getMessage());
-			}
+			var supplier = senderLoad(sender);
+			ReporterRegistry.registrySender(sender.name(), supplier);
 		}
+	}
+
+	private static Supplier<Encoder<?>> encoderLoad(Encoder<?> encoder) {
+		return () -> {
+			try {
+				log.info("Loading encoder {}", encoder.getClass().getName());
+				return encoder.getClass().getConstructor().newInstance();
+			}
+			catch (Exception e) {
+				log.warn("Unable to load encoder: {}, because: {}", encoder.name(), e.getMessage());
+				return null;
+			}
+		};
+	}
+
+	private static Supplier<Sender> senderLoad(Sender sender) {
+		return () -> {
+			try {
+				log.info("Loading sender {}", sender.getClass().getName());
+				return sender.getClass().getConstructor().newInstance();
+			}
+			catch (Exception e) {
+				log.warn("Unable to load sender: {}, because: {}", sender.name(), e.getMessage());
+				return null;
+			}
+		};
 	}
 
 	private static <T> List<T> load(Class<T> serviceClass) {
@@ -75,8 +72,8 @@ public class ReporterLoader {
 				result.add(it.next());
 			}
 			catch (UnsupportedClassVersionError e) {
-				logger.info("Unable to load class: {}", e.getMessage());
-				logger.info("Please check the plugin compile Java version configuration, " +
+				log.info("Unable to load class: {}", e.getMessage());
+				log.info("Please check the plugin compile Java version configuration, " +
 						"and it should not latter that current JVM runtime");
 			}
 		}

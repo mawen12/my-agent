@@ -29,7 +29,7 @@ public class MethodTransformation {
 	private ElementMatcher.Junction<? super MethodDescription> matcher;
 	private ProviderChain.Builder providerBuilder;
 
-	public AgentInterceptorChain getAgentInterceptorChain(final int unqieIndex,
+	public AgentInterceptorChain getAgentInterceptorChain(final int uniqueIndex,
 			final String type,
 			final String method,
 			final String methodDescription) {
@@ -45,7 +45,7 @@ public class MethodTransformation {
 			if (i instanceof InterceptorPluginDecorator interceptor) {
 				try {
 					interceptor.init(interceptor.getConfig(), type, method, methodDescription);
-					interceptor.init(interceptor.getConfig(), unqieIndex);
+					interceptor.init(interceptor.getConfig(), uniqueIndex);
 				}
 				catch (Exception e) {
 					logger.error("Interceptor init fail: {}:{} {}", type, method, interceptor.getClass().getSimpleName());

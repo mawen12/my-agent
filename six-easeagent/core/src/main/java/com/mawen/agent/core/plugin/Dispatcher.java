@@ -20,6 +20,10 @@ public final class Dispatcher implements AppendBootstrapLoader {
 
 	static AgentArray<AgentInterceptorChain> chains = new AgentArray<>();
 
+	public static AgentInterceptorChain register(int index, AgentInterceptorChain chain) {
+		return chains.putIfAbsent(index, chain);
+	}
+
 	public static void enter(int index, MethodInfo info, InitializeContext ctx) {
 		var chain = chains.getUncheck(index);
 		var pos = 0;
@@ -32,10 +36,6 @@ public final class Dispatcher implements AppendBootstrapLoader {
 		var pos = chain.size() - 1;
 		ContextUtils.setEndTime(ctx);
 		return chain.doAfter(info, pos, ctx);
-	}
-
-	public static AgentInterceptorChain register(int index, AgentInterceptorChain chain) {
-		return chains.putIfAbsent(index, chain);
 	}
 
 	public static AgentInterceptorChain getChain(int index) {

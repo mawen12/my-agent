@@ -15,8 +15,6 @@ import net.bytebuddy.asm.Advice;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DynamicFieldAdvice {
 
-	private static final Logger log = LoggerFactory.getLogger(DynamicFieldAdvice.class);
-
 	@NoArgsConstructor(access = AccessLevel.PRIVATE)
 	public static class DynamicInstanceInit {
 
@@ -35,7 +33,7 @@ public class DynamicFieldAdvice {
 	public static class DynamicClassInit {
 		@Advice.OnMethodExit
 		public static void exit(@Advice.Origin("#m") String method) {
-
+			// nothing
 		}
 	}
 }

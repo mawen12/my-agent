@@ -24,6 +24,7 @@ import net.bytebuddy.utility.JavaModule;
 public class DynamicFieldTransformer implements AgentBuilder.Transformer {
 
 	private static final Logger log = LoggerFactory.getLogger(DynamicFieldTransformer.class);
+
 	private static final Map<String, Cache<ClassLoader, Boolean>> FIELD_MAP = new ConcurrentHashMap<>();
 
 	private final String fieldName;

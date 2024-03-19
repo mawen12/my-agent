@@ -14,8 +14,8 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-public class ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher, ElementMatcher<ClassLoader>> {
-	public static final ClassLoaderMatcherConvert INSTANCE = new ClassLoaderMatcherConvert();
+public enum ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher, ElementMatcher<ClassLoader>> {
+	INSTANCE;
 
 	private static final ElementMatcher<ClassLoader> agentLoaderMatcher = is(Bootstrap.class.getClassLoader())
 			.or(is(FinalClassLoaderSupplier.CLASSLOADER));
@@ -31,7 +31,8 @@ public class ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher,
 
 		if (ALL.equals(source)) {
 			matcher = any();
-		} else {
+		}
+		else {
 			matcher = switch (source.getClassLoaderName()) {
 				case BOOTSTRAP_NAME -> ElementMatchers.isBootstrapClassLoader();
 				case EXTERNAL_NAME -> ElementMatchers.isExtensionClassLoader();
@@ -43,12 +44,13 @@ public class ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher,
 
 		if (negate) {
 			return not(matcher);
-		} else {
+		}
+		else {
 			return matcher;
 		}
 	}
 
-	static record NameMatcher(String className) implements ElementMatcher<ClassLoader> {
+	record NameMatcher(String className) implements ElementMatcher<ClassLoader> {
 
 		@Override
 		public boolean matches(ClassLoader target) {

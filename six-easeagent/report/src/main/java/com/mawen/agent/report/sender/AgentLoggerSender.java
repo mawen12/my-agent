@@ -18,20 +18,20 @@ import com.mawen.agent.plugin.report.Sender;
  * @since 2024/3/3
  */
 @AutoService(Sender.class)
-public class AgentLoggerSender implements Sender{
-	public static final String SENDER_NAME = ReportConfigConst.CONSOLE_SENDER_NAME;
-	private static final Logger LOGGER = LoggerFactory.getLogger(AgentLoggerSender.class);
-	private String prefix;
+public class AgentLoggerSender implements Sender {
+	private static final Logger log = LoggerFactory.getLogger(AgentLoggerSender.class);
 
-	@Override
-	public String name() {
-		return SENDER_NAME;
-	}
+	private String prefix;
 
 	@Override
 	public void init(Config config, String prefix) {
 		// ignored
 		this.prefix = prefix;
+	}
+
+	@Override
+	public String name() {
+		return ReportConfigConst.CONSOLE_SENDER_NAME;
 	}
 
 	@Override
@@ -58,13 +58,13 @@ public class AgentLoggerSender implements Sender{
 
 		@Override
 		public Void execute() throws IOException {
-			LOGGER.info("{}",new String(msg));
+			log.info("{}", new String(msg));
 			return null;
 		}
 
 		@Override
 		public void enqueue(Callback<Void> cb) {
-			LOGGER.debug("{}",new String(msg));
+			log.debug("{}", new String(msg));
 		}
 	}
 }

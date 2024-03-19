@@ -32,10 +32,10 @@ import net.bytebuddy.agent.builder.AgentBuilder;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PluginLoader {
+	private static final Logger log = LoggerFactory.getLogger(PluginLoader.class);
 
-	private static Logger log = LoggerFactory.getLogger(PluginLoader.class);
-
-	public static AgentBuilder load(AgentBuilder ab, Configs conf) {
+	public static AgentBuilder load(AgentBuilder ab) {
+		log.info("Loading plugins >>>>>");
 		pluginLoad();
 		providerLoad();
 		var sortedTransformations = pointsLoad();
@@ -44,6 +44,7 @@ public class PluginLoader {
 			ab = ab.type(transformation.getClassMatcher(), transformation.getClassLoaderMatcher())
 					.transform(compound(transformation.isHasDynamicField(), transformation.getMethodTransformations()));
 		}
+		log.info("Loaded plugins <<<<<");
 		return ab;
 	}
 
@@ -62,17 +63,14 @@ public class PluginLoader {
 
 	public static void providerLoad() {
 		for (var provider : BaseLoader.load(InterceptorProvider.class)) {
-			log.debug("loading provider: {}", provider.getClass().getName());
+			log.info("loading provider: {}", provider.getClass().getName());
 
 			try {
-				log.debug("provider for:{} at {}",
-						provider.getPluginClassName(),
-						provider.getAdviceTo());
+				log.debugIfEnabled("provider for:{} at {}", provider.getPluginClassName(), provider.getAdviceTo());
 				PluginRegistry.register(provider);
 			}
 			catch (Exception | LinkageError e) {
-				log.error("Unable to load provider in [class []]",
-						provider.getClass().getName(), e);
+				log.error("Unable to load provider in [class {}]", provider.getClass().getName(), e);
 			}
 		}
 	}
@@ -85,9 +83,7 @@ public class PluginLoader {
 						return PluginRegistry.register(point);
 					}
 					catch (Exception e) {
-						log.error("Unable to load points in [class []]",
-								point.getClass().getName(),
-								e);
+						log.error("Unable to load points in [class {}]", point.getClass().getName(), e);
 						return null;
 					}
 				}).filter(Objects::nonNull)

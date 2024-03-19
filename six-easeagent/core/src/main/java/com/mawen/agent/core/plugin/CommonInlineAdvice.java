@@ -15,7 +15,6 @@ import net.bytebuddy.implementation.bytecode.assign.Assigner;
 public class CommonInlineAdvice {
 
 	private static final String CONTEXT = "agent_context";
-	private static final String POS = "agent_pos";
 
 	@Advice.OnMethodEnter(suppress = AgentAdvice.NoExceptionHandler.class)
 	public static MethodInfo enter(@Index int index,

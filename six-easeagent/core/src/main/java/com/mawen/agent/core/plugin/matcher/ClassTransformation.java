@@ -3,6 +3,7 @@ package com.mawen.agent.core.plugin.matcher;
 import java.util.Set;
 
 import com.mawen.agent.plugin.Ordered;
+import com.mawen.agent.plugin.utils.NoNull;
 import lombok.Getter;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -25,11 +26,7 @@ public class ClassTransformation implements Ordered {
 	public ClassTransformation(int order, ElementMatcher.Junction<TypeDescription> classMatcher, ElementMatcher<ClassLoader> classLoaderMatcher, Set<MethodTransformation> methodTransformations, boolean hasDynamicField) {
 		this.order = order;
 		this.classMatcher = classMatcher;
-		if (classLoaderMatcher != null) {
-			this.classLoaderMatcher = any();
-		} else {
-			this.classLoaderMatcher = classLoaderMatcher;
-		}
+		this.classLoaderMatcher = NoNull.of(classLoaderMatcher, any());
 		this.methodTransformations = methodTransformations;
 		this.hasDynamicField = hasDynamicField;
 	}

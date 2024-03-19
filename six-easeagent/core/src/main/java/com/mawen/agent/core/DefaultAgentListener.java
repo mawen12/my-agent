@@ -8,11 +8,15 @@ import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.utility.JavaModule;
 
 /**
+ *
+ *
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/18
  */
-public class AgentListener implements AgentBuilder.Listener {
-	private static final Logger log = LoggerFactory.getLogger(AgentListener.class);
+public enum DefaultAgentListener implements AgentBuilder.Listener {
+	INSTANCE;
+
+	private static final Logger log = LoggerFactory.getLogger(DefaultAgentListener.class);
 
 	@Override
 	public void onDiscovery(String s, ClassLoader classLoader, JavaModule javaModule, boolean b) {

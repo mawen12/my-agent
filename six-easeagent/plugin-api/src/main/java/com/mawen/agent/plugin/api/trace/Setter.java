@@ -6,6 +6,8 @@ package com.mawen.agent.plugin.api.trace;
  */
 public interface Setter {
 
+	Setter NOOP_INSTANCE = (name, value) -> {};
+
 	/**
 	 * @param name header name
 	 * @param value header value

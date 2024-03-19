@@ -1,12 +1,19 @@
 package com.mawen.agent.plugin.bean;
 
 import com.mawen.agent.plugin.Ordered;
+import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/24
  */
 public interface BeanProvider extends Ordered {
+	@Override
+	default int order() {
+		return BeanOrder.HIGH.getOrder();
+	}
+
+	@Getter
 	enum BeanOrder {
 		INIT(0, "init"),
 		HIGH(20, "high"),
@@ -21,18 +28,5 @@ public interface BeanProvider extends Ordered {
 			this.order = order;
 			this.name = name;
 		}
-
-		public int getOrder() {
-			return order;
-		}
-
-		public String getName() {
-			return name;
-		}
-	}
-
-	@Override
-	default int order() {
-		return BeanOrder.HIGH.getOrder();
 	}
 }

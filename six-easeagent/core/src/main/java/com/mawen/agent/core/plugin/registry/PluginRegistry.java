@@ -29,7 +29,7 @@ import static com.mawen.agent.core.plugin.interceptor.ProviderChain.*;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PluginRegistry {
-	static Logger log = Agent.getLogger(PluginRegistry.class);
+	private static final Logger log = Agent.getLogger(PluginRegistry.class);
 
 	static final Map<String, AgentPlugin> QUALIFIER_TO_PLUGIN = new ConcurrentHashMap<>();
 	static final Map<String, AgentPlugin> POINTS_TO_PLUGIN = new ConcurrentHashMap<>();
@@ -49,7 +49,7 @@ public class PluginRegistry {
 	public static ClassTransformation register(Points points) {
 		var pointClassName = points.getClass().getCanonicalName();
 		var classMatcher = points.getClassMatcher();
-		var HasDynamicField = points.isAddDynamicField();
+		var hasDynamicField = points.isAddDynamicField();
 		var innerClassMatcher = ClassMatcherConvert.INSTANCE.convert(classMatcher);
 		var loaderMatcher = ClassLoaderMatcherConvert.INSTANCE.convert(points.getClassLoaderMatcher());
 
@@ -74,6 +74,7 @@ public class PluginRegistry {
 
 		return ClassTransformation.builder()
 				.classMatcher(innerClassMatcher)
+				.hasDynamicField(hasDynamicField)
 				.methodTransformations(mInfo)
 				.classLoaderMatcher(loaderMatcher)
 				.order(order)

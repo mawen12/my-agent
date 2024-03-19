@@ -36,10 +36,7 @@ import lombok.AllArgsConstructor;
  * @since 2024/3/4
  */
 public class SessionContext implements InitializeContext {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(SessionContext.class.getName());
-
-	private static final Setter NOOP_SETTER = (name, value) -> {};
+	private static final Logger log = LoggerFactory.getLogger(SessionContext.class.getName());
 
 	@lombok.Getter
 	private ITracing tracing = NoOpTracer.NO_OP_TRACING;
@@ -81,7 +78,7 @@ public class SessionContext implements InitializeContext {
 	@Override
 	public IPluginConfig getConfig() {
 		if (configs.isEmpty()) {
-			LOGGER.warn("context.configs was empty.");
+			log.warn("context.configs was empty.");
 			return NoOpIPluginConfig.INSTANCE;
 		}
 		return configs.peek();
@@ -194,7 +191,7 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public Cleaner importForwardHeaders(Getter getter) {
-		return importForwardedHeaders(getter, NOOP_SETTER);
+		return importForwardedHeaders(getter, Setter.NOOP_INSTANCE);
 	}
 
 	@Override
@@ -205,7 +202,7 @@ public class SessionContext implements InitializeContext {
 	@Override
 	public IPluginConfig popConfig() {
 		if (configs.isEmpty()) {
-			LOGGER.warn("context.configs was empty.");
+			log.warn("context.configs was empty.");
 			return NoOpIPluginConfig.INSTANCE;
 		}
 		return configs.pop();

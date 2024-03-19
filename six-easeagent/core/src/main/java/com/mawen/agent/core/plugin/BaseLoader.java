@@ -27,8 +27,7 @@ public class BaseLoader {
 				result.add(it.next());
 			}
 			catch (Exception e) {
-				log.warn("Unable to load class: {}", e.getMessage());
-				log.warn("Please check the plugin compile Java version configuration. and it should not latter than current JVM runtime");
+				log.warn("Unable to load class: {}, Please check the plugin compile Java version configuration. and it should not latter than current JVM runtime", e.getMessage());
 			}
 		}
 		return result;

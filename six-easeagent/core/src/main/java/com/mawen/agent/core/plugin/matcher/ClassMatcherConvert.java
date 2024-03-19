@@ -16,9 +16,8 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-public class ClassMatcherConvert implements Converter<IClassMatcher, ElementMatcher.Junction<TypeDescription>> {
-
-	public static final ClassMatcherConvert INSTANCE = new ClassMatcherConvert();
+public enum ClassMatcherConvert implements Converter<IClassMatcher, ElementMatcher.Junction<TypeDescription>> {
+	INSTANCE;
 
 	@Override
 	public ElementMatcher.Junction<TypeDescription> convert(IClassMatcher source) {
