@@ -63,6 +63,10 @@ public class ProgressFields {
 		serviceTags = serviceTags.rebuild(tags);
 	}
 
+	public static boolean isEmpty(String[] fields) {
+		return fields == null || fields.length == 0;
+	}
+
 	public static String[] getResponseHoldTagFields() {
 		return responseHoldTagFields.values;
 	}
