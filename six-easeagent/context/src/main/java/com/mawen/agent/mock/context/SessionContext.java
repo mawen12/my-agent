@@ -293,7 +293,7 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public void setCurrentTracing(ITracing tracing) {
-
+		this.tracing = NoNull.of(tracing, NoOpTracer.NO_OP_TRACING);
 	}
 
 	private <V> V change(Object o) {

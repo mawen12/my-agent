@@ -63,6 +63,11 @@
             <artifactId>loader</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.mawen</groupId>
+            <artifactId>zipkin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.mawen</groupId>

@@ -1,6 +1,7 @@
 package com.mawen.agent.metrics.jvm;
 
 import com.mawen.agent.metrics.MetricProviderImpl;
+import com.mawen.agent.metrics.jvm.gc.JVMGCMetricV2;
 import com.mawen.agent.metrics.jvm.memory.JVMMemoryMetricV2;
 import com.mawen.agent.plugin.bean.AgentInitializingBean;
 import com.mawen.agent.plugin.bean.BeanProvider;
@@ -14,7 +15,7 @@ public class JvmBeanProvider implements BeanProvider, AgentInitializingBean {
 	private final MetricProviderImpl metricProvider = new MetricProviderImpl();
 
 	public void jvmGcMetricV2() {
-		JVMMemoryMetricV2.getMetric();
+		JVMGCMetricV2.getMetric();
 	}
 
 	public void jvmMemoryMetricV2() {

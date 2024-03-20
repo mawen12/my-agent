@@ -91,8 +91,8 @@ public class JVMGCMetricV2 extends ServiceMetric {
 				return;
 			}
 
-			var cd = (CompositeData) notification.getUserData();
-			var notificationInfo = GarbageCollectionNotificationInfo.from(cd);
+			var compositeData = (CompositeData) notification.getUserData();
+			var notificationInfo = GarbageCollectionNotificationInfo.from(compositeData);
 			var gcCause = notificationInfo.getGcCause();
 			var gcInfo = notificationInfo.getGcInfo();
 			var duration = gcInfo.getDuration();

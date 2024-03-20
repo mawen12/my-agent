@@ -12,11 +12,13 @@ public enum NoOpReporter implements Reporter {
 
 	@Override
 	public void report(String msg) {
+		System.out.println("This is NoopReporter.............................................");
 		// ignored
 	}
 
 	@Override
 	public void report(EncodedData msg) {
+		System.out.println("This is NoopReporter.............................................");
 		// ignored
 	}
 }

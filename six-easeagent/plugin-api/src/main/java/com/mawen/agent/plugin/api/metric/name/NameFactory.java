@@ -70,7 +70,7 @@ public interface NameFactory {
 	/**
 	 * Return a meter name, the {@code subType} must exist in the meter MetricSubType of that exists in the NameFactory
 	 *
-	 * @param key the key for metric
+	 * @param key     the key for metric
 	 * @param subType the metric type
 	 * @return a metric name
 	 */
@@ -79,7 +79,7 @@ public interface NameFactory {
 	/**
 	 * Return a histogram name, the {@code subType} must exist in the counter MetricSubType of that exists in the NameFactory
 	 *
-	 * @param key the key for metric
+	 * @param key     the key for metric
 	 * @param subType the metric type
 	 * @return a metric name
 	 */
@@ -88,7 +88,7 @@ public interface NameFactory {
 	/**
 	 * Return a counter name, the {@code subType} must exist in the counter MetricSubType of that exists in the NameFactory
 	 *
-	 * @param key the key for metric
+	 * @param key     the key for metric
 	 * @param subType the metric type
 	 * @return a metric name
 	 */
@@ -97,7 +97,7 @@ public interface NameFactory {
 	/**
 	 * Return a timer name, the {@code subType} must exist in the timer MetricSubType of that exists in the NameFactory
 	 *
-	 * @param key the key for metric
+	 * @param key     the key for metric
 	 * @param subType the metric type
 	 * @return a metric name
 	 */
@@ -106,7 +106,7 @@ public interface NameFactory {
 	/**
 	 * Return a gauge name, the {@code subType} must exist in the gauge MetricSubType of that exists in the NameFactory
 	 *
-	 * @param key the key for metric
+	 * @param key     the key for metric
 	 * @param subType the metric type
 	 * @return a metric name
 	 */
@@ -266,7 +266,7 @@ public interface NameFactory {
 		}
 
 		public NameFactory build() {
-			return new DefaultNameFactory(meterTypes,histogramTypes,timerTypes,gaugeTypes,meterTypes);
+			return new DefaultNameFactory(histogramTypes, counterTypes, timerTypes, gaugeTypes, meterTypes);
 		}
 
 		public Builder meterType(MetricSubType metricSubType, Map<MetricField, MetricValueFetcher> valueFetchers) {

@@ -77,15 +77,6 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 	}
 
 	@Override
-	public Call<Void> send(List<EncodedData> encodedData) {
-		EncodedData data = this.packer.encodeList(encodedData);
-		if (log.isDebugEnabled()) {
-			log.debug(new String(data.getData()));
-		}
-		return send(encodedData);
-	}
-
-	@Override
 	public String getPrefix() {
 		return this.prefix;
 	}
@@ -100,6 +91,15 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 		this.packer = ReporterRegistry.getEncoder(config.getString(this.encoderKey));
 		this.packer.init(this.packerConfig);
 		this.sender.init(this.senderConfig, prefix);
+	}
+
+	@Override
+	public Call<Void> send(List<EncodedData> encodedData) {
+		EncodedData data = this.packer.encodeList(encodedData);
+		if (log.isDebugEnabled()) {
+			log.debug(new String(data.getData()));
+		}
+		return send(encodedData);
 	}
 
 	@Override
