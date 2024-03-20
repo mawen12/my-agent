@@ -36,9 +36,10 @@ public class AgentV2SpanWriter implements WriteBuffer.Writer<ReportSpan> {
 
 	@Override
 	public void write(ReportSpan value, WriteBuffer buffer) {
-		buffer.writeByte(123);
+		// write by ASCII Code
+		buffer.writeByte(123); // {
 		writerList.forEach(w -> w.write(value, buffer));
-		buffer.writeByte(125);
+		buffer.writeByte(125); // }
 	}
 
 	@Override

@@ -51,21 +51,21 @@ public class AgentV2SpanGlobalWriter implements WriteBuffer.Writer<ReportSpan> {
 	public void write(ReportSpan value, WriteBuffer buffer) {
 		if (TextUtils.hasText(type)) {
 			buffer.writeAscii(TYPE_FIELD_NAME);
-			buffer.writeAscii(JsonEscaper.jsonEscapedSizeInBytes(type));
+			buffer.writeUtf8(JsonEscaper.jsonEscape(type));
 			buffer.writeByte(34);
 		}
 
 		var tmpService = this.extras.service();
 		if (TextUtils.hasText(tmpService)) {
 			buffer.writeAscii(SERVICE_FIELD_NAME);
-			buffer.writeAscii(JsonEscaper.jsonEscapedSizeInBytes(tmpService));
+			buffer.writeUtf8(JsonEscaper.jsonEscape(tmpService));
 			buffer.writeByte(34);
 		}
 
 		var tmpSystem = this.extras.system();
 		if (TextUtils.hasText(tmpSystem)) {
 			buffer.writeAscii(SYSTEM_FIELD_NAME);
-			buffer.writeAscii(JsonEscaper.jsonEscapedSizeInBytes(tmpSystem));
+			buffer.writeUtf8(JsonEscaper.jsonEscape(tmpSystem));
 			buffer.writeByte(34);
 		}
 	}

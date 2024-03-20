@@ -60,6 +60,37 @@
 
     <build>
         <plugins>
+            <!-- see https://youtrack.jetbrains.com/issue/IDEA-255509/Cannot-build-project-with-annotation-processor -->
+            <!-- see https://stackoverflow.com/questions/36248959/bad-service-configuration-file-or-exception-thrown-while-constructing-processor/36250332#36250332 -->
+            <!-- Resolve IDEA build module plugin-api then throw java compile error -->
+            <!-- Don't create src/main/resource/META-INF/services/javax.annotation.processing.Processor -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler.version}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                            <compilerArgument>-proc:none</compilerArgument>
+                            <includes>
+                                <include>com/mawen/agent/plugin/processor/PluginProcessor.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-project</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

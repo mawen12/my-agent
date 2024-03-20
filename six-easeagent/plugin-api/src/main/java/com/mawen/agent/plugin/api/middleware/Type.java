@@ -9,7 +9,7 @@ public enum Type {
 	DATABASE(MiddlewareConstants.TYPE_DATABASE),
 	KAFKA(MiddlewareConstants.TYPE_KAFKA),
 	RABBITMQ(MiddlewareConstants.TYPE_RABBITMQ),
-	ELASTICSEARCH(MiddlewareConstants.ENV_ES),
+	ELASTICSEARCH(MiddlewareConstants.TYPE_ES),
 	MONGODB(MiddlewareConstants.ENV_MONGODB),
 	MOTAN(MiddlewareConstants.TYPE_MOTAN),
 	;

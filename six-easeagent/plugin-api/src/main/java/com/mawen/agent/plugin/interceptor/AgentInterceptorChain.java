@@ -37,7 +37,7 @@ public class AgentInterceptorChain {
 		}
 		catch (Throwable e) {
 			// set error message to context;
-			logger.debug("Interceptor before execute exception:" + e.getMessage());
+			logger.warn("Interceptor before execute exception:" + e.getMessage());
 		}
 		this.doBefore(methodInfo, pos + 1, context);
 	}
@@ -52,7 +52,7 @@ public class AgentInterceptorChain {
 		}
 		catch (Throwable e) {
 			// set error message to context;
-			logger.debug("Interceptor exit execute exception:" + e.getMessage());
+			logger.warn("Interceptor exit execute exception:" + e.getMessage());
 		}
 		return this.doAfter(methodInfo, pos - 1, context);
 	}

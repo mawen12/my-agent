@@ -11,14 +11,14 @@ import zipkin2.internal.WriteBuffer;
 public class AgentV2SpanBaseWriter implements WriteBuffer.Writer<ReportSpan> {
 
 	static final String TRACE_ID_FIELD_NAME = "\"traceId\":\"";
-	static final String PARENT_ID_FIELD_NAME = "\"parentId\":\"";
-	static final String SPAN_ID_FIELD_NAME = "\"id\":\"";
-	static final String KIND_FIELD_NAME = "\"kind\":\"";
-	static final String NAME_FIELD_NAME = "\"name\":\"";
-	static final String TIMESTAMP_FIELD_NAME = "\"timestamp\":";
-	static final String DURATION_FIELD_NAME = "\"duration\":";
-	static final String DEBUG_FIELD_NAME = "\"debug\":true";
-	static final String SHARED_FIELD_NAME = "\"shared\":true";
+	static final String PARENT_ID_FIELD_NAME = ",\"parentId\":\"";
+	static final String SPAN_ID_FIELD_NAME = ",\"id\":\"";
+	static final String KIND_FIELD_NAME = ",\"kind\":\"";
+	static final String NAME_FIELD_NAME = ",\"name\":\"";
+	static final String TIMESTAMP_FIELD_NAME = ",\"timestamp\":";
+	static final String DURATION_FIELD_NAME = ",\"duration\":";
+	static final String DEBUG_FIELD_NAME = ",\"debug\":true";
+	static final String SHARED_FIELD_NAME = ",\"shared\":true";
 
 	@Override
 	public int sizeInBytes(ReportSpan value) {
@@ -30,7 +30,7 @@ public class AgentV2SpanBaseWriter implements WriteBuffer.Writer<ReportSpan> {
 
 		// parentId
 		if (value.parentId() != null) {
-			sizeInBytes += SPAN_ID_FIELD_NAME.length() + 1;
+			sizeInBytes += PARENT_ID_FIELD_NAME.length() + 1;
 			sizeInBytes += value.parentId().length();
 		}
 
@@ -104,7 +104,7 @@ public class AgentV2SpanBaseWriter implements WriteBuffer.Writer<ReportSpan> {
 		// name
 		if (value.name() != null) {
 			b.writeAscii(NAME_FIELD_NAME);
-			b.writeAscii(value.name());
+			b.writeUtf8(JsonEscaper.jsonEscape(value.name()));
 			b.writeByte('\"');
 		}
 

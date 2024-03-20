@@ -15,7 +15,7 @@ import com.mawen.agent.plugin.api.middleware.RedirectProcessor;
  */
 public class CustomTagsSpanHandler extends SpanHandler {
 
-	private static final String TAG_INSTANCE = "";
+	private static final String TAG_INSTANCE = "i";
 
 	private final String instance;
 	private final Supplier<String> serviceName;

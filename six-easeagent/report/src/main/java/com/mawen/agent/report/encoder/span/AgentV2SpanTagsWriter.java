@@ -32,9 +32,7 @@ public class AgentV2SpanTagsWriter implements WriteBuffer.Writer<ReportSpan> {
 	@Override
 	public void write(ReportSpan value, WriteBuffer buffer) {
 		if (!value.tags().isEmpty()) {
-			buffer.writeAscii("""
-					,"tags":{
-					""");
+			buffer.writeAscii(",\"tags\":{");
 			var iter = value.tags().entrySet().iterator();
 			while (iter.hasNext()) {
 				var entry = iter.next();

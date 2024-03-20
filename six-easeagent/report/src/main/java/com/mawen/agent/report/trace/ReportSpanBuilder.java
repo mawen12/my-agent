@@ -97,7 +97,7 @@ public class ReportSpanBuilder extends ReportSpanImpl.Builder {
 
 	public static Endpoint endpoint(zipkin2.Endpoint endpoint) {
 		var e = new Endpoint();
-		e.setPort(endpoint.port());
+		e.setPort(endpoint.portAsInt());
 		e.setServiceName(endpoint.serviceName());
 		e.setIpV4(endpoint.ipv4());
 		e.setIpV6(endpoint.ipv6());

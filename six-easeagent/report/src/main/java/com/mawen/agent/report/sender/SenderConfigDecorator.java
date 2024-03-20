@@ -99,7 +99,7 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 		if (log.isDebugEnabled()) {
 			log.debug(new String(data.getData()));
 		}
-		return send(encodedData);
+		return send(data);
 	}
 
 	@Override

@@ -9,9 +9,7 @@ import zipkin2.internal.WriteBuffer;
  */
 public class AgentV2SpanLocalEndpointWriter extends AbstractAgentV2SpanEndpointWriter implements WriteBuffer.Writer<ReportSpan> {
 
-	static final String LOCAL_ENDPOINT_FIELD_NAME = """
-			,"localEndpoint":
-			""";
+	static final String LOCAL_ENDPOINT_FIELD_NAME = ",\"localEndpoint\":";
 
 	@Override
 	public int sizeInBytes(ReportSpan value) {

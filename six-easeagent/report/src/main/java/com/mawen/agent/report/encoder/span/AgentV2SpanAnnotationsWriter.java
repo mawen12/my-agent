@@ -19,7 +19,7 @@ public class AgentV2SpanAnnotationsWriter implements WriteBuffer.Writer<ReportSp
 		var sizeInBytes = 0;
 
 		sizeInBytes += TIMESTAMP_FIELD_NAME.length();
-		sizeInBytes += sizeInBytes + WriteBuffer.asciiSizeInBytes(timestamp);
+		sizeInBytes += WriteBuffer.asciiSizeInBytes(timestamp);
 		sizeInBytes += VALUE_FIELD_NAME.length() + 1;
 		sizeInBytes += JsonEscaper.jsonEscapedSizeInBytes(value);
 		if (endpointSizeInBytes != 0) {

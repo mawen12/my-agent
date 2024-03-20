@@ -151,7 +151,7 @@ public class PluginProcessor extends AbstractProcessor {
 			var className = utils.classNameOf(p);
 			pluginNames.put(className.canonicalName(), p);
 		}
-		writeToMetaInf(AgentPlugin.class,pluginNames.keySet());
+		writeToMetaInf(AgentPlugin.class, pluginNames.keySet());
 
 		return pluginNames;
 	}
@@ -162,7 +162,7 @@ public class PluginProcessor extends AbstractProcessor {
 		var points = new TreeSet<String>();
 		for (var type : interceptors) {
 			if (Objects.isNull(type.getAnnotation(AdviceTo.class))
-					&& Objects.isNull(type.getAnnotation(AdvicesTo.class))) {
+			    && Objects.isNull(type.getAnnotation(AdvicesTo.class))) {
 				continue;
 			}
 			var annotations = type.getAnnotationMirrors();
@@ -199,7 +199,8 @@ public class PluginProcessor extends AbstractProcessor {
 					String value;
 					if (av.getValue() == null) {
 						value = "default";
-					} else {
+					}
+					else {
 						value = av.getValue().toString();
 					}
 					to.put(key, value);

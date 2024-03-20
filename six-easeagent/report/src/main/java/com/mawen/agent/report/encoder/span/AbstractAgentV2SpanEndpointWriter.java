@@ -11,7 +11,7 @@ import zipkin2.internal.WriteBuffer;
  */
 public abstract class AbstractAgentV2SpanEndpointWriter implements WriteBuffer.Writer<ReportSpan> {
 
-	static final String SERVICE_NAME_FIELD_NAME = "\"service_name\":\"";
+	static final String SERVICE_NAME_FIELD_NAME = "\"serviceName\":\"";
 	static final String IPV4_FIELD_NAME = "\"ipv4\":\"";
 	static final String IPV6_FIELD_NAME = "\"ipv6\":\"";
 	static final String PORT_FIELD_NAME = "\"port\":";
@@ -23,6 +23,11 @@ public abstract class AbstractAgentV2SpanEndpointWriter implements WriteBuffer.W
 		var serviceName = value.serviceName();
 		if (serviceName == null && writeEmptyServiceName) {
 			serviceName = "";
+		}
+
+		if (serviceName != null) {
+			sizeInBytes += SERVICE_NAME_FIELD_NAME.length() + 1;
+			sizeInBytes += JsonEscaper.jsonEscapedSizeInBytes(serviceName);
 		}
 
 		// ipv4
@@ -71,6 +76,7 @@ public abstract class AbstractAgentV2SpanEndpointWriter implements WriteBuffer.W
 		if (serviceName == null && writeEmptyServiceName) {
 			serviceName = "";
 		}
+
 		if (serviceName != null) {
 			b.writeAscii(SERVICE_NAME_FIELD_NAME);
 			b.writeUtf8(JsonEscaper.jsonEscape(serviceName));
