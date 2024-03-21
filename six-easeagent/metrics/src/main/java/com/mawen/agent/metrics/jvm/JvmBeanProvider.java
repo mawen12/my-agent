@@ -9,9 +9,7 @@ import com.mawen.agent.plugin.bean.BeanProvider;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/5
  */
-public enum JvmBeanProvider implements BeanProvider, AgentInitializingBean {
-
-	INSTANCE;
+public class JvmBeanProvider implements BeanProvider, AgentInitializingBean {
 
 	public void jvmGcMetricV2() {
 		JVMGCMetricV2.getMetric();
