@@ -56,7 +56,7 @@ public abstract class AbstractAgentSpanWriterBaseTest {
 
 	@Test
 	public void shouldWriteCorrectly() {
-		assertEquals(bufferStr, expected);
+		assertEquals(expected, bufferStr);
 	}
 
 	public abstract WriteBuffer.Writer<ReportSpan> getWriter();

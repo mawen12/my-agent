@@ -28,19 +28,19 @@ public class AgentV2SpanRemoteEndpointWriterUnitTest extends AbstractAgentSpanWr
 						.build(),
 						"{}"},
 				{ReportSpanBuilder.newBuilder().traceId("0000000000000130").id("0000000000000120")
-						.localEndpoint(new Endpoint("abc", null, null, 0))
+						.remoteEndpoint(new Endpoint("abc", null, null, 0))
 						.build(),
 						"{,\"remoteEndpoint\":{\"serviceName\":\"abc\"}}"},
 				{ReportSpanBuilder.newBuilder().traceId("0000000000000130").id("0000000000000120")
-						.localEndpoint(new Endpoint("abc", "192.168.3.10", null, 0))
+						.remoteEndpoint(new Endpoint("abc", "192.168.3.10", null, 0))
 						.build(),
 						"{,\"remoteEndpoint\":{\"serviceName\":\"abc\",\"ipv4\":\"192.168.3.10\"}}"},
 				{ReportSpanBuilder.newBuilder().traceId("0000000000000130").id("0000000000000120")
-						.localEndpoint(new Endpoint("abc", "192.168.3.10", "2001:db8:3333:4444:5555:6666:7777:8888", 0))
+						.remoteEndpoint(new Endpoint("abc", "192.168.3.10", "2001:db8:3333:4444:5555:6666:7777:8888", 0))
 						.build(),
 						"{,\"remoteEndpoint\":{\"serviceName\":\"abc\",\"ipv4\":\"192.168.3.10\",\"ipv6\":\"2001:db8:3333:4444:5555:6666:7777:8888\"}}"},
 				{ReportSpanBuilder.newBuilder().traceId("0000000000000130").id("0000000000000120")
-						.localEndpoint(new Endpoint("abc", "192.168.3.10", "2001:db8:3333:4444:5555:6666:7777:8888", 1))
+						.remoteEndpoint(new Endpoint("abc", "192.168.3.10", "2001:db8:3333:4444:5555:6666:7777:8888", 1))
 						.build(),
 						"{,\"remoteEndpoint\":{\"serviceName\":\"abc\",\"ipv4\":\"192.168.3.10\",\"ipv6\":\"2001:db8:3333:4444:5555:6666:7777:8888\",\"port\":1}}"},
 		});
