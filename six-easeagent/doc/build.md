@@ -10,7 +10,7 @@ You need Jdk 17:
 
 ```shell
 $ cd my-agent
-$ mvn clean package -am -pl :build -Dmaven.test.skip
+$ mvn clean package -am -pl :build -Dmaven.test.skip -T 2
 ```
 
 Then you can find jar in path: `six-agent/build/target/agent-dep.jar`

@@ -2,7 +2,6 @@ package com.mawen.agent.core.plugin.transformer;
 
 import com.mawen.agent.plugin.field.DynamicFieldAccessor;
 import com.mawen.agent.plugin.field.NullObject;
-
 import net.bytebuddy.asm.Advice;
 
 /**

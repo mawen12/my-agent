@@ -16,7 +16,6 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
-import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
 import com.mawen.agent.metrics.impl.CounterImpl;
 import com.mawen.agent.metrics.impl.MeterImpl;
@@ -132,7 +131,7 @@ public class ConverterAdapter extends AbstractConverter {
 				.ifPresent(t -> {
 					final var snapshot = t.getSnapshot();
 					v.getValueFetcher().forEach((fieldName, fetcher) -> {
-						if (fetcher.getClazz().equals(Snapshot.class)) {
+						if (fetcher.getClazz().equals(com.mawen.agent.plugin.api.metric.Snapshot.class)) {
 							appendField(output, fieldName, fetcher, SnapshotImpl.build(snapshot));
 						}
 						else {

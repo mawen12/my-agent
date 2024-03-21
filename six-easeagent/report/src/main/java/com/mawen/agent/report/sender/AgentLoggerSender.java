@@ -58,13 +58,13 @@ public class AgentLoggerSender implements Sender {
 
 		@Override
 		public Void execute() throws IOException {
-			log.info("{}", new String(msg));
+			log.infoIfEnabled("{}", new String(msg));
 			return null;
 		}
 
 		@Override
 		public void enqueue(Callback<Void> cb) {
-			log.debug("{}", new String(msg));
+			log.debugIfEnabled("{}", new String(msg));
 		}
 	}
 }

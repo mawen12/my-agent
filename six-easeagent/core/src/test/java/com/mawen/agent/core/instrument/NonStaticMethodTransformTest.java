@@ -10,7 +10,6 @@ import com.mawen.agent.core.plugin.CommonInlineAdvice;
 import com.mawen.agent.core.plugin.PluginLoader;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.field.AgentDynamicFieldAccessor;
-import lombok.Getter;
 import net.bytebuddy.agent.ByteBuddyAgent;
 import net.bytebuddy.dynamic.ClassFileLocator;
 import net.bytebuddy.dynamic.loading.ByteArrayClassLoader;
@@ -101,7 +100,6 @@ public class NonStaticMethodTransformTest extends TransformTestBase {
 		}
 	}
 
-	@Getter
 	public static class Foo extends FooBase {
 		public String instanceT;
 		static String classInitString = FOO;
@@ -121,6 +119,14 @@ public class NonStaticMethodTransformTest extends TransformTestBase {
 
 		public int baz() {
 			return (int) System.currentTimeMillis();
+		}
+
+		public String getInstanceT() {
+			return instanceT;
+		}
+
+		public static String getClassInitString() {
+			return classInitString;
 		}
 	}
 }

@@ -16,6 +16,9 @@ public interface ReportSpan {
 	 */
 	String traceId();
 
+	/**
+	 * span parent id
+	 */
 	String parentId();
 
 	/**

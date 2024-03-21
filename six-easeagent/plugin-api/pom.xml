@@ -74,6 +74,7 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
                 <executions>
+                    <!-- comment when maven package -->
                     <execution>
                         <id>default-compile</id>
                         <configuration>

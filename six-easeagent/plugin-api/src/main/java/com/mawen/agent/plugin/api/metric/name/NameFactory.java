@@ -164,28 +164,28 @@ public interface NameFactory {
 		@Override
 		public Map<MetricSubType, MetricName> histogramNames(String key) {
 			final Map<MetricSubType, MetricName> results = new HashMap<>();
-			meterTypes.forEach(t -> results.put(t.getX(), new MetricName(t.getX(), key, MetricType.HistogramType, t.getY())));
+			histogramTypes.forEach(t -> results.put(t.getX(), new MetricName(t.getX(), key, MetricType.HistogramType, t.getY())));
 			return results;
 		}
 
 		@Override
 		public Map<MetricSubType, MetricName> counterNames(String key) {
 			final Map<MetricSubType, MetricName> results = new HashMap<>();
-			meterTypes.forEach(t -> results.put(t.getX(), new MetricName(t.getX(), key, MetricType.CounterType, t.getY())));
+			counterTypes.forEach(t -> results.put(t.getX(), new MetricName(t.getX(), key, MetricType.CounterType, t.getY())));
 			return results;
 		}
 
 		@Override
 		public Map<MetricSubType, MetricName> timerNames(String key) {
 			final Map<MetricSubType, MetricName> results = new HashMap<>();
-			meterTypes.forEach(t -> results.put(t.getX(), new MetricName(t.getX(), key, MetricType.TimerType, t.getY())));
+			timerTypes.forEach(t -> results.put(t.getX(), new MetricName(t.getX(), key, MetricType.TimerType, t.getY())));
 			return results;
 		}
 
 		@Override
 		public Map<MetricSubType, MetricName> gaugeNames(String key) {
 			final Map<MetricSubType, MetricName> results = new HashMap<>();
-			meterTypes.forEach(t -> results.put(t.getX(), new MetricName(t.getX(), key, MetricType.GaugeType, t.getY())));
+			gaugeTypes.forEach(t -> results.put(t.getX(), new MetricName(t.getX(), key, MetricType.GaugeType, t.getY())));
 			return results;
 		}
 
@@ -196,22 +196,22 @@ public interface NameFactory {
 
 		@Override
 		public String histogramName(String key, MetricSubType subType) {
-			return getName(key, MetricType.HistogramType, subType, meterTypes);
+			return getName(key, MetricType.HistogramType, subType, histogramTypes);
 		}
 
 		@Override
 		public String counterName(String key, MetricSubType subType) {
-			return getName(key, MetricType.CounterType, subType, meterTypes);
+			return getName(key, MetricType.CounterType, subType, counterTypes);
 		}
 
 		@Override
 		public String timerName(String key, MetricSubType subType) {
-			return getName(key, MetricType.TimerType, subType, meterTypes);
+			return getName(key, MetricType.TimerType, subType, timerTypes);
 		}
 
 		@Override
 		public String gaugeName(String key, MetricSubType subType) {
-			return getName(key, MetricType.GaugeType, subType, meterTypes);
+			return getName(key, MetricType.GaugeType, subType, gaugeTypes);
 		}
 
 		private String getName(String key, MetricType metricType, MetricSubType metricSubType, List<Tuple<MetricSubType, Map<MetricField, MetricValueFetcher>>> metricsTypes) {

@@ -28,17 +28,18 @@ import static com.mawen.agent.config.report.ReportConfigConst.*;
 public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeListener {
 	private static final Logger log = LoggerFactory.getLogger(SenderConfigDecorator.class);
 
-	protected Sender sender;
-	String prefix;
-	Config senderConfig;
-	Config packerConfig;
-	String encoderKey;
-	Encoder<?> packer;
+	private final Sender sender;
+	private final String prefix;
+	private final Config senderConfig;
+	private final Config packerConfig;
+	private final String encoderKey;
+	private Encoder<?> packer;
 
 	public SenderConfigDecorator(String prefix, Sender sender, Config config) {
 		this.sender = sender;
 		this.prefix = prefix;
 		this.encoderKey = getEncoderKey(prefix);
+
 		config.addChangeListener(this);
 		this.senderConfig = new Configs(extractSenderConfig(this.prefix, config));
 		this.packerConfig = new Configs(extractSenderConfig(encoderKey, config));
@@ -73,21 +74,6 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 	}
 
 	@Override
-	public <T> Encoder<T> getEncoder() {
-		return (Encoder<T>) this.packer;
-	}
-
-	@Override
-	public String getPrefix() {
-		return this.prefix;
-	}
-
-	@Override
-	public String name() {
-		return sender.name();
-	}
-
-	@Override
 	public void init(Config config, String prefix) {
 		this.packer = ReporterRegistry.getEncoder(config.getString(this.encoderKey));
 		this.packer.init(this.packerConfig);
@@ -97,9 +83,7 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 	@Override
 	public Call<Void> send(List<EncodedData> encodedData) {
 		EncodedData data = this.packer.encodeList(encodedData);
-		if (log.isDebugEnabled()) {
-			log.debug(new String(data.getData()));
-		}
+		log.debugIfEnabled(new String(data.getData()));
 		return send(data);
 	}
 
@@ -140,6 +124,22 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 		}
 		this.packer = ReporterRegistry.getEncoder(packerConfig.getString(this.encoderKey));
 		this.packer.init(packerConfig);
+	}
+
+
+	@Override
+	public <T> Encoder<T> getEncoder() {
+		return (Encoder<T>) this.packer;
+	}
+
+	@Override
+	public String getPrefix() {
+		return this.prefix;
+	}
+
+	@Override
+	public String name() {
+		return sender.name();
 	}
 
 	private static String getEncoderKey(String prefix) {

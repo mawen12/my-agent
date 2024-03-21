@@ -68,7 +68,7 @@ public abstract class AbstractConverter implements Converter {
 				result.add(output);
 			}
 			catch (Exception e) {
-				LOGGER.trace("convert key of " + key + " error: " + e.getMessage());
+				LOGGER.warn("convert key of " + key + " error: " + e.getMessage());
 			}
 		}
 		return result;

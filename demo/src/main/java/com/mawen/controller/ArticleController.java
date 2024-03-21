@@ -31,7 +31,10 @@ public class ArticleController {
 
     @GetMapping("/{id}")
     public Article findById(@PathVariable("id") String id) {
-        return articleService.findById(id);
+        long start = System.currentTimeMillis();
+        Article result = articleService.findById(id);
+        System.out.println("cost: " + (System.currentTimeMillis() - start) + "ms");
+        return result;
     }
 
     @GetMapping("/{pageNumber}/{pageSize}")

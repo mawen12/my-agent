@@ -11,6 +11,7 @@ import com.mawen.agent.plugin.api.trace.Span;
  * @since 2024/3/20
  */
 public class AsyncRequest implements Request {
+
 	private final Request request;
 	private final Map<String, String> header;
 
