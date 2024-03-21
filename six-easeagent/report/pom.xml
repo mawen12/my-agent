@@ -135,6 +135,7 @@
                             <shadedPattern>agent.okhttp3</shadedPattern>
                         </relocation>
                     </relocations>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
                 </configuration>
                 <executions>
                     <execution>
