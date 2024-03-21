@@ -17,7 +17,6 @@ import com.mawen.agent.plugin.api.metric.MetricSupplier;
 import com.mawen.agent.plugin.api.metric.Timer;
 import com.mawen.agent.plugin.bridge.NoOpMetrics;
 import com.mawen.agent.plugin.utils.NoNull;
-import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -26,7 +25,6 @@ import lombok.Getter;
 public class MetricRegistryImpl implements MetricRegistry {
 
 	private final ConcurrentMap<String, Metric> metricCache;
-	@Getter
 	private final com.codahale.metrics.MetricRegistry metricRegistry;
 
 	MetricBuilder<Counter> counters = new MetricBuilder<>() {
@@ -61,6 +59,10 @@ public class MetricRegistryImpl implements MetricRegistry {
 		this.metricRegistry = Objects.requireNonNull(metricRegistry, "metricRegistry must not be null");
 		this.metricCache = new ConcurrentHashMap<>();
 		this.metricRegistry.addListener(new MetricRemoveListener());
+	}
+
+	public com.codahale.metrics.MetricRegistry getMetricRegistry() {
+		return metricRegistry;
 	}
 
 	public static MetricRegistry build(com.codahale.metrics.MetricRegistry metricRegistry) {

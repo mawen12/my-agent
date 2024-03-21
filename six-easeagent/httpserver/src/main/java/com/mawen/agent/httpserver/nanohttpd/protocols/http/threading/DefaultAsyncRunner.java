@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.mawen.agent.httpserver.nanohttpd.protocols.http.ClientHandler;
-import lombok.Getter;
 
 /**
  * Default threading strategy for NanoHTTPD
@@ -19,9 +18,12 @@ import lombok.Getter;
  */
 public class DefaultAsyncRunner implements IAsyncRunner {
 
-	@Getter
 	protected long requestCount;
 	private final List<ClientHandler> running = Collections.synchronizedList(new ArrayList<>());
+
+	public long getRequestCount() {
+		return requestCount;
+	}
 
 	@Override
 	public void closeAll() {

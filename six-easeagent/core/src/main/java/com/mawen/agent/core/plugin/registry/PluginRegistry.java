@@ -18,8 +18,6 @@ import com.mawen.agent.plugin.Points;
 import com.mawen.agent.plugin.api.logging.Logger;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.interceptor.InterceptorProvider;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 import static com.mawen.agent.core.plugin.interceptor.ProviderChain.*;
 
@@ -27,7 +25,6 @@ import static com.mawen.agent.core.plugin.interceptor.ProviderChain.*;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PluginRegistry {
 	private static final Logger log = Agent.getLogger(PluginRegistry.class);
 
@@ -106,6 +103,9 @@ public class PluginRegistry {
 				.addProvider(new ProviderPluginDecorator(plugin, provider));
 
 		return index;
+	}
+
+	private PluginRegistry() {
 	}
 
 	static String getPointsClassName(String name) {

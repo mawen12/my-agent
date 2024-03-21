@@ -2,13 +2,11 @@ package com.mawen.agent.core.plugin;
 
 import java.util.Comparator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.mawen.agent.config.Configs;
 import com.mawen.agent.core.plugin.matcher.ClassTransformation;
 import com.mawen.agent.core.plugin.matcher.MethodTransformation;
 import com.mawen.agent.core.plugin.registry.PluginRegistry;
@@ -22,17 +20,17 @@ import com.mawen.agent.plugin.Ordered;
 import com.mawen.agent.plugin.Points;
 import com.mawen.agent.plugin.field.AgentDynamicFieldAccessor;
 import com.mawen.agent.plugin.interceptor.InterceptorProvider;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import net.bytebuddy.agent.builder.AgentBuilder;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PluginLoader {
 	private static final Logger log = LoggerFactory.getLogger(PluginLoader.class);
+
+	private PluginLoader() {
+	}
 
 	public static AgentBuilder load(AgentBuilder ab) {
 		log.info("Loading plugins >>>>>");

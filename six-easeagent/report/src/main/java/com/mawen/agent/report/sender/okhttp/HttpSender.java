@@ -8,6 +8,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.google.auto.service.AutoService;
+import com.mawen.agent.log4j2.Logger;
+import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.async.AgentThreadFactory;
 import com.mawen.agent.plugin.report.Call;
@@ -16,8 +18,6 @@ import com.mawen.agent.plugin.report.Sender;
 import com.mawen.agent.plugin.utils.NoNull;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 import com.mawen.agent.report.plugin.NoOpCall;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.Credentials;
 import okhttp3.Dispatcher;
 import okhttp3.HttpUrl;
@@ -41,9 +41,9 @@ import static com.mawen.agent.config.report.ReportConfigConst.*;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/4
  */
-@Slf4j
 @AutoService(Sender.class)
 public class HttpSender implements Sender{
+	private static final Logger log = LoggerFactory.getLogger(HttpSender.class);
 
 	public static final String SENDER_NAME = ZIPKIN_SENDER_NAME;
 
@@ -350,10 +350,15 @@ public class HttpSender implements Sender{
 		}
 	}
 
-	@AllArgsConstructor
+
 	static final class BufferRequestBody extends RequestBody {
 		final MediaType contentType;
 		final Buffer body;
+
+		public BufferRequestBody(MediaType contentType, Buffer body) {
+			this.contentType = contentType;
+			this.body = body;
+		}
 
 		@Override
 		public long contentLength() {

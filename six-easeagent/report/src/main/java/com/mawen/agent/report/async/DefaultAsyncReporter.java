@@ -22,7 +22,6 @@ import com.mawen.agent.report.async.zipkin.AgentByteBoundedQueue;
 import com.mawen.agent.report.encoder.PackedMessage;
 import com.mawen.agent.report.encoder.span.GlobalExtrasSupplier;
 import com.mawen.agent.report.sender.SenderWithEncoder;
-import lombok.AllArgsConstructor;
 import org.slf4j.LoggerFactory;
 import zipkin2.Call;
 
@@ -361,7 +360,6 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 		}
 	}
 
-	@AllArgsConstructor
 	public static final class Flusher<S> implements Runnable {
 
 		static final Logger logger = Logger.getLogger(Flusher.class.getName());
@@ -369,6 +367,10 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 		final DefaultAsyncReporter<S> reporter;
 		final AgentBufferNextMessage<S> consumer;
 
+		public Flusher(DefaultAsyncReporter<S> reporter, AgentBufferNextMessage<S> consumer) {
+			this.reporter = reporter;
+			this.consumer = consumer;
+		}
 
 		@Override
 		public void run() {

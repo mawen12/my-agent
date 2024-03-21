@@ -28,12 +28,11 @@ public class CommonInlineAdvice {
 			return null;
 		}
 
-		MethodInfo methodInfo = MethodInfo.builder()
-				.invoker(invoker)
-				.type(type)
-				.method(method)
-				.args(args)
-				.build();
+		MethodInfo methodInfo = new MethodInfo();
+		methodInfo.setInvoker(invoker);
+		methodInfo.setType(type);
+		methodInfo.setMethod(method);
+		methodInfo.setArgs(args);
 		Dispatcher.enter(index, methodInfo, context);
 		if (methodInfo.isChanged()) {
 			args = methodInfo.getArgs();

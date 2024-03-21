@@ -11,13 +11,11 @@ import com.mawen.agent.plugin.api.otlp.common.SemanticKey;
 import com.mawen.agent.plugin.bridge.Agent;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.semconv.resource.attributes.ResourceAttributes;
-import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/24
  */
-@Getter
 public class AgentResource extends Resource implements ConfigChangeListener {
 	static volatile AgentResource agentResource = null;
 
@@ -80,5 +78,17 @@ public class AgentResource extends Resource implements ConfigChangeListener {
 	@Override
 	public Attributes getAttributes() {
 		return this.resource.getAttributes();
+	}
+
+	public static AgentResource getAgentResource() {
+		return agentResource;
+	}
+
+	public String getService() {
+		return service;
+	}
+
+	public String getSystem() {
+		return system;
 	}
 }

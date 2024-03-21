@@ -20,7 +20,6 @@ import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.api.metric.name.MetricName;
 import io.prometheus.client.Collector;
 import io.prometheus.client.dropwizard.samplebuilder.SampleBuilder;
-import lombok.AllArgsConstructor;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -94,11 +93,15 @@ public class AgentPrometheusExports extends Collector implements Collector.Descr
 		return this.sampleBuilder.createSample(dropwizardName, "_" + valueType, Collections.emptyList(), Collections.emptyList(), value);
 	}
 
-	@AllArgsConstructor
 	abstract class Exports<T extends Metric> {
 
 		private final Collector.Type type;
 		private final Class<?> clazz;
+
+		public Exports(Type type, Class<?> clazz) {
+			this.type = type;
+			this.clazz = clazz;
+		}
 
 		public void addToMap(Map<String, MetricFamilySamples> map) {
 			var values = new HashMap<String, Object>();

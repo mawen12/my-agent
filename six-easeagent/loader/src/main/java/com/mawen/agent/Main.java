@@ -3,7 +3,6 @@ package com.mawen.agent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -11,15 +10,11 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
-import org.springframework.boot.loader.LaunchedURLClassLoader;
 import org.springframework.boot.loader.archive.JarFileArchive;
 
 /**

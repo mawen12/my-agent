@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import com.mawen.agent.plugin.report.Call;
 import com.mawen.agent.plugin.report.Callback;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,10 +11,13 @@ import org.jetbrains.annotations.NotNull;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/4
  */
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class HttpCall implements Call<Void>{
 
 	final okhttp3.Call call;
+
+	protected HttpCall(okhttp3.Call call) {
+		this.call = call;
+	}
 
 	@Override
 	public Void execute() throws IOException {

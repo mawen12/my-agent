@@ -1,6 +1,5 @@
 package com.mawen.agent.core.utils;
 
-import lombok.Data;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -20,7 +19,6 @@ public interface MutableObject<T> {
 
 	void setValue(T value);
 
-	@Data
 	class DefaultMutableObject<T> implements MutableObject<T> {
 		private T value;
 
@@ -31,6 +29,16 @@ public interface MutableObject<T> {
 		@Override
 		public String toString() {
 			return value == null ? "null" : value.toString();
+		}
+
+		@Override
+		public T getValue() {
+			return value;
+		}
+
+		@Override
+		public void setValue(T value) {
+			this.value = value;
 		}
 	}
 }

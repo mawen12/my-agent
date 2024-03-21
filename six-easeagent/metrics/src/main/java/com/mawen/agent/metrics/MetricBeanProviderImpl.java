@@ -11,13 +11,11 @@ import com.mawen.agent.plugin.api.metric.MetricRegistrySupplier;
 import com.mawen.agent.plugin.bean.BeanProvider;
 import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.report.AgentReportAware;
-import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/5
  */
-@Getter
 public class MetricBeanProviderImpl implements BeanProvider, AgentHttpHandlerProvider, ConfigAware,
 		MetricProvider, AgentReportAware {
 
@@ -41,5 +39,9 @@ public class MetricBeanProviderImpl implements BeanProvider, AgentHttpHandlerPro
 	@Override
 	public void setAgentReport(AgentReport report) {
 		this.metricProvider.setAgentReport(report);
+	}
+
+	public MetricProviderImpl getMetricProvider() {
+		return metricProvider;
 	}
 }

@@ -64,6 +64,7 @@
             <!-- see https://stackoverflow.com/questions/36248959/bad-service-configuration-file-or-exception-thrown-while-constructing-processor/36250332#36250332 -->
             <!-- Resolve IDEA build module plugin-api then throw java compile error -->
             <!-- Don't create src/main/resource/META-INF/services/javax.annotation.processing.Processor -->
+            <!-- if throw java compile error, should run maven clean -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

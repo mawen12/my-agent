@@ -9,14 +9,11 @@ import java.util.function.Consumer;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/4
  */
-@Getter
 public class JdkHttpServer {
 	public static final JdkHttpServer INSTANCE;
 
@@ -35,9 +32,7 @@ public class JdkHttpServer {
 	private final String url;
 	private AtomicReference<Headers> lastHeaders = new AtomicReference<>();
 	private AtomicReference<HttpExchange> lastHttpExchange = new AtomicReference<>();
-	@Setter
 	private Consumer<Headers> headersConsumer;
-	@Setter
 	private Consumer<HttpExchange> exchangeConsumer;
 
 	public JdkHttpServer(int port, HttpServer server, String path) {
@@ -75,17 +70,60 @@ public class JdkHttpServer {
 		os.close();
 	}
 
+	public int getPort() {
+		return port;
+	}
+
+	public HttpServer getServer() {
+		return server;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public AtomicReference<Headers> getLastHeaders() {
+		return lastHeaders;
+	}
+
+	public AtomicReference<HttpExchange> getLastHttpExchange() {
+		return lastHttpExchange;
+	}
+
+	public Consumer<Headers> getHeadersConsumer() {
+		return headersConsumer;
+	}
+
+	public Consumer<HttpExchange> getExchangeConsumer() {
+		return exchangeConsumer;
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}
 
+	public void setHeadersConsumer(Consumer<Headers> headersConsumer) {
+		this.headersConsumer = headersConsumer;
+	}
+
+	public void setExchangeConsumer(Consumer<HttpExchange> exchangeConsumer) {
+		this.exchangeConsumer = exchangeConsumer;
+	}
+
 	public static class Builder {
-		@Setter
 		private int tryPortNum = 4;
 		private int port = 0;
 		private String path;
 		private Consumer<Headers> headersConsumer;
 		private Consumer<HttpExchange> exchangeConsumer;
+
+		public void setTryPortNum(int tryPortNum) {
+			this.tryPortNum = tryPortNum;
+		}
 
 		public Builder setPort(int port) {
 			this.port = port;

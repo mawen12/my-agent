@@ -29,7 +29,6 @@ import com.mawen.agent.plugin.bridge.NoOpIPluginConfig;
 import com.mawen.agent.plugin.bridge.NoOpTracer;
 import com.mawen.agent.plugin.field.NullObject;
 import com.mawen.agent.plugin.utils.NoNull;
-import lombok.AllArgsConstructor;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -38,9 +37,7 @@ import lombok.AllArgsConstructor;
 public class SessionContext implements InitializeContext {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class.getName());
 
-	@lombok.Getter
 	private ITracing tracing = NoOpTracer.NO_OP_TRACING;
-	@lombok.Getter @lombok.Setter
 	private Supplier<InitializeContext> supplier;
 	private final Deque<IPluginConfig> configs = new ArrayDeque<>();
 	private final Deque<Object> retStack = new ArrayDeque<>();
@@ -48,6 +45,22 @@ public class SessionContext implements InitializeContext {
 	private final Map<Object, Object> context = new HashMap<>();
 	private final Map<Object, Integer> entered = new HashMap<>();
 	private boolean hasCleaner = false;
+
+	public ITracing getTracing() {
+		return tracing;
+	}
+
+	public void setTracing(ITracing tracing) {
+		this.tracing = tracing;
+	}
+
+	public void setSupplier(Supplier<InitializeContext> supplier) {
+		this.supplier = supplier;
+	}
+
+	public Supplier<InitializeContext> getSupplier() {
+		return supplier;
+	}
 
 	@Override
 	public boolean isNoop() {
@@ -322,11 +335,15 @@ public class SessionContext implements InitializeContext {
 		return new FieldCleaner(fieldArr);
 	}
 
-	@AllArgsConstructor
 	public class AsyncCleaner implements Cleaner {
 
 		private final Scope scope;
 		private final boolean clearContext;
+
+		public AsyncCleaner(Scope scope, boolean clearContext) {
+			this.scope = scope;
+			this.clearContext = clearContext;
+		}
 
 		@Override
 		public void close() {
@@ -346,10 +363,13 @@ public class SessionContext implements InitializeContext {
 		}
 	}
 
-	@AllArgsConstructor
 	private class FieldCleaner implements Cleaner {
 
 		private final List<String> fields;
+
+		public FieldCleaner(List<String> fields) {
+			this.fields = fields;
+		}
 
 		@Override
 		public void close() {

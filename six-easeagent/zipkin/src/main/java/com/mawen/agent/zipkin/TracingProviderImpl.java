@@ -5,7 +5,6 @@ import brave.propagation.ThreadLocalCurrentTraceContext;
 import brave.sampler.CountingSampler;
 import com.mawen.agent.config.AutoRefreshConfigItem;
 import com.mawen.agent.config.ConfigAware;
-import com.mawen.agent.config.Configs;
 import com.mawen.agent.plugin.annotation.Injection;
 import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.api.config.ConfigConst;

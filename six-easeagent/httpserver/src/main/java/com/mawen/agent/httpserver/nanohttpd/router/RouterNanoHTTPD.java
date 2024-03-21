@@ -22,8 +22,6 @@ import com.mawen.agent.httpserver.nanohttpd.protocols.http.NanoHTTPD;
 import com.mawen.agent.httpserver.nanohttpd.protocols.http.response.IStatus;
 import com.mawen.agent.httpserver.nanohttpd.protocols.http.response.Response;
 import com.mawen.agent.httpserver.nanohttpd.protocols.http.response.Status;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -387,7 +385,6 @@ public class RouterNanoHTTPD extends NanoHTTPD {
 		}
 	}
 
-	@Getter
 	public static class UriResource implements Comparable<UriResource> {
 
 		private static final Pattern PARAM_PATTERN = Pattern.compile("(?<=(^|/)):[a-zA-Z0-9_-]+(?=(/|$))");
@@ -396,7 +393,6 @@ public class RouterNanoHTTPD extends NanoHTTPD {
 
 		private final String uri;
 		private final Pattern uriPattern;
-		@Setter
 		private int priority;
 		private final Class<?> handler;
 		private final Object[] initParameter;
@@ -508,6 +504,34 @@ public class RouterNanoHTTPD extends NanoHTTPD {
 				matcher = PARAM_PATTERN.matcher(patternUri);
 			}
 			return Pattern.compile(patternUri);
+		}
+
+		public void setPriority(int priority) {
+			this.priority = priority;
+		}
+
+		public String getUri() {
+			return uri;
+		}
+
+		public Pattern getUriPattern() {
+			return uriPattern;
+		}
+
+		public int getPriority() {
+			return priority;
+		}
+
+		public Class<?> getHandler() {
+			return handler;
+		}
+
+		public Object[] getInitParameter() {
+			return initParameter;
+		}
+
+		public List<String> getUriParams() {
+			return uriParams;
 		}
 	}
 

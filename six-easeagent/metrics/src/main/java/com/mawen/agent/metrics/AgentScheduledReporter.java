@@ -29,8 +29,6 @@ import com.mawen.agent.plugin.report.Encoder;
 import com.mawen.agent.plugin.utils.NoNull;
 import com.mawen.agent.report.encoder.metric.MetricJsonEncoder;
 import com.mawen.agent.report.plugin.ReporterRegistry;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -38,8 +36,6 @@ import lombok.Setter;
  */
 public class AgentScheduledReporter extends ScheduledReporter {
 
-	@Getter
-	@Setter
 	private Converter converter;
 	private final Consumer<EncodedData> dataConsumer;
 	private final Supplier<Boolean> enabled;
@@ -85,6 +81,14 @@ public class AgentScheduledReporter extends ScheduledReporter {
 	@Override
 	protected String getRateUnit() {
 		return "events/" + super.getRateUnit();
+	}
+
+	public Converter getConverter() {
+		return converter;
+	}
+
+	public void setConverter(Converter converter) {
+		this.converter = converter;
 	}
 
 	public static class Builder {

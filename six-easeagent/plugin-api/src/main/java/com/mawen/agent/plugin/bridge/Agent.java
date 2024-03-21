@@ -23,7 +23,6 @@ import com.mawen.agent.plugin.api.metric.ServiceMetricSupplier;
 import com.mawen.agent.plugin.api.metric.name.NameFactory;
 import com.mawen.agent.plugin.api.metric.name.Tags;
 import com.mawen.agent.plugin.report.AgentReport;
-import lombok.Getter;
 
 /**
  * the bridge api will be initialized when agent startup
@@ -32,7 +31,6 @@ import lombok.Getter;
  * @since 2024/2/23
  */
 public final class Agent {
-	@Getter
 	public static AgentInfo agentInfo;
 	public static MetricRegistrySupplier metricRegistrySupplier = NoOpMetrics.NO_OP_METRIC_SUPPLIER;
 	public static IContextManager initializeContextSupplier = () -> NoOpContext.NO_OP_CONTEXT;
@@ -44,6 +42,10 @@ public final class Agent {
 	public static IDispatcher dispatcher = NoOpDispatcher.INSTANCE;
 
 	public static Supplier<URLClassLoader> agentClassLoader = () -> null;
+
+	public static AgentInfo getAgentInfo() {
+		return agentInfo;
+	}
 
 	public static URLClassLoader getAgentClassLoader() {
 		return agentClassLoader.get();

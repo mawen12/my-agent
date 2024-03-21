@@ -8,13 +8,11 @@ import java.util.TreeMap;
 
 import com.mawen.agent.config.report.ReportConfigAdapter;
 import com.mawen.agent.plugin.api.config.ConfigConst;
-import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/26
  */
-@Getter
 public class GlobalConfigs extends Configs implements ConfigManagerMXBean{
 
 	Configs originalConfigs;
@@ -96,5 +94,9 @@ public class GlobalConfigs extends Configs implements ConfigManagerMXBean{
 		catch (Exception e) {
 			return null;
 		}
+	}
+
+	public Configs getOriginalConfigs() {
+		return originalConfigs;
 	}
 }

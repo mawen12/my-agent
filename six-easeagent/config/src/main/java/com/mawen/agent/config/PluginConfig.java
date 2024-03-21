@@ -15,8 +15,6 @@ import com.mawen.agent.plugin.api.config.Const;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.api.config.PluginConfigChangeListener;
 import com.mawen.agent.plugin.utils.common.StringUtils;
-import lombok.Getter;
-import lombok.experimental.Accessors;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -26,14 +24,8 @@ public class PluginConfig implements IPluginConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PluginConfig.class);
 
 	private final Set<PluginConfigChangeListener> listeners;
-	@Accessors(fluent = true)
-	@Getter
 	private final String domain;
-	@Accessors(fluent = true)
-	@Getter
 	private final String namespace;
-	@Accessors(fluent = true)
-	@Getter
 	private final String id;
 	private final Map<String, String> global;
 	private final Map<String, String> cover;
@@ -165,6 +157,21 @@ public class PluginConfig implements IPluginConfig {
 		synchronized (listeners) {
 			listeners.add(listener);
 		}
+	}
+
+	@Override
+	public String domain() {
+		return this.domain;
+	}
+
+	@Override
+	public String namespace() {
+		return this.namespace;
+	}
+
+	@Override
+	public String id() {
+		return this.id;
 	}
 
 	public void foreachConfigChangeListener(Consumer<PluginConfigChangeListener> action) {

@@ -2,23 +2,17 @@ package com.mawen.agent.core.instrument;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.mawen.agent.core.Bootstrap;
 import com.mawen.agent.core.instrument.utils.AgentAttachmentRule;
 import com.mawen.agent.core.plugin.CommonInlineAdvice;
 import com.mawen.agent.core.plugin.PluginLoader;
-import com.mawen.agent.core.plugin.matcher.MethodTransformation;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.field.AgentDynamicFieldAccessor;
 import lombok.Getter;
-import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.agent.ByteBuddyAgent;
-import net.bytebuddy.agent.builder.AgentBuilder;
-import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.dynamic.ClassFileLocator;
-import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.dynamic.loading.ByteArrayClassLoader;
 import net.bytebuddy.dynamic.scaffold.TypeWriter;
 import net.bytebuddy.matcher.ElementMatchers;

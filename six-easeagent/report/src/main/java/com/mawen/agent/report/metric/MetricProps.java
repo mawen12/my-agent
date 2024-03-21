@@ -12,9 +12,7 @@ import com.mawen.agent.plugin.api.config.Const;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.utils.NoNull;
 import com.mawen.agent.plugin.utils.common.StringUtils;
-import com.mawen.agent.report.sender.AgentLoggerSender;
 import com.mawen.agent.report.sender.metric.MetricKafkaSender;
-import lombok.Getter;
 
 import static com.mawen.agent.config.report.ReportConfigConst.*;
 
@@ -46,7 +44,6 @@ public interface MetricProps {
 		return new Default(reportConfig, prefix);
 	}
 
-	@Getter
 	class Default implements MetricProps {
 
 		private volatile String senderName;
@@ -157,6 +154,48 @@ public interface MetricProps {
 			if (StringUtils.isEmpty(bootstrapServers) && this.senderName.equals(MetricKafkaSender.SENDER_NAME)) {
 				this.senderName = ReportConfigConst.CONSOLE_SENDER_NAME;
 			}
+		}
+
+		@Override
+		public String getSenderName() {
+			return senderName;
+		}
+
+		@Override
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		@Override
+		public String getTopic() {
+			return topic;
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public int getInterval() {
+			return interval;
+		}
+
+		public Config getConfig() {
+			return config;
+		}
+
+		@Override
+		public String getSenderPrefix() {
+			return senderPrefix;
+		}
+
+		public String getAsyncPrefix() {
+			return asyncPrefix;
+		}
+
+		public Map<String, String> getPluginConfigMap() {
+			return pluginConfigMap;
 		}
 	}
 }

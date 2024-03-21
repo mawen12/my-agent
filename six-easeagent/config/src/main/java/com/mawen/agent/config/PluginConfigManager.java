@@ -17,7 +17,6 @@ import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.api.config.IConfigFactory;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
-import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -27,7 +26,6 @@ public class PluginConfigManager implements IConfigFactory {
 	private static final Logger log = LoggerFactory.getLogger(PluginConfigManager.class);
 
 	private Runnable shutdownRunnable;
-	@Getter
 	private final Config config;
 	private final Map<Key, PluginSourceConfig> pluginSourceConfigs;
 	private final Map<Key, PluginConfig> pluginConfigs;
@@ -147,6 +145,11 @@ public class PluginConfigManager implements IConfigFactory {
 			}
 		}
 		return changeKeys;
+	}
+
+	@Override
+	public Config getConfig() {
+		return config;
 	}
 
 	public class Builder {

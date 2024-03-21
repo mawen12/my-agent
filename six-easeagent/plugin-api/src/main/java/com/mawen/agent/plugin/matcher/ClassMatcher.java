@@ -5,13 +5,11 @@ import com.mawen.agent.plugin.enums.ClassMatch;
 import com.mawen.agent.plugin.enums.Operator;
 import com.mawen.agent.plugin.matcher.operator.AndClassMatcher;
 import com.mawen.agent.plugin.matcher.operator.OrClassMatcher;
-import lombok.Data;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/1
  */
-@Data
 public class ClassMatcher implements IClassMatcher {
 
 	public static final int MODIFIER_MASK = Modifier.ACC_ABSTRACT | Modifier.ACC_INTERFACE
@@ -34,6 +32,22 @@ public class ClassMatcher implements IClassMatcher {
 
 	public static ClassMatcherBuilder builder() {
 		return new ClassMatcherBuilder();
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public ClassMatch getMatchType() {
+		return matchType;
+	}
+
+	public int getModifier() {
+		return modifier;
+	}
+
+	public int getNotModifier() {
+		return notModifier;
 	}
 
 	public static class ClassMatcherBuilder {

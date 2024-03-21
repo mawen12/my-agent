@@ -24,8 +24,6 @@ import java.util.zip.GZIPOutputStream;
 import com.mawen.agent.httpserver.nanohttpd.protocols.http.NanoHTTPD;
 import com.mawen.agent.httpserver.nanohttpd.protocols.http.content.ContentType;
 import com.mawen.agent.httpserver.nanohttpd.protocols.http.request.Method;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * HTTP response. Return one of these from serve().
@@ -33,8 +31,6 @@ import lombok.Setter;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/27
  */
-@Getter
-@Setter
 public class Response implements Closeable {
 
 	/**
@@ -184,6 +180,86 @@ public class Response implements Closeable {
 		catch (IOException e) {
 			NanoHTTPD.LOGGER.log(Level.SEVERE, "Could not send response to the client", e);
 		}
+	}
+
+	public IStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(IStatus status) {
+		this.status = status;
+	}
+
+	public String getMimeType() {
+		return mimeType;
+	}
+
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+
+	public InputStream getData() {
+		return data;
+	}
+
+	public void setData(InputStream data) {
+		this.data = data;
+	}
+
+	public long getContentLength() {
+		return contentLength;
+	}
+
+	public void setContentLength(long contentLength) {
+		this.contentLength = contentLength;
+	}
+
+	public Method getRequestMethod() {
+		return requestMethod;
+	}
+
+	public void setRequestMethod(Method requestMethod) {
+		this.requestMethod = requestMethod;
+	}
+
+	public boolean isChunkedTransfer() {
+		return chunkedTransfer;
+	}
+
+	public void setChunkedTransfer(boolean chunkedTransfer) {
+		this.chunkedTransfer = chunkedTransfer;
+	}
+
+	public boolean isKeepAlive() {
+		return keepAlive;
+	}
+
+	public void setKeepAlive(boolean keepAlive) {
+		this.keepAlive = keepAlive;
+	}
+
+	public List<String> getCookieHandlers() {
+		return cookieHandlers;
+	}
+
+	public void setCookieHandlers(List<String> cookieHandlers) {
+		this.cookieHandlers = cookieHandlers;
+	}
+
+	public GzipUsage getGzipUsage() {
+		return gzipUsage;
+	}
+
+	public void setGzipUsage(GzipUsage gzipUsage) {
+		this.gzipUsage = gzipUsage;
+	}
+
+	public Map<String, String> getLowerCaseHeaders() {
+		return lowerCaseHeaders;
+	}
+
+	public Map<String, String> getHeader() {
+		return header;
 	}
 
 	/**

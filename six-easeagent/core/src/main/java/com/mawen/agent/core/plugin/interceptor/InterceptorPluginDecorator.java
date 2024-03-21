@@ -1,7 +1,5 @@
 package com.mawen.agent.core.plugin.interceptor;
 
-import java.util.function.Supplier;
-
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.AgentPlugin;

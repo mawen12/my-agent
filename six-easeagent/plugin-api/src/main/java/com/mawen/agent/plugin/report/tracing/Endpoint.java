@@ -10,10 +10,43 @@ import java.util.Objects;
  * @since 2024/2/23
  */
 public class Endpoint {
+	/**
+	 * Lower-case label of this node in the service graph, such as "favstar". Leave absent it unknown.
+	 * This is a primary label for trace lookup and aggregation, so
+	 * it should be intuitive and consistent. Many use a name from service discovery.
+	 */
 	String serviceName;
+
+	/**
+	 * The text representation of the primary IPv4 address associated with this a connection.
+	 * Ex. 192.168.99.100 Absent if unknown.
+	 */
 	String ipV4;
+
+	/**
+	 * The text representation of the primary IPv6 address associated with this a connection.
+	 * Ex. 2001:db8::c001 Absent if unknown.
+	 *
+	 * @see #ipV4() for mapped addresses
+	 */
 	String ipV6;
+
+	/**
+	 * Port of the IP's socket or null, if not known
+	 *
+	 * @see InetSocketAddress#getPort()
+	 */
 	int port;
+
+	public Endpoint() {
+	}
+
+	public Endpoint(String serviceName, String ipV4, String ipV6, int port) {
+		this.serviceName = serviceName;
+		this.ipV4 = ipV4;
+		this.ipV6 = ipV6;
+		this.port = port;
+	}
 
 	public void setServiceName(String serviceName) {
 		this.serviceName = serviceName;
@@ -31,38 +64,21 @@ public class Endpoint {
 		this.port = port;
 	}
 
-	/**
-	 * Lower-case label of this node in the service graph, such as "favstar". Leave absent it unknown.
-	 * This is a primary label for trace lookup and aggregation, so
-	 * it should be intuitive and consistent. Many use a name from service discovery.
-	 */
 	public String serviceName() {
 		return serviceName;
 	}
 
-	/**
-	 * The text representation of the primary IPv4 address associated with this a connection.
-	 * Ex. 192.168.99.100 Absent if unknown.
-	 */
+
 	public String ipV4() {
 		return ipV4;
 	}
 
-	/**
-	 * The text representation of the primary IPv6 address associated with this a connection.
-	 * Ex. 2001:db8::c001 Absent if unknown.
-	 *
-	 * @see #ipV4() for mapped addresses
-	 */
+
 	public String ipV6() {
 		return ipV6;
 	}
 
-	/**
-	 * Port of the IP's socket or null, if not known
-	 *
-	 * @see InetSocketAddress#getPort()
-	 */
+
 	public int port() {
 		return port;
 	}

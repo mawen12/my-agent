@@ -14,7 +14,6 @@ import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.interceptor.AgentInterceptorChain;
 import com.mawen.agent.plugin.utils.common.WeakConcurrentMap;
-import lombok.Getter;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 
@@ -150,7 +149,6 @@ public class AdviceRegistry {
 
 	private AdviceRegistry(){}
 
-	@Getter
 	private static class PointcutsUniqueId {
 		static AtomicInteger index = new AtomicInteger(1);
 		ReentrantLock lock = new ReentrantLock();
@@ -182,6 +180,26 @@ public class AdviceRegistry {
 		public void tryRelease() {
 			int id = this.uniqueId;
 			index.compareAndSet(id, id - 1);
+		}
+
+		public static AtomicInteger getIndex() {
+			return index;
+		}
+
+		public ReentrantLock getLock() {
+			return lock;
+		}
+
+		public int getUniqueId() {
+			return uniqueId;
+		}
+
+		public Map<Integer, Integer> getPointcutIndexSet() {
+			return pointcutIndexSet;
+		}
+
+		public WeakConcurrentMap<ClassLoader, Boolean> getCache() {
+			return cache;
 		}
 	}
 }

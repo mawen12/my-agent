@@ -9,16 +9,18 @@ import com.mawen.agent.plugin.api.metric.name.Tags;
 import com.mawen.agent.plugin.api.middleware.Redirect;
 import com.mawen.agent.plugin.api.middleware.RedirectProcessor;
 import com.mawen.agent.plugin.enums.Order;
-import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/4
  */
-@Getter
 public abstract class ElasticsearchBaseMetricsInterceptor extends ElasticsearchBaseInterceptor {
 
 	protected ElasticsearchMetric elasticsearchMetric;
+
+	public ElasticsearchMetric getElasticsearchMetric() {
+		return elasticsearchMetric;
+	}
 
 	@Override
 	public void init(IPluginConfig config, String className, String methodName, String methodDescriptor) {

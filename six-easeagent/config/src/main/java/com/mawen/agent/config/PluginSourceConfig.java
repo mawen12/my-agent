@@ -4,20 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import lombok.Getter;
-
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/26
  */
 public class PluginSourceConfig {
-	@Getter
 	private final String domain;
-	@Getter
 	private final String namespace;
-	@Getter
 	private final String id;
-	@Getter
 	private final Map<String, String> source;
 	private final Map<PluginProperty, String> properties;
 
@@ -51,5 +45,21 @@ public class PluginSourceConfig {
 			result.put(entry.getKey().property(), entry.getValue());
 		}
 		return result;
+	}
+
+	public String getDomain() {
+		return domain;
+	}
+
+	public String getNamespace() {
+		return namespace;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public Map<String, String> getSource() {
+		return source;
 	}
 }

@@ -1,7 +1,5 @@
 package com.mawen.agent.httpserver.nanohttpd.protocols.http.response;
 
-import lombok.Getter;
-
 /**
  * Some HTTP response status codes
  *
@@ -56,7 +54,6 @@ public enum Status implements IStatus {
 	UNSUPPORTED_HTTP_VERSION(505, "HTTP Version Not Supported"),
 	;
 
-	@Getter
 	private final int requestStatus;
 	private final String description;
 
@@ -76,5 +73,10 @@ public enum Status implements IStatus {
 
 	public String getDescription() {
 		return "" + this.requestStatus + " " + this.description;
+	}
+
+	@Override
+	public int getRequestStatus() {
+		return requestStatus;
 	}
 }

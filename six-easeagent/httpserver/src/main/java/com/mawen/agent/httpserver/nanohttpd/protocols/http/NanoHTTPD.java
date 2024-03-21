@@ -35,15 +35,11 @@ import com.mawen.agent.httpserver.nanohttpd.protocols.http.threading.IAsyncRunne
 import com.mawen.agent.httpserver.nanohttpd.util.IFactory;
 import com.mawen.agent.httpserver.nanohttpd.util.IFactoryThrowing;
 import com.mawen.agent.httpserver.nanohttpd.util.IHandler;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/27
  */
-@Setter
-@Getter
 public class NanoHTTPD {
 	/**
 	 * logger to log to.
@@ -407,7 +403,78 @@ public class NanoHTTPD {
 		}
 	}
 
-	@Getter
+	public static Map<String, String> getMimeTypes() {
+		return MIME_TYPES;
+	}
+
+	public static void setMimeTypes(Map<String, String> mimeTypes) {
+		MIME_TYPES = mimeTypes;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public int getMyPort() {
+		return myPort;
+	}
+
+	public ServerSocket getMyServerSocket() {
+		return myServerSocket;
+	}
+
+	public void setMyServerSocket(ServerSocket myServerSocket) {
+		this.myServerSocket = myServerSocket;
+	}
+
+	public IFactoryThrowing<ServerSocket, IOException> getServerSocketFactory() {
+		return serverSocketFactory;
+	}
+
+	public void setServerSocketFactory(IFactoryThrowing<ServerSocket, IOException> serverSocketFactory) {
+		this.serverSocketFactory = serverSocketFactory;
+	}
+
+	public Thread getMyThread() {
+		return myThread;
+	}
+
+	public void setMyThread(Thread myThread) {
+		this.myThread = myThread;
+	}
+
+	public IHandler<IHTTPSession, Response> getHttpHandler() {
+		return httpHandler;
+	}
+
+	public void setHttpHandler(IHandler<IHTTPSession, Response> httpHandler) {
+		this.httpHandler = httpHandler;
+	}
+
+	public List<IHandler<IHTTPSession, Response>> getInterceptors() {
+		return interceptors;
+	}
+
+	public void setInterceptors(List<IHandler<IHTTPSession, Response>> interceptors) {
+		this.interceptors = interceptors;
+	}
+
+	public IAsyncRunner getAsyncRunner() {
+		return asyncRunner;
+	}
+
+	public void setAsyncRunner(IAsyncRunner asyncRunner) {
+		this.asyncRunner = asyncRunner;
+	}
+
+	public IFactory<ITempFileManager> getTempFileManagerFactory() {
+		return tempFileManagerFactory;
+	}
+
+	public void setTempFileManagerFactory(IFactory<ITempFileManager> tempFileManagerFactory) {
+		this.tempFileManagerFactory = tempFileManagerFactory;
+	}
+
 	public static final class ResponseException extends Exception {
 		private static final long serialVersionUID = -1688629409805817325L;
 
@@ -421,6 +488,10 @@ public class NanoHTTPD {
 		public ResponseException(Status status, String message, Throwable cause) {
 			super(message, cause);
 			this.status = status;
+		}
+
+		public Status getStatus() {
+			return status;
 		}
 	}
 }

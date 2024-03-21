@@ -6,12 +6,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.asm.AsmVisitorWrapper;
@@ -31,7 +25,6 @@ import net.bytebuddy.utility.JavaModule;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 
 	private final AgentAdvice.WithCustomMapping advice;
@@ -42,21 +35,30 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 	private final AgentBuilder.LocationStrategy locationStrategy;
 	private final List<Entry> entries;
 
+	public AgentForAdvice(AgentAdvice.WithCustomMapping advice, Advice.ExceptionHandler exceptionHandler, Assigner assigner, ClassFileLocator classFileLocator, AgentBuilder.PoolStrategy poolStrategy, AgentBuilder.LocationStrategy locationStrategy, List<Entry> entries) {
+		this.advice = advice;
+		this.exceptionHandler = exceptionHandler;
+		this.assigner = assigner;
+		this.classFileLocator = classFileLocator;
+		this.poolStrategy = poolStrategy;
+		this.locationStrategy = locationStrategy;
+		this.entries = entries;
+	}
+
 	public AgentForAdvice() {
 		this(new AgentAdvice.WithCustomMapping());
 	}
 
 	public AgentForAdvice(AgentAdvice.WithCustomMapping advice) {
-		this(
-				advice,
+		this(advice,
 				Advice.ExceptionHandler.Default.SUPPRESSING,
 				Assigner.DEFAULT,
 				ClassFileLocator.NoOp.INSTANCE,
 				AgentBuilder.PoolStrategy.Default.FAST,
 				AgentBuilder.LocationStrategy.ForClassLoader.STRONG,
-				List.of()
-		);
+				List.of());
 	}
+
 
 	@Override
 	public AgentForAdvice include(ClassLoader... classLoader) {
@@ -96,7 +98,7 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 				classFileLocator,
 				poolStrategy,
 				locationStrategy,
-				CompoundList.of(entries, ForUnifiedAdvice.builder().name(name).matcher(matcher).build()));
+				CompoundList.of(entries, new ForUnifiedAdvice(matcher, name)));
 	}
 
 	@Override
@@ -116,24 +118,37 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 		return builder.visit(asmVisitorWrapper);
 	}
 
-	@Getter
-	@SuperBuilder
 	@HashCodeAndEqualsPlugin.Enhance
 	protected abstract static class Entry {
 		private final LatentMatcher<? super MethodDescription> matcher;
 
+		public Entry(LatentMatcher<? super MethodDescription> matcher) {
+			this.matcher = matcher;
+		}
+
 		protected abstract AgentAdvice resolve(AgentAdvice.WithCustomMapping advice, TypePool typePool, ClassFileLocator classFileLocator);
+
+		public LatentMatcher<? super MethodDescription> getMatcher() {
+			return matcher;
+		}
 	}
 
-	@Getter
-	@SuperBuilder
 	@HashCodeAndEqualsPlugin.Enhance
 	protected static class ForUnifiedAdvice extends Entry {
 		protected final String name;
 
+		public ForUnifiedAdvice(LatentMatcher<? super MethodDescription> matcher, String name) {
+			super(matcher);
+			this.name = name;
+		}
+
 		@Override
 		protected AgentAdvice resolve(AgentAdvice.WithCustomMapping advice, TypePool typePool, ClassFileLocator classFileLocator) {
 			return advice.to(typePool.describe(name).resolve(), classFileLocator);
+		}
+
+		public String getName() {
+			return name;
 		}
 	}
 }

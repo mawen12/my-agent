@@ -1,7 +1,6 @@
 package com.mawen.agent.plugin.bean;
 
 import com.mawen.agent.plugin.Ordered;
-import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -13,7 +12,6 @@ public interface BeanProvider extends Ordered {
 		return BeanOrder.HIGH.getOrder();
 	}
 
-	@Getter
 	enum BeanOrder {
 		INIT(0, "init"),
 		HIGH(20, "high"),
@@ -27,6 +25,10 @@ public interface BeanProvider extends Ordered {
 		BeanOrder(int order, String name) {
 			this.order = order;
 			this.name = name;
+		}
+
+		public int getOrder() {
+			return order;
 		}
 	}
 }

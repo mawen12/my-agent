@@ -4,7 +4,6 @@ import java.util.Set;
 
 import com.mawen.agent.plugin.Ordered;
 import com.mawen.agent.plugin.utils.NoNull;
-import lombok.Getter;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 
@@ -14,7 +13,6 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-@Getter
 public class ClassTransformation implements Ordered {
 
 	private int order;
@@ -34,6 +32,26 @@ public class ClassTransformation implements Ordered {
 	@Override
 	public int order() {
 		return order;
+	}
+
+	public int getOrder() {
+		return order;
+	}
+
+	public ElementMatcher.Junction<TypeDescription> getClassMatcher() {
+		return classMatcher;
+	}
+
+	public ElementMatcher<ClassLoader> getClassLoaderMatcher() {
+		return classLoaderMatcher;
+	}
+
+	public Set<MethodTransformation> getMethodTransformations() {
+		return methodTransformations;
+	}
+
+	public boolean isHasDynamicField() {
+		return hasDynamicField;
 	}
 
 	public static Builder builder() {

@@ -14,7 +14,6 @@ import com.mawen.agent.plugin.api.metric.name.MetricName;
 import com.mawen.agent.plugin.api.metric.name.Tags;
 import io.prometheus.client.Collector;
 import io.prometheus.client.dropwizard.samplebuilder.DefaultSampleBuilder;
-import lombok.AllArgsConstructor;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -38,10 +37,14 @@ public class MetricRegistryService {
 		return metricRegistry;
 	}
 
-	@AllArgsConstructor
 	static class AgentSampleBuilder extends DefaultSampleBuilder {
 		private final Supplier<Map<String, Object>> additionalAttributes;
 		private final Tags tags;
+
+		public AgentSampleBuilder(Supplier<Map<String, Object>> additionalAttributes, Tags tags) {
+			this.additionalAttributes = additionalAttributes;
+			this.tags = tags;
+		}
 
 		@Override
 		public Collector.MetricFamilySamples.Sample createSample(String dropwizardName, String nameSuffix, List<String> additionalLabelNames, List<String> additionalLabelValues, double value) {

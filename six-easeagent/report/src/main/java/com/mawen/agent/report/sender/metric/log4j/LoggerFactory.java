@@ -1,6 +1,5 @@
 package com.mawen.agent.report.sender.metric.log4j;
 
-import lombok.Getter;
 import org.apache.logging.log4j.core.LoggerContext;
 
 /**
@@ -11,6 +10,9 @@ public class LoggerFactory {
 
 	private LoggerFactory(){}
 
-	@Getter
 	private static final LoggerContext loggerContext = new LoggerContext("ROOT");
+
+	public static final LoggerContext getLoggerContext() {
+		return loggerContext;
+	}
 }

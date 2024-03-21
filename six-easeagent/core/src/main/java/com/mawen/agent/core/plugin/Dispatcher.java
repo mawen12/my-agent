@@ -7,14 +7,11 @@ import com.mawen.agent.plugin.AppendBootstrapLoader;
 import com.mawen.agent.plugin.api.InitializeContext;
 import com.mawen.agent.plugin.interceptor.AgentInterceptorChain;
 import com.mawen.agent.plugin.interceptor.MethodInfo;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AutoService(AppendBootstrapLoader.class)
 public final class Dispatcher implements AppendBootstrapLoader {
 
@@ -44,5 +41,8 @@ public final class Dispatcher implements AppendBootstrapLoader {
 
 	public static boolean updateChain(int index, AgentInterceptorChain chain) {
 		return chains.replace(index, chain) != null;
+	}
+
+	private Dispatcher() {
 	}
 }

@@ -1,5 +1,6 @@
 package com.mawen.agent.plugin.elasticsearch.interceptor;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import com.mawen.agent.plugin.api.Context;
@@ -8,7 +9,6 @@ import com.mawen.agent.plugin.api.middleware.Type;
 import com.mawen.agent.plugin.api.trace.Span;
 import com.mawen.agent.plugin.interceptor.MethodInfo;
 import com.mawen.agent.plugin.utils.common.StringUtils;
-import lombok.SneakyThrows;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
@@ -22,23 +22,28 @@ public class ElasticsearchCtxUtils {
 	private static final String SPAN = ElasticsearchCtxUtils.class.getName() + "-Span";
 	public static final String REQUEST = ElasticsearchCtxUtils.class.getName() + "-Request";
 
-	@SneakyThrows
+
 	public static void initSpan(MethodInfo methodInfo, Context context) {
-		var request = (Request) methodInfo.getArgs()[0];
-		var entity = request.getEntity();
-		var span = context.nextSpan();
-		span.kind(Span.Kind.CLIENT);
-		span.remoteServiceName("elasticsearch");
-		span.tag(MiddlewareConstants.TYPE_TAG_NAME, Type.ELASTICSEARCH.getRemoteType());
-		span.tag("es.index", getIndex(request.getEndpoint()));
-		span.tag("es.operation", request.getMethod() + " " + request.getEndpoint());
-		if (entity != null) {
-			String body = EntityUtils.toString(entity, StandardCharsets.UTF_8);
-			span.tag("es.body", body);
+		try {
+			var request = (Request) methodInfo.getArgs()[0];
+			var entity = request.getEntity();
+			var span = context.nextSpan();
+			span.kind(Span.Kind.CLIENT);
+			span.remoteServiceName("elasticsearch");
+			span.tag(MiddlewareConstants.TYPE_TAG_NAME, Type.ELASTICSEARCH.getRemoteType());
+			span.tag("es.index", getIndex(request.getEndpoint()));
+			span.tag("es.operation", request.getMethod() + " " + request.getEndpoint());
+			if (entity != null) {
+				String body = EntityUtils.toString(entity, StandardCharsets.UTF_8);
+				span.tag("es.body", body);
+			}
+			span.start();
+			context.put(SPAN, span);
+			context.put(REQUEST, request);
 		}
-		span.start();
-		context.put(SPAN, span);
-		context.put(REQUEST, request);
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static String getIndex(String endpoint) {

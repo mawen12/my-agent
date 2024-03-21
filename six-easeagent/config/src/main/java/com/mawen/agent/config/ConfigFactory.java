@@ -11,14 +11,11 @@ import com.mawen.agent.plugin.utils.ImmutableMap;
 import com.mawen.agent.plugin.utils.SystemEnv;
 import com.mawen.agent.plugin.utils.common.JsonUtil;
 import com.mawen.agent.plugin.utils.common.StringUtils;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/26
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ConfigFactory {
 	private static final Logger log = LoggerFactory.getLogger(ConfigFactory.class);
 
@@ -50,6 +47,9 @@ public class ConfigFactory {
 					entry.getValue()
 			);
 		}
+	}
+
+	private ConfigFactory() {
 	}
 
 	/**

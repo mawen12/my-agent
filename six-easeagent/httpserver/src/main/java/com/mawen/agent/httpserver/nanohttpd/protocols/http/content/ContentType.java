@@ -3,13 +3,10 @@ package com.mawen.agent.httpserver.nanohttpd.protocols.http.content;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.Getter;
-
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/27
  */
-@Getter
 public class ContentType {
 
 	private static final String ASCII_ENCODING = "US-ASCII";
@@ -62,4 +59,15 @@ public class ContentType {
 		return matcher.find() ? matcher.group(group) : defaultValue;
 	}
 
+	public String getContentTypeHeader() {
+		return contentTypeHeader;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public String getBoundary() {
+		return boundary;
+	}
 }

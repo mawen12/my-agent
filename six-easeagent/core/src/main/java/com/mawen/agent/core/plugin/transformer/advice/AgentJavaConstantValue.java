@@ -1,6 +1,5 @@
 package com.mawen.agent.core.plugin.transformer.advice;
 
-import lombok.Getter;
 import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.bytecode.constant.JavaConstantValue;
 import net.bytebuddy.jar.asm.MethodVisitor;
@@ -9,7 +8,6 @@ import net.bytebuddy.jar.asm.MethodVisitor;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-@Getter
 public class AgentJavaConstantValue extends JavaConstantValue {
 
 	private final MethodIdentityJavaConstant constant;
@@ -26,5 +24,13 @@ public class AgentJavaConstantValue extends JavaConstantValue {
 		var index = (Integer) constant.accept(Visitor.INSTANCE);
 		methodVisitor.visitLdcInsn(index);
 		return constant.getTypeDescription().getStackSize().toIncreasingSize();
+	}
+
+	public MethodIdentityJavaConstant getConstant() {
+		return constant;
+	}
+
+	public int getPointcutIndex() {
+		return pointcutIndex;
 	}
 }

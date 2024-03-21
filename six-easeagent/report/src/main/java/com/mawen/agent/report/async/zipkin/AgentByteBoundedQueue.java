@@ -5,8 +5,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 
-import lombok.Data;
-
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/2
@@ -98,10 +96,22 @@ public class AgentByteBoundedQueue<S> implements WithSizeConsumer<S> {
 		return drainedCount;
 	}
 
-	@Data
 	private static class DataWrapper<S> {
 
 		private final S element;
 		private final int sizeInBytes;
+
+		public DataWrapper(S element, int sizeInBytes) {
+			this.element = element;
+			this.sizeInBytes = sizeInBytes;
+		}
+
+		public S getElement() {
+			return element;
+		}
+
+		public int getSizeInBytes() {
+			return sizeInBytes;
+		}
 	}
 }

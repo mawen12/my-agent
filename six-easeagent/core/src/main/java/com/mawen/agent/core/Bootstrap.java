@@ -39,8 +39,6 @@ import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 import com.mawen.agent.report.AgentReportAware;
 import com.mawen.agent.report.DefaultAgentReport;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.dynamic.ClassFileLocator;
 import net.bytebuddy.dynamic.loading.ClassInjector;
@@ -51,7 +49,6 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/5
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Bootstrap {
 	private static final Logger log = LoggerFactory.getLogger(Bootstrap.class);
 
@@ -61,6 +58,9 @@ public class Bootstrap {
 	private static ContextManager contextManager;
 
 	private static AgentBuilder builder;
+
+	private Bootstrap() {
+	}
 
 	public static void start(String args, Instrumentation inst, String javaAgentJarPath) throws IOException {
 		var begin = System.currentTimeMillis();

@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.mawen.agent.config.Configs;
+import com.mawen.agent.log4j2.Logger;
+import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.api.config.ChangeItem;
 import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.api.config.ConfigChangeListener;
@@ -15,7 +17,6 @@ import com.mawen.agent.plugin.report.EncodedData;
 import com.mawen.agent.plugin.report.Encoder;
 import com.mawen.agent.plugin.report.Sender;
 import com.mawen.agent.report.plugin.ReporterRegistry;
-import lombok.extern.slf4j.Slf4j;
 
 import static com.mawen.agent.config.ConfigUtils.*;
 import static com.mawen.agent.config.report.ReportConfigConst.*;
@@ -24,8 +25,8 @@ import static com.mawen.agent.config.report.ReportConfigConst.*;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/4
  */
-@Slf4j
 public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeListener {
+	private static final Logger log = LoggerFactory.getLogger(SenderConfigDecorator.class);
 
 	protected Sender sender;
 	String prefix;

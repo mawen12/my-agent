@@ -6,8 +6,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.logging.Level;
 
-import lombok.Getter;
-
 /**
  * The runnable that will be used for the main listening thread.
  *
@@ -18,9 +16,7 @@ public class ServerRunnable implements Runnable {
 
 	private NanoHTTPD httpd;
 	private final int timeout;
-	@Getter
 	private IOException bindException;
-	@Getter
 	private boolean hasBinded = false;
 
 	public ServerRunnable(NanoHTTPD httpd, int timeout) {
@@ -54,6 +50,14 @@ public class ServerRunnable implements Runnable {
 	}
 
 	public boolean hasBinded() {
+		return hasBinded;
+	}
+
+	public IOException getBindException() {
+		return bindException;
+	}
+
+	public boolean isHasBinded() {
 		return hasBinded;
 	}
 }

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import lombok.Getter;
+
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -19,7 +19,6 @@ import org.yaml.snakeyaml.Yaml;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/25
  */
-@Getter
 public class YamlReader {
 	private static final DumperOptions DUMPER_OPTIONS;
 
@@ -101,5 +100,9 @@ public class YamlReader {
 			resultMap.put(String.join(".", keyStack),String.valueOf(v));
 			keyStack.removeLast();
 		});
+	}
+
+	public Map<String, Object> getYaml() {
+		return yaml;
 	}
 }

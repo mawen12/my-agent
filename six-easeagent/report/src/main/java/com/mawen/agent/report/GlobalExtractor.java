@@ -28,7 +28,7 @@ public class GlobalExtractor implements GlobalExtrasSupplier {
 		return instance;
 	}
 
-	private GlobalExtractor(Config configs) {
+	public GlobalExtractor(Config configs) {
 		serviceName = new AutoRefreshConfigItem<>(configs, ConfigConst.SERVICE_NAME, Config::getString);
 		systemName = new AutoRefreshConfigItem<>(configs, ConfigConst.SYSTEM_NAME, Config::getString);
 	}

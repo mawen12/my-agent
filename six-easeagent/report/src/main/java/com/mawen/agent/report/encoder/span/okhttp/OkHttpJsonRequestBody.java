@@ -3,7 +3,6 @@ package com.mawen.agent.report.encoder.span.okhttp;
 import java.io.IOException;
 
 import com.mawen.agent.plugin.report.EncodedData;
-import lombok.Getter;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okio.BufferedSink;
@@ -18,7 +17,6 @@ public class OkHttpJsonRequestBody extends RequestBody implements EncodedData {
 	static final MediaType CONTENT_TYPE = MediaType.parse("application/json");
 
 	private final byte[] data;
-	@Getter
 	private final int contentLength;
 
 	public OkHttpJsonRequestBody(byte[] data) {
@@ -45,5 +43,9 @@ public class OkHttpJsonRequestBody extends RequestBody implements EncodedData {
 	@Override
 	public void writeTo(@NotNull BufferedSink sink) throws IOException {
 		sink.write(data);
+	}
+
+	public int getContentLength() {
+		return contentLength;
 	}
 }

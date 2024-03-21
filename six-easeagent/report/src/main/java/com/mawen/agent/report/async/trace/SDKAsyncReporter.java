@@ -22,8 +22,6 @@ import com.mawen.agent.report.encoder.PackedMessage;
 import com.mawen.agent.report.encoder.span.GlobalExtrasSupplier;
 import com.mawen.agent.report.sender.SenderWithEncoder;
 import com.mawen.agent.report.util.SpanUtils;
-import lombok.Getter;
-import lombok.Setter;
 import zipkin2.Call;
 import zipkin2.CheckResult;
 import zipkin2.reporter.AsyncReporter;
@@ -33,7 +31,6 @@ import zipkin2.reporter.ReporterMetrics;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/27
  */
-@Getter
 public class SDKAsyncReporter<S> extends AsyncReporter<S> {
 	private static final Logger logger = Logger.getLogger(SDKAsyncReporter.class.getName());
 
@@ -44,17 +41,17 @@ public class SDKAsyncReporter<S> extends AsyncReporter<S> {
 	Encoder<S> encoder;
 	AgentByteBoundedQueue<S> pending;
 	final int messageMaxBytes;
-	@Setter long messageTimeoutNanos;
+	long messageTimeoutNanos;
 	final long closeTimeoutNanos;
 	final CountDownLatch close;
 	final ReporterMetrics metrics;
-	@Setter AsyncProps traceProperties;
+	AsyncProps traceProperties;
 
-	@Setter ThreadFactory threadFactory;
+	ThreadFactory threadFactory;
 
 	private boolean shouldWarnException = true;
 
-	@Setter List<Thread> flushThreads;
+	List<Thread> flushThreads;
 
 	SDKAsyncReporter(Builder builder, Encoder<S> encoder, AsyncProps traceProperties) {
 		this.pending = new AgentByteBoundedQueue<>(builder.queuedMaxItems, builder.queuedMaxBytes);
@@ -230,6 +227,86 @@ public class SDKAsyncReporter<S> extends AsyncReporter<S> {
 		thread.setName("TempAsyncReporter{" + this.sender + "}");
 		thread.setDaemon(true);
 		thread.start();
+	}
+
+	public AtomicBoolean getClosed() {
+		return closed;
+	}
+
+	public SenderWithEncoder getSender() {
+		return sender;
+	}
+
+	public Encoder<S> getEncoder() {
+		return encoder;
+	}
+
+	public AgentByteBoundedQueue<S> getPending() {
+		return pending;
+	}
+
+	public int getMessageMaxBytes() {
+		return messageMaxBytes;
+	}
+
+	public long getMessageTimeoutNanos() {
+		return messageTimeoutNanos;
+	}
+
+	public long getCloseTimeoutNanos() {
+		return closeTimeoutNanos;
+	}
+
+	public CountDownLatch getClose() {
+		return close;
+	}
+
+	public ReporterMetrics getMetrics() {
+		return metrics;
+	}
+
+	public AsyncProps getTraceProperties() {
+		return traceProperties;
+	}
+
+	public ThreadFactory getThreadFactory() {
+		return threadFactory;
+	}
+
+	public boolean isShouldWarnException() {
+		return shouldWarnException;
+	}
+
+	public List<Thread> getFlushThreads() {
+		return flushThreads;
+	}
+
+	public void setEncoder(Encoder<S> encoder) {
+		this.encoder = encoder;
+	}
+
+	public void setPending(AgentByteBoundedQueue<S> pending) {
+		this.pending = pending;
+	}
+
+	public void setMessageTimeoutNanos(long messageTimeoutNanos) {
+		this.messageTimeoutNanos = messageTimeoutNanos;
+	}
+
+	public void setTraceProperties(AsyncProps traceProperties) {
+		this.traceProperties = traceProperties;
+	}
+
+	public void setThreadFactory(ThreadFactory threadFactory) {
+		this.threadFactory = threadFactory;
+	}
+
+	public void setShouldWarnException(boolean shouldWarnException) {
+		this.shouldWarnException = shouldWarnException;
+	}
+
+	public void setFlushThreads(List<Thread> flushThreads) {
+		this.flushThreads = flushThreads;
 	}
 
 	public static final class Builder {

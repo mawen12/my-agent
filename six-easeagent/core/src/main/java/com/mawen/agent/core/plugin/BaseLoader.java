@@ -8,14 +8,11 @@ import java.util.ServiceLoader;
 import com.mawen.agent.plugin.Ordered;
 import com.mawen.agent.plugin.api.logging.Logger;
 import com.mawen.agent.plugin.bridge.Agent;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BaseLoader {
 	private static final Logger log = Agent.getLogger(BaseLoader.class);
 
@@ -37,5 +34,8 @@ public class BaseLoader {
 		var result = load(serviceClass);
 		result.sort(Comparator.comparing(Ordered::order));
 		return result;
+	}
+
+	private BaseLoader() {
 	}
 }

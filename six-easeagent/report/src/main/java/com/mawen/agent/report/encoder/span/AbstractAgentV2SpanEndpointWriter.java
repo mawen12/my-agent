@@ -17,7 +17,7 @@ public abstract class AbstractAgentV2SpanEndpointWriter implements WriteBuffer.W
 	static final String PORT_FIELD_NAME = "\"port\":";
 
 	protected int endpointSizeInBytes(Endpoint value, boolean writeEmptyServiceName) {
-		var sizeInBytes = 0;
+		var sizeInBytes = 1; // ,
 
 		// serviceName
 		var serviceName = value.serviceName();

@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 import java.lang.instrument.Instrumentation;
 import java.util.logging.Logger;
 
-import lombok.AllArgsConstructor;
 import net.bytebuddy.agent.ByteBuddyAgent;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
@@ -56,10 +55,13 @@ public class AgentAttachmentRule implements MethodRule {
 		boolean nativeMethodPrefix() default false;
 	}
 
-	@AllArgsConstructor
 	private static class NoOpStatement extends Statement {
 
 		private final String reason;
+
+		public NoOpStatement(String reason) {
+			this.reason = reason;
+		}
 
 		@Override
 		public void evaluate() throws Throwable {

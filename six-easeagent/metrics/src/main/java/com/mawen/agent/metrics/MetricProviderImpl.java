@@ -21,13 +21,11 @@ import com.mawen.agent.plugin.api.metric.name.NameFactory;
 import com.mawen.agent.plugin.api.metric.name.Tags;
 import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.report.AgentReportAware;
-import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/5
  */
-@Getter
 public class MetricProviderImpl implements AgentReportAware, ConfigAware, MetricProvider {
 
 	private Config config;
@@ -35,6 +33,26 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
 	private final List<AutoRefreshReporter> reporters = new ArrayList<>();
 	private AgentReport agentReport;
 	private Supplier<Map<String, Object>> additionalAttributes;
+
+	public Config getConfig() {
+		return config;
+	}
+
+	public List<MetricRegistry> getRegistries() {
+		return registries;
+	}
+
+	public List<AutoRefreshReporter> getReporters() {
+		return reporters;
+	}
+
+	public AgentReport getAgentReport() {
+		return agentReport;
+	}
+
+	public Supplier<Map<String, Object>> getAdditionalAttributes() {
+		return additionalAttributes;
+	}
 
 	@Override
 	public void setConfig(Config config) {

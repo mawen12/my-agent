@@ -7,7 +7,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.mawen.agent.metrics.config.MetricsConfig;
 import com.mawen.agent.metrics.converter.Converter;
 import com.mawen.agent.plugin.report.EncodedData;
-import lombok.Getter;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -19,7 +18,6 @@ public class AutoRefreshReporter implements Runnable {
 	private final Converter converter;
 	private final Consumer<EncodedData> consumer;
 	private final MetricRegistry registry;
-	@Getter
 	private AgentScheduledReporter reporter;
 
 	public AutoRefreshReporter(MetricRegistry registry, MetricsConfig config, Converter converter, Consumer<EncodedData> consumer) {
@@ -44,5 +42,9 @@ public class AutoRefreshReporter implements Runnable {
 				.build();
 		reporter.setConverter(converter);
 		reporter.start(config.getInterval(), config.getIntervalUnit());
+	}
+
+	public AgentScheduledReporter getReporter() {
+		return reporter;
 	}
 }

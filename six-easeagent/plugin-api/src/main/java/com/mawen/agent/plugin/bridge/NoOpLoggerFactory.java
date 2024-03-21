@@ -2,7 +2,6 @@ package com.mawen.agent.plugin.bridge;
 
 import com.mawen.agent.plugin.api.logging.ILoggerFactory;
 import com.mawen.agent.plugin.api.logging.Logger;
-import com.mawen.agent.plugin.api.logging.Mdc;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
