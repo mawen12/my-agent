@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Premain-Class: com.mawen.agent.instrument.MyAgent
-Can-Redefine-Classes: true

@@ -2,6 +2,7 @@ package com.mawen.agent.config;
 
 import java.util.Locale;
 
+import com.mawen.agent.plugin.utils.NoNull;
 import com.mawen.agent.plugin.utils.SystemEnv;
 
 /**
@@ -16,7 +17,7 @@ public final class ConfigPropertiesUtils {
 
 	public static boolean getBoolean(String propertyName, boolean defaultValue) {
 		var strValue = getString(propertyName);
-		return strValue == null ? defaultValue : Boolean.parseBoolean(strValue);
+		return NoNull.of(Boolean.parseBoolean(strValue), defaultValue);
 	}
 
 	public static int getInt(String propertyName, int defaultValue) {
@@ -34,10 +35,8 @@ public final class ConfigPropertiesUtils {
 
 	public static String getString(String propertyName) {
 		var value = System.getProperty(propertyName);
-		if (value != null) {
-			return value;
-		}
-		return SystemEnv.get(toEnvVarName(propertyName));
+
+		return NoNull.of(value, SystemEnv.get(toEnvVarName(propertyName)));
 	}
 
 	public static String toEnvVarName(String propertyName) {

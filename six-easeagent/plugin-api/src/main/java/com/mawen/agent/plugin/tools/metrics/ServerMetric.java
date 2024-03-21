@@ -1,6 +1,5 @@
 package com.mawen.agent.plugin.tools.metrics;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.HashMap;
 
@@ -55,30 +54,32 @@ public class ServerMetric extends ServiceMetric {
 		defaultMeter.mark();
 		defaultCounter.inc();
 
-		gauge(key, MetricSubType.DEFAULT, () -> () -> {
-			var m1ErrorPercent = BigDecimal.ZERO;
-			var m5ErrorPercent = BigDecimal.ZERO;
-			var m15ErrorPercent = BigDecimal.ZERO;
-			var error = BigDecimal.valueOf(errorMeter.getOneMinuteRate()).setScale(5, BigDecimal.ROUND_HALF_DOWN);
-			var n = BigDecimal.valueOf(defaultMeter.getOneMinuteRate());
-			// 1 minute
-			if (n.compareTo(BigDecimal.ZERO) != 0) {
-				m1ErrorPercent = error.divide(n, 2, BigDecimal.ROUND_HALF_UP);
-			}
-			// 5 minute
-			error = BigDecimal.valueOf(errorMeter.getFiveMinuteRate()).setScale(5, BigDecimal.ROUND_HALF_DOWN);
-			n = BigDecimal.valueOf(defaultMeter.getFiveMinuteRate());
-			if (n.compareTo(BigDecimal.ZERO) != 0) {
-				m5ErrorPercent = error.divide(n, 2, BigDecimal.ROUND_HALF_UP);
-			}
-			// 15 minute
-			error = BigDecimal.valueOf(errorMeter.getFifteenMinuteRate()).setScale(5, BigDecimal.ROUND_HALF_DOWN);
-			n = BigDecimal.valueOf(defaultMeter.getFifteenMinuteRate());
-			if (n.compareTo(BigDecimal.ZERO) != 0) {
-				m15ErrorPercent = error.divide(n, 2, BigDecimal.ROUND_HALF_UP);
-			}
-			return new ErrorPercentModelGauge(m1ErrorPercent, m5ErrorPercent, m15ErrorPercent);
-		});
+		gauge(key, MetricSubType.DEFAULT
+//				, () -> () -> {
+//			var m1ErrorPercent = BigDecimal.ZERO;
+//			var m5ErrorPercent = BigDecimal.ZERO;
+//			var m15ErrorPercent = BigDecimal.ZERO;
+//			var error = BigDecimal.valueOf(errorMeter.getOneMinuteRate()).setScale(5, BigDecimal.ROUND_HALF_DOWN);
+//			var n = BigDecimal.valueOf(defaultMeter.getOneMinuteRate());
+//			// 1 minute
+//			if (n.compareTo(BigDecimal.ZERO) != 0) {
+//				m1ErrorPercent = error.divide(n, 2, BigDecimal.ROUND_HALF_UP);
+//			}
+//			// 5 minute
+//			error = BigDecimal.valueOf(errorMeter.getFiveMinuteRate()).setScale(5, BigDecimal.ROUND_HALF_DOWN);
+//			n = BigDecimal.valueOf(defaultMeter.getFiveMinuteRate());
+//			if (n.compareTo(BigDecimal.ZERO) != 0) {
+//				m5ErrorPercent = error.divide(n, 2, BigDecimal.ROUND_HALF_UP);
+//			}
+//			// 15 minute
+//			error = BigDecimal.valueOf(errorMeter.getFifteenMinuteRate()).setScale(5, BigDecimal.ROUND_HALF_DOWN);
+//			n = BigDecimal.valueOf(defaultMeter.getFifteenMinuteRate());
+//			if (n.compareTo(BigDecimal.ZERO) != 0) {
+//				m15ErrorPercent = error.divide(n, 2, BigDecimal.ROUND_HALF_UP);
+//			}
+//			return new ErrorPercentModelGauge(m1ErrorPercent, m5ErrorPercent, m15ErrorPercent);
+//		}
+		);
 	}
 
 	@Nonnull

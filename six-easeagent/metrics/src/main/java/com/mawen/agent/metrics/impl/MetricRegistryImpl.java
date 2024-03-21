@@ -13,7 +13,6 @@ import com.mawen.agent.plugin.api.metric.Histogram;
 import com.mawen.agent.plugin.api.metric.Meter;
 import com.mawen.agent.plugin.api.metric.Metric;
 import com.mawen.agent.plugin.api.metric.MetricRegistry;
-import com.mawen.agent.plugin.api.metric.MetricSupplier;
 import com.mawen.agent.plugin.api.metric.Timer;
 import com.mawen.agent.plugin.bridge.metric.NoOpMetricsRegistry;
 import com.mawen.agent.plugin.utils.NoNull;
@@ -59,22 +58,27 @@ public class MetricRegistryImpl implements MetricRegistry {
 		return getOrAdd(name, MetricInstance.COUNTER, metricRegistry -> CounterImpl.build(metricRegistry.counter(name)));
 	}
 
+//	@Override
+//	public Gauge<?> gauge(String name, MetricSupplier<Gauge<?>> supplier) {
+//		var metric = metricCache.get(name);
+//		if (metric != null) {
+//			return MetricInstance.GAUGE.to(name, metric);
+//		}
+//		synchronized (metricCache) {
+//			metric = metricCache.get(name);
+//			if (metric != null) {
+//				return MetricInstance.GAUGE.to(name, metric);
+//			}
+//			var result = metricRegistry.gauge(name, new GaugeSupplier(supplier));
+//			var g = ((GaugeImpl) result).g();
+//			metricCache.putIfAbsent(name, g);
+//			return g;
+//		}
+//	}
+
 	@Override
-	public Gauge<?> gauge(String name, MetricSupplier<Gauge<?>> supplier) {
-		var metric = metricCache.get(name);
-		if (metric != null) {
-			return MetricInstance.GAUGE.to(name, metric);
-		}
-		synchronized (metricCache) {
-			metric = metricCache.get(name);
-			if (metric != null) {
-				return MetricInstance.GAUGE.to(name, metric);
-			}
-			var result = metricRegistry.gauge(name, new GaugeSupplier(supplier));
-			var g = ((GaugeImpl) result).g();
-			metricCache.putIfAbsent(name, g);
-			return g;
-		}
+	public Gauge<?> gauge(String name) {
+		return getOrAdd(name, MetricInstance.GAUGE, metricRegistry -> GaugeImpl.build(metricRegistry.gauge(name)));
 	}
 
 	@Override
@@ -103,14 +107,14 @@ public class MetricRegistryImpl implements MetricRegistry {
 		}
 	}
 
-	public record GaugeSupplier(MetricSupplier<Gauge<?>> supplier) implements com.codahale.metrics.MetricRegistry.MetricSupplier<com.codahale.metrics.Gauge<?>> {
-
-		@Override
-		public com.codahale.metrics.Gauge<?> newMetric() {
-			var newGauge = supplier.newMetric();
-			return new GaugeImpl(newGauge);
-		}
-	}
+//	public record GaugeSupplier(MetricSupplier<Gauge<?>> supplier) implements com.codahale.metrics.MetricRegistry.MetricSupplier<com.codahale.metrics.Gauge<?>> {
+//
+//		@Override
+//		public com.codahale.metrics.Gauge<?> newMetric() {
+//			var newGauge = supplier.newMetric();
+//			return new GaugeImpl(newGauge);
+//		}
+//	}
 
 	@FunctionalInterface
 	private interface MetricBuilder<T extends Metric> {

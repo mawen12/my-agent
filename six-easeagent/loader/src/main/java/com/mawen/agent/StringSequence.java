@@ -7,12 +7,10 @@ import java.util.Objects;
  * @since 2024/2/21
  */
 public class StringSequence implements CharSequence {
+
 	private final String source;
-
 	private final int start;
-
 	private final int end;
-
 	private int hash;
 
 	public StringSequence(String source) {

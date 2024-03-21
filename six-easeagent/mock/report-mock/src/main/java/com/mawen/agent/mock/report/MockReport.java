@@ -13,7 +13,6 @@ import com.mawen.agent.mock.report.impl.LastJsonReporter;
 import com.mawen.agent.plugin.api.Reporter;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.api.logging.AccessLogInfo;
-import com.mawen.agent.plugin.api.otlp.common.AgentLogData;
 import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.plugin.report.EncodedData;
 import com.mawen.agent.plugin.report.metric.MetricReporterFactory;
@@ -21,7 +20,6 @@ import com.mawen.agent.plugin.report.tracing.ReportSpan;
 import com.mawen.agent.plugin.utils.common.JsonUtil;
 import com.mawen.agent.report.DefaultAgentReport;
 import com.mawen.agent.report.util.SpanUtils;
-import io.opentelemetry.sdk.logs.data.LogData;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -34,7 +32,6 @@ public class MockReport {
 	private static final AgentReport AGENT_REPORT = new MockAgentReport(DefaultAgentReport.create(MockConfig.getConfigs()));
 
 	private static final AtomicReference<AccessLogInfo> LAST_ACCESS_LOG = new AtomicReference<>();
-	private static final AtomicReference<LogData> LAST_APP_LOG = new AtomicReference<>();
 	private static final AtomicReference<ReportSpan> LAST_SPAN = new AtomicReference<>();
 	private static final AtomicReference<ReportSpan> LAST_SKIP_SPAN = new AtomicReference<>();
 
@@ -104,14 +101,6 @@ public class MockReport {
 		LAST_SKIP_SPAN.set(null);
 	}
 
-	public static LogData getLastAppLog() {
-		return LAST_APP_LOG.get();
-	}
-
-	public static void cleanLastAppLog() {
-		LAST_APP_LOG.set(null);
-	}
-
 	public static class MockAgentReport implements AgentReport {
 
 		private final AgentReport agentReport;
@@ -148,23 +137,12 @@ public class MockReport {
 		}
 
 		@Override
-		public void report(AgentLogData log) {
-			LAST_APP_LOG.set(log);
-		}
-
-		@Override
 		public MetricReporterFactory metricReporter() {
 			return pluginMetricFactory;
 		}
 	}
 
-	public static class MockMetricReporterFactory implements MetricReporterFactory {
-
-		private final MetricReporterFactory metricReporterFactory;
-
-		public MockMetricReporterFactory(MetricReporterFactory metricReporterFactory) {
-			this.metricReporterFactory = metricReporterFactory;
-		}
+	public record MockMetricReporterFactory(MetricReporterFactory metricReporterFactory) implements MetricReporterFactory {
 
 		@Override
 		public Reporter reporter(IPluginConfig config) {
@@ -172,13 +150,7 @@ public class MockReport {
 		}
 	}
 
-	public static class MockReporter implements Reporter {
-
-		private final Reporter delegate;
-
-		public MockReporter(Reporter delegate) {
-			this.delegate = delegate;
-		}
+	public record MockReporter(Reporter delegate) implements Reporter {
 
 		@Override
 		public void report(String msg) {

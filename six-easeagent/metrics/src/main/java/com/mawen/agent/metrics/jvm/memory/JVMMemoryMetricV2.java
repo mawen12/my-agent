@@ -83,7 +83,9 @@ public class JVMMemoryMetricV2 extends ServiceMetric implements ScheduleRunner {
 						memoryPoolMXBean.getUsage().getMax()
 				);
 
-				this.metricRegistry.gauge(metricName.name(), () -> gauge);
+				this.metricRegistry.gauge(metricName.name()
+//						, () -> gauge
+				);
 			}
 		}
 	}

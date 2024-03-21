@@ -9,10 +9,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.mawen</groupId>
     <artifactId>six-easeagent</artifactId>
     <packaging>pom</packaging>
     <description>Easeagent copy</description>
+
     <modules>
         <module>core</module>
         <module>loader</module>
@@ -71,12 +71,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <build>
         <plugins>

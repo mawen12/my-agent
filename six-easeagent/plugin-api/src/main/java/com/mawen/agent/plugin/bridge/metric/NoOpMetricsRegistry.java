@@ -9,7 +9,6 @@ import com.mawen.agent.plugin.api.metric.Histogram;
 import com.mawen.agent.plugin.api.metric.Meter;
 import com.mawen.agent.plugin.api.metric.Metric;
 import com.mawen.agent.plugin.api.metric.MetricRegistry;
-import com.mawen.agent.plugin.api.metric.MetricSupplier;
 import com.mawen.agent.plugin.api.metric.Timer;
 
 /**
@@ -41,7 +40,7 @@ public enum NoOpMetricsRegistry implements MetricRegistry {
 	}
 
 	@Override
-	public Gauge<?> gauge(String name, MetricSupplier<Gauge<?>> supplier) {
+	public Gauge<?> gauge(String name) {
 		return NoOpGauge.INSTANCE;
 	}
 

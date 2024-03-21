@@ -11,7 +11,6 @@ import com.mawen.agent.plugin.api.metric.name.MetricField;
 import com.mawen.agent.plugin.api.metric.name.MetricSubType;
 import com.mawen.agent.plugin.api.metric.name.MetricValueFetcher;
 import com.mawen.agent.plugin.api.metric.name.NameFactory;
-import com.mawen.agent.plugin.tools.metrics.LastMinutesCounterGauge;
 import com.mawen.agent.plugin.utils.ImmutableMap;
 
 /**
@@ -79,10 +78,12 @@ public class ElasticsearchMetric extends ServiceMetric {
 		defaultCounter.inc();
 
 		var gaugeName = nameFactory.gaugeNames(key).get(MetricSubType.DEFAULT);
-		metricRegistry.gauge(gaugeName.name(), () -> () ->
-				new LastMinutesCounterGauge((long) (defaultMeter.getOneMinuteRate() * 60),
-						(long) (defaultMeter.getFiveMinuteRate() * 60 * 5),
-						(long) (defaultMeter.getFifteenMinuteRate() * 60 * 15),
-						""));
+		metricRegistry.gauge(gaugeName.name()
+//				, () -> () ->
+//				new LastMinutesCounterGauge((long) (defaultMeter.getOneMinuteRate() * 60),
+//						(long) (defaultMeter.getFiveMinuteRate() * 60 * 5),
+//						(long) (defaultMeter.getFifteenMinuteRate() * 60 * 15),
+//						"")
+		);
 	}
 }

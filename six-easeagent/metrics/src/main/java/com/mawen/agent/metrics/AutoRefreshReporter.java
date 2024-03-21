@@ -21,10 +21,10 @@ public class AutoRefreshReporter implements Runnable {
 	private AgentScheduledReporter reporter;
 
 	public AutoRefreshReporter(MetricRegistry registry, MetricsConfig config, Converter converter, Consumer<EncodedData> consumer) {
+		this.registry = registry;
 		this.config = config;
 		this.converter = converter;
 		this.consumer = consumer;
-		this.registry = registry;
 		config.setIntervalChangeCallback(this);
 	}
 

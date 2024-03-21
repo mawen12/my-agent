@@ -16,7 +16,7 @@ import com.mawen.agent.log4j2.LoggerFactory;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-public class CanaryListUpdateAgentHttpHandler extends ConfigsUpdateAgentHttpHandler{
+public class CanaryListUpdateAgentHttpHandler extends ConfigsUpdateAgentHttpHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(CanaryListUpdateAgentHttpHandler.class);
 

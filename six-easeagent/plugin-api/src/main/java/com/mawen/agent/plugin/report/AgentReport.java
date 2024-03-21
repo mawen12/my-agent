@@ -1,7 +1,6 @@
 package com.mawen.agent.plugin.report;
 
 import com.mawen.agent.plugin.api.logging.AccessLogInfo;
-import com.mawen.agent.plugin.api.otlp.common.AgentLogData;
 import com.mawen.agent.plugin.report.metric.MetricReporterFactory;
 import com.mawen.agent.plugin.report.tracing.ReportSpan;
 
@@ -26,13 +25,6 @@ public interface AgentReport {
 	 * @param log log info
 	 */
 	void report(AccessLogInfo log);
-
-	/**
-	 * report application log
-	 *
-	 * @param log
-	 */
-	void report(AgentLogData log);
 
 	/**
 	 * Metric reporters factory

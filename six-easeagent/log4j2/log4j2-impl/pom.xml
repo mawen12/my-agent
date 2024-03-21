@@ -81,6 +81,7 @@
                                     <shadedPattern>com.mawen.agent.org.apache.kafka</shadedPattern>
                                 </relocation>
                             </relocations>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>
                 </executions>

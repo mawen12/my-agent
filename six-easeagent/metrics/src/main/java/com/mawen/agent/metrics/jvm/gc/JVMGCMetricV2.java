@@ -28,7 +28,7 @@ public class JVMGCMetricV2 extends ServiceMetric {
 
 	private static final String NO_GC = "No GC";
 
-	public static final ServiceMetricSupplier<JVMGCMetricV2> METRIC_SUPPLIER = new ServiceMetricSupplier<JVMGCMetricV2>() {
+	public static final ServiceMetricSupplier<JVMGCMetricV2> METRIC_SUPPLIER = new ServiceMetricSupplier<>() {
 		@Override
 		public NameFactory newNameFactory() {
 			return JVMGCMetricV2.nameFactory();

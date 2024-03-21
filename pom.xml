@@ -11,11 +11,6 @@
 
     <name>my-agent</name>
     <modules>
-        <module>first-agent</module>
-        <module>second-bytebuddy</module>
-        <module>third-instrument</module>
-        <module>fourth-jvm-hook</module>
-        <module>fifth-jvm-profiler</module>
         <module>six-easeagent</module>
         <module>demo</module>
     </modules>
@@ -114,27 +109,6 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${servlet.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-sdk</artifactId>
-                <version>${otel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-sdk-common</artifactId>
-                <version>${otel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-semconv</artifactId>
-                <version>${otel-alpha.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-sdk-logs</artifactId>
-                <version>${otel-alpha.version}</version>
             </dependency>
 
             <dependency>

@@ -20,7 +20,7 @@ import io.prometheus.client.dropwizard.samplebuilder.DefaultSampleBuilder;
  * @since 2024/3/5
  */
 public class MetricRegistryService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(MetricRegistryService.class);
+	private static final Logger log = LoggerFactory.getLogger(MetricRegistryService.class);
 
 	public static final String METRIC_TYPE_LABEL_NAME = "MetricType";
 	public static final String METRIC_SUB_TYPE_LABEL_NAME = "MetricSubType";
@@ -105,7 +105,7 @@ public class MetricRegistryService {
 				return builder.toString();
 			}
 			catch (Exception e) {
-				LOGGER.error("rebuild metric name[{}] fail.{}",name, e);
+				log.error("rebuild metric name[{}] fail.{}",name, e);
 				return name;
 			}
 		}

@@ -96,8 +96,8 @@ public class AgentMDCScopeDecorator {
 	}
 
 	enum MDCContextAgentLoader implements CorrelationContext {
-		INSTANCE;
 
+		INSTANCE;
 
 		@Override
 		public String getValue(String name) {

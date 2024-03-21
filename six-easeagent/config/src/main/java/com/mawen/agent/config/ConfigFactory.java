@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.utils.ImmutableMap;
+import com.mawen.agent.plugin.utils.NoNull;
 import com.mawen.agent.plugin.utils.SystemEnv;
 import com.mawen.agent.plugin.utils.common.JsonUtil;
 import com.mawen.agent.plugin.utils.common.StringUtils;
@@ -145,6 +146,6 @@ public class ConfigFactory {
 
 	private static GlobalConfigs loadDefaultConfigs(ClassLoader loader, String file) {
 		var globalConfigs = JarFileConfigLoader.load(file);
-		return globalConfigs != null ? globalConfigs : ConfigLoader.loadFromClasspath(loader, file);
+		return NoNull.of(globalConfigs, ConfigLoader.loadFromClasspath(loader, file));
 	}
 }

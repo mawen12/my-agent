@@ -13,6 +13,7 @@ import org.springframework.boot.loader.LaunchedURLClassLoader;
  * @since 2024/3/18
  */
 public class CompoundableClassLoader extends LaunchedURLClassLoader {
+
 	private final Set<WeakReference<ClassLoader>> externals = new CopyOnWriteArraySet<>();
 
 	CompoundableClassLoader(URL[] urls) {

@@ -4,3 +4,5 @@
 # What changed?
 
 - Remove OpenTelemetry support
+- Gauge change
+- 

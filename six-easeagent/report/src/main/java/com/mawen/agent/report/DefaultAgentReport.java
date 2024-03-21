@@ -8,12 +8,10 @@ import com.mawen.agent.plugin.api.config.ChangeItem;
 import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 import com.mawen.agent.plugin.api.logging.AccessLogInfo;
-import com.mawen.agent.plugin.api.otlp.common.AgentLogData;
 import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.plugin.report.metric.MetricReporterFactory;
 import com.mawen.agent.plugin.report.tracing.ReportSpan;
 import com.mawen.agent.report.async.log.AccessLogReporter;
-import com.mawen.agent.report.async.log.ApplicationLogReporter;
 import com.mawen.agent.report.metric.MetricReporterFactoryImpl;
 import com.mawen.agent.report.plugin.ReporterLoader;
 import com.mawen.agent.report.trace.TraceReport;
@@ -27,7 +25,6 @@ public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
 	private final TraceReport traceReport;
 	private final MetricReporterFactory metricReporterFactory;
 	private final AccessLogReporter accessLogReporter;
-	private final ApplicationLogReporter appLogReporter;
 	private final Config config;
 	private final Config reportConfig;
 
@@ -36,7 +33,6 @@ public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
 		this.reportConfig = new Configs(ReportConfigAdapter.extractReporterConfig(config));
 		this.traceReport = new TraceReport(this.reportConfig);
 		this.accessLogReporter = new AccessLogReporter(reportConfig);
-		this.appLogReporter = new ApplicationLogReporter(reportConfig);
 		this.metricReporterFactory = MetricReporterFactoryImpl.create(reportConfig);
 
 		this.config.addChangeListener(this);
@@ -61,11 +57,6 @@ public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
 	@Override
 	public void report(AccessLogInfo log) {
 		this.accessLogReporter.report(log);
-	}
-
-	@Override
-	public void report(AgentLogData log) {
-		this.appLogReporter.report(log);
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.api.config.Const;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.api.config.PluginConfigChangeListener;
+import com.mawen.agent.plugin.utils.NoNull;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 
 /**
@@ -66,10 +67,7 @@ public class PluginConfig implements IPluginConfig {
 	@Override
 	public String getString(String property) {
 		var value = cover.get(property);
-		if (value != null) {
-			return value;
-		}
-		return global.get(property);
+		return NoNull.of(value, global.get(property));
 	}
 
 	@Override

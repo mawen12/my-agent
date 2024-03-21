@@ -41,8 +41,12 @@ public abstract class ServiceMetric {
 		return metricRegistry.histogram(nameFactory.histogramName(key, subType));
 	}
 
-	public Gauge<?> gauge(String key, MetricSubType subType, MetricSupplier<Gauge<?>> supplier) {
-		return metricRegistry.gauge(nameFactory.gaugeName(key, subType), supplier);
+//	public Gauge<?> gauge(String key, MetricSubType subType, MetricSupplier<Gauge<?>> supplier) {
+//		return metricRegistry.gauge(nameFactory.gaugeName(key, subType), supplier);
+//	}
+
+	public Gauge<?> gauge(String key, MetricSubType subType) {
+		return metricRegistry.gauge(nameFactory.gaugeName(key, subType));
 	}
 
 	public MetricRegistry getMetricRegistry() {
