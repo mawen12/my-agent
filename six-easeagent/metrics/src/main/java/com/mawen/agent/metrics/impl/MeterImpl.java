@@ -3,7 +3,8 @@ package com.mawen.agent.metrics.impl;
 import java.util.Objects;
 
 import com.mawen.agent.plugin.api.metric.Meter;
-import com.mawen.agent.plugin.bridge.NoOpMetrics;
+import com.mawen.agent.plugin.bridge.metric.NoOpMeter;
+import com.mawen.agent.plugin.utils.NoNull;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -18,7 +19,7 @@ public class MeterImpl implements Meter {
 	}
 
 	public static Meter build(com.codahale.metrics.Meter meter) {
-		return meter == null ? NoOpMetrics.NO_OP_METER : new MeterImpl(meter);
+		return NoNull.of(new MeterImpl(meter), NoOpMeter.INSTANCE);
 	}
 
 	@Override

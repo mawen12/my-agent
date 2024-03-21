@@ -15,26 +15,6 @@ import java.util.function.Supplier;
 public interface Timer extends Metric {
 
 	/**
-	 * A timing context.
-	 */
-	interface Context {
-
-		/**
-		 * Updates the timer with the difference between current and start time.
-		 * Call to this method will not reset the start time.
-		 * Multiple calls result in multiple updates.
-		 *
-		 * @return the elapsed time in nanoseconds
-		 */
-		long stop();
-
-		/**
-		 * Equivalent to calling {@link #stop()}.
-		 */
-		void close();
-	}
-
-	/**
 	 * Adds a recorded duration.
 	 *
 	 * @param duration the length of the duration
@@ -140,4 +120,24 @@ public interface Timer extends Metric {
 	 * Here is a Timer objects: {@code com.codahale.metrics.Timer}
 	 */
 	Object unwrap();
+
+	/**
+	 * A timing context.
+	 */
+	interface Context {
+
+		/**
+		 * Updates the timer with the difference between current and start time.
+		 * Call to this method will not reset the start time.
+		 * Multiple calls result in multiple updates.
+		 *
+		 * @return the elapsed time in nanoseconds
+		 */
+		long stop();
+
+		/**
+		 * Equivalent to calling {@link #stop()}.
+		 */
+		void close();
+	}
 }

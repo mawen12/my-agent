@@ -4,7 +4,8 @@ import java.io.OutputStream;
 import java.util.Objects;
 
 import com.mawen.agent.plugin.api.metric.Snapshot;
-import com.mawen.agent.plugin.bridge.NoOpMetrics;
+import com.mawen.agent.plugin.bridge.metric.NoopSnapshot;
+import com.mawen.agent.plugin.utils.NoNull;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -19,7 +20,7 @@ public class SnapshotImpl implements Snapshot {
 	}
 
 	public static Snapshot build(com.codahale.metrics.Snapshot snapshot) {
-		return snapshot == null ? NoOpMetrics.NO_OP_SNAPSHOT : new SnapshotImpl(snapshot);
+		return NoNull.of(new SnapshotImpl(snapshot), NoopSnapshot.INSTANCE);
 	}
 
 	@Override

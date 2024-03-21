@@ -22,6 +22,7 @@ import com.mawen.agent.plugin.api.metric.ServiceMetricRegistry;
 import com.mawen.agent.plugin.api.metric.ServiceMetricSupplier;
 import com.mawen.agent.plugin.api.metric.name.NameFactory;
 import com.mawen.agent.plugin.api.metric.name.Tags;
+import com.mawen.agent.plugin.bridge.metric.NoOpMetricsRegistrySupplier;
 import com.mawen.agent.plugin.report.AgentReport;
 
 /**
@@ -32,7 +33,7 @@ import com.mawen.agent.plugin.report.AgentReport;
  */
 public final class Agent {
 	public static AgentInfo agentInfo;
-	public static MetricRegistrySupplier metricRegistrySupplier = NoOpMetrics.NO_OP_METRIC_SUPPLIER;
+	public static MetricRegistrySupplier metricRegistrySupplier = NoOpMetricsRegistrySupplier.INSTANCE;
 	public static IContextManager initializeContextSupplier = () -> NoOpContext.NO_OP_CONTEXT;
 	public static ILoggerFactory loggerFactory = NoOpLoggerFactory.INSTANCE;
 	public static Mdc loggerMdc = NoOpMdc.INSTANCE;

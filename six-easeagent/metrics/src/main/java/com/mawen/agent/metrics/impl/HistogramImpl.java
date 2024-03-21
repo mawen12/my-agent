@@ -4,7 +4,8 @@ import java.util.Objects;
 
 import com.mawen.agent.plugin.api.metric.Histogram;
 import com.mawen.agent.plugin.api.metric.Snapshot;
-import com.mawen.agent.plugin.bridge.NoOpMetrics;
+import com.mawen.agent.plugin.bridge.metric.NoOpHistogram;
+import com.mawen.agent.plugin.utils.NoNull;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -19,7 +20,7 @@ public class HistogramImpl implements Histogram {
 	}
 
 	public static Histogram build(com.codahale.metrics.Histogram histogram) {
-		return histogram == null ? NoOpMetrics.NO_OP_HISTOGRAM : new HistogramImpl(histogram);
+		return NoNull.of(new HistogramImpl(histogram), NoOpHistogram.INSTANCE);
 	}
 
 	@Override

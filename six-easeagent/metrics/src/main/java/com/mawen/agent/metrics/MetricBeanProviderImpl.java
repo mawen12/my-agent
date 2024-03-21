@@ -16,8 +16,7 @@ import com.mawen.agent.report.AgentReportAware;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/5
  */
-public class MetricBeanProviderImpl implements BeanProvider, AgentHttpHandlerProvider, ConfigAware,
-		MetricProvider, AgentReportAware {
+public class MetricBeanProviderImpl implements BeanProvider, AgentHttpHandlerProvider, ConfigAware, MetricProvider, AgentReportAware {
 
 	private final MetricProviderImpl metricProvider = new MetricProviderImpl();
 
@@ -41,7 +40,4 @@ public class MetricBeanProviderImpl implements BeanProvider, AgentHttpHandlerPro
 		this.metricProvider.setAgentReport(report);
 	}
 
-	public MetricProviderImpl getMetricProvider() {
-		return metricProvider;
-	}
 }

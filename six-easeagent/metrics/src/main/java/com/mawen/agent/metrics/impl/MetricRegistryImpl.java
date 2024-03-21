@@ -15,7 +15,7 @@ import com.mawen.agent.plugin.api.metric.Metric;
 import com.mawen.agent.plugin.api.metric.MetricRegistry;
 import com.mawen.agent.plugin.api.metric.MetricSupplier;
 import com.mawen.agent.plugin.api.metric.Timer;
-import com.mawen.agent.plugin.bridge.NoOpMetrics;
+import com.mawen.agent.plugin.bridge.metric.NoOpMetricsRegistry;
 import com.mawen.agent.plugin.utils.NoNull;
 
 /**
@@ -27,46 +27,14 @@ public class MetricRegistryImpl implements MetricRegistry {
 	private final ConcurrentMap<String, Metric> metricCache;
 	private final com.codahale.metrics.MetricRegistry metricRegistry;
 
-	MetricBuilder<Counter> counters = new MetricBuilder<>() {
-		@Override
-		public Counter newMetric(String name) {
-			return NoNull.of(CounterImpl.build(metricRegistry.counter(name)), NoOpMetrics.NO_OP_COUNTER);
-		}
-	};
-
-	MetricBuilder<Histogram> histograms = new MetricBuilder<>() {
-		@Override
-		public Histogram newMetric(String name) {
-			return NoNull.of(HistogramImpl.build(metricRegistry.histogram(name)), NoOpMetrics.NO_OP_HISTOGRAM);
-		}
-	};
-
-	MetricBuilder<Meter> meters = new MetricBuilder<>() {
-		@Override
-		public Meter newMetric(String name) {
-			return NoNull.of(MeterImpl.build(metricRegistry.meter(name)), NoOpMetrics.NO_OP_METER);
-		}
-	};
-
-	MetricBuilder<Timer> timers = new MetricBuilder<>() {
-		@Override
-		public Timer newMetric(String name) {
-			return NoNull.of(TimerImpl.build(metricRegistry.timer(name)), NoOpMetrics.NO_OP_TIMER);
-		}
-	};
-
 	private MetricRegistryImpl(com.codahale.metrics.MetricRegistry metricRegistry) {
 		this.metricRegistry = Objects.requireNonNull(metricRegistry, "metricRegistry must not be null");
 		this.metricCache = new ConcurrentHashMap<>();
 		this.metricRegistry.addListener(new MetricRemoveListener());
 	}
 
-	public com.codahale.metrics.MetricRegistry getMetricRegistry() {
-		return metricRegistry;
-	}
-
 	public static MetricRegistry build(com.codahale.metrics.MetricRegistry metricRegistry) {
-		return metricRegistry == null ? NoOpMetrics.NO_OP_METRIC : new MetricRegistryImpl(metricRegistry);
+		return NoNull.of(new MetricRegistryImpl(metricRegistry), NoOpMetricsRegistry.INSTANCE);
 	}
 
 	@Override
@@ -83,16 +51,16 @@ public class MetricRegistryImpl implements MetricRegistry {
 
 	@Override
 	public Meter meter(String name) {
-		return getOrAdd(name, MetricInstance.METER, meters);
+		return getOrAdd(name, MetricInstance.METER, metricRegistry -> MeterImpl.build(metricRegistry.meter(name)));
 	}
 
 	@Override
 	public Counter counter(String name) {
-		return getOrAdd(name, MetricInstance.COUNTER, counters);
+		return getOrAdd(name, MetricInstance.COUNTER, metricRegistry -> CounterImpl.build(metricRegistry.counter(name)));
 	}
 
 	@Override
-	public Gauge gauge(String name, MetricSupplier<Gauge> supplier) {
+	public Gauge<?> gauge(String name, MetricSupplier<Gauge<?>> supplier) {
 		var metric = metricCache.get(name);
 		if (metric != null) {
 			return MetricInstance.GAUGE.to(name, metric);
@@ -111,12 +79,12 @@ public class MetricRegistryImpl implements MetricRegistry {
 
 	@Override
 	public Histogram histogram(String name) {
-		return getOrAdd(name, MetricInstance.HISTOGRAM, histograms);
+		return getOrAdd(name, MetricInstance.HISTOGRAM, metricRegistry -> HistogramImpl.build(metricRegistry.histogram(name)));
 	}
 
 	@Override
 	public Timer timer(String name) {
-		return getOrAdd(name, MetricInstance.TIMER, timers);
+		return getOrAdd(name, MetricInstance.TIMER, metricRegistry -> TimerImpl.build(metricRegistry.timer(name)));
 	}
 
 	private <T extends Metric> T getOrAdd(String name, MetricInstance<T> instance, MetricBuilder<T> builder) {
@@ -129,29 +97,24 @@ public class MetricRegistryImpl implements MetricRegistry {
 			if (metric != null) {
 				return instance.to(name, metric);
 			}
-			var t = builder.newMetric(name);
+			var t = builder.newMetric(metricRegistry);
 			metricCache.putIfAbsent(name, t);
 			return t;
 		}
 	}
 
-	public static class GaugeSupplier implements com.codahale.metrics.MetricRegistry.MetricSupplier<com.codahale.metrics.Gauge> {
-
-		private final MetricSupplier<Gauge> supplier;
-
-		public GaugeSupplier(MetricSupplier<Gauge> supplier) {
-			this.supplier = supplier;
-		}
+	public record GaugeSupplier(MetricSupplier<Gauge<?>> supplier) implements com.codahale.metrics.MetricRegistry.MetricSupplier<com.codahale.metrics.Gauge<?>> {
 
 		@Override
-		public com.codahale.metrics.Gauge newMetric() {
+		public com.codahale.metrics.Gauge<?> newMetric() {
 			var newGauge = supplier.newMetric();
 			return new GaugeImpl(newGauge);
 		}
 	}
 
+	@FunctionalInterface
 	private interface MetricBuilder<T extends Metric> {
-		T newMetric(String name);
+		T newMetric(com.codahale.metrics.MetricRegistry metricRegistry);
 	}
 
 	class MetricRemoveListener implements MetricRegistryListener {

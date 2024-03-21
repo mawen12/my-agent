@@ -18,16 +18,12 @@ public abstract class ElasticsearchBaseMetricsInterceptor extends ElasticsearchB
 
 	protected ElasticsearchMetric elasticsearchMetric;
 
-	public ElasticsearchMetric getElasticsearchMetric() {
-		return elasticsearchMetric;
-	}
-
 	@Override
 	public void init(IPluginConfig config, String className, String methodName, String methodDescriptor) {
 		super.init(config, className, methodName, methodDescriptor);
 		var tags = new Tags("application", "elasticsearch", "index");
 		RedirectProcessor.setTagsIfRedirected(Redirect.ELASTICSEARCH, tags);
-		this.elasticsearchMetric = ServiceMetricRegistry.getOrCreate(config, tags, new ServiceMetricSupplier<ElasticsearchMetric>() {
+		this.elasticsearchMetric = ServiceMetricRegistry.getOrCreate(config, tags, new ServiceMetricSupplier<>() {
 			@Override
 			public NameFactory newNameFactory() {
 				return ElasticsearchMetric.nameFactory();

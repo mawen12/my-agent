@@ -3,7 +3,8 @@ package com.mawen.agent.metrics.impl;
 import java.util.Objects;
 
 import com.mawen.agent.plugin.api.metric.Counter;
-import com.mawen.agent.plugin.bridge.NoOpMetrics;
+import com.mawen.agent.plugin.bridge.metric.NoOpCounter;
+import com.mawen.agent.plugin.utils.NoNull;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -18,7 +19,7 @@ public class CounterImpl implements Counter {
 	}
 
 	public static Counter build(com.codahale.metrics.Counter counter) {
-		return counter == null ? NoOpMetrics.NO_OP_COUNTER : new CounterImpl(counter);
+		return NoNull.of(new CounterImpl(counter), NoOpCounter.INSTANCE);
 	}
 
 	@Override

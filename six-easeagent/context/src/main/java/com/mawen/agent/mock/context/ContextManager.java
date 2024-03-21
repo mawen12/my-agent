@@ -27,9 +27,10 @@ import com.mawen.agent.plugin.api.trace.TracingSupplier;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.bridge.NoOpLoggerFactory;
 import com.mawen.agent.plugin.bridge.NoOpMdc;
-import com.mawen.agent.plugin.bridge.NoOpMetrics;
 import com.mawen.agent.plugin.bridge.NoOpReporter;
 import com.mawen.agent.plugin.bridge.NoOpTracer;
+import com.mawen.agent.plugin.bridge.metric.NoOpMetricsRegistry;
+import com.mawen.agent.plugin.bridge.metric.NoOpMetricsRegistrySupplier;
 import com.mawen.agent.plugin.utils.NoNull;
 
 /**
@@ -44,7 +45,7 @@ public class ContextManager implements IContextManager {
 	private final Supplier<InitializeContext> sessionContextSupplier;
 	private final GlobalContext globalContext;
 	private volatile TracingSupplier tracingSupplier = (supplier) -> null;
-	private volatile MetricRegistrySupplier metric = NoOpMetrics.NO_OP_METRIC_SUPPLIER;
+	private volatile MetricRegistrySupplier metric = NoOpMetricsRegistrySupplier.INSTANCE;
 
 	public ContextManager(@Nonnull Configs configs, @Nonnull PluginConfigManager pluginConfigManager, @Nonnull ILoggerFactory loggerFactory, @Nonnull Mdc mdc) {
 		this.pluginConfigManager = pluginConfigManager;
@@ -110,7 +111,7 @@ public class ContextManager implements IContextManager {
 
 		@Override
 		public MetricRegistry newMetricRegistry(IPluginConfig config, NameFactory nameFactory, Tags tags) {
-			return NoNull.of(metric.newMetricRegistry(config, nameFactory, tags), NoOpMetrics.NO_OP_METRIC);
+			return NoNull.of(metric.newMetricRegistry(config, nameFactory, tags), NoOpMetricsRegistry.INSTANCE);
 		}
 
 		@Override

@@ -8,7 +8,8 @@ import java.util.function.Supplier;
 
 import com.mawen.agent.plugin.api.metric.Snapshot;
 import com.mawen.agent.plugin.api.metric.Timer;
-import com.mawen.agent.plugin.bridge.NoOpMetrics;
+import com.mawen.agent.plugin.bridge.metric.NoOpTimer;
+import com.mawen.agent.plugin.utils.NoNull;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -23,7 +24,7 @@ public class TimerImpl implements Timer {
 	}
 
 	public static Timer build(com.codahale.metrics.Timer timer) {
-		return timer == null ? NoOpMetrics.NO_OP_TIMER : new TimerImpl(timer);
+		return NoNull.of(new TimerImpl(timer), NoOpTimer.INSTANCE);
 	}
 
 	@Override

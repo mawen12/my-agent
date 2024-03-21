@@ -15,35 +15,35 @@ import com.mawen.agent.plugin.api.metric.Timer;
  */
 public abstract class MetricInstance<T extends Metric> {
 
-	public static final MetricInstance<Counter> COUNTER = new MetricInstance<Counter>() {
+	public static final MetricInstance<Counter> COUNTER = new MetricInstance<>() {
 		@Override
 		protected Counter toInstance(String name, Metric metric) {
 			return (Counter) metric;
 		}
 	};
 
-	public static final MetricInstance<Histogram> HISTOGRAM = new MetricInstance<Histogram>() {
+	public static final MetricInstance<Histogram> HISTOGRAM = new MetricInstance<>() {
 		@Override
 		protected Histogram toInstance(String name, Metric metric) {
 			return (Histogram) metric;
 		}
 	};
 
-	public static final MetricInstance<Meter> METER = new MetricInstance<Meter>() {
+	public static final MetricInstance<Meter> METER = new MetricInstance<>() {
 		@Override
 		protected Meter toInstance(String name, Metric metric) {
 			return (Meter) metric;
 		}
 	};
 
-	public static final MetricInstance<Timer> TIMER = new MetricInstance<Timer>() {
+	public static final MetricInstance<Timer> TIMER = new MetricInstance<>() {
 		@Override
 		protected Timer toInstance(String name, Metric metric) {
 			return (Timer) metric;
 		}
 	};
 
-	public static final MetricInstance<Gauge> GAUGE = new MetricInstance<Gauge>() {
+	public static final MetricInstance<Gauge> GAUGE = new MetricInstance<>() {
 		@Override
 		protected Gauge toInstance(String name, Metric metric) {
 			return (Gauge) metric;
