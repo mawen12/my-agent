@@ -21,11 +21,9 @@ public class DefaultAgentReport implements AgentReport {
 	private final TraceReport traceReport;
 	private final MetricReporterFactory metricReporterFactory;
 	private final AccessLogReporter accessLogReporter;
-	private final Config config;
 	private final Config reportConfig;
 
 	public DefaultAgentReport(Config config) {
-		this.config = config;
 		this.reportConfig = new Configs(ReportConfigAdapter.extractReporterConfig(config));
 		this.traceReport = new TraceReport(this.reportConfig);
 		this.accessLogReporter = new AccessLogReporter(reportConfig);

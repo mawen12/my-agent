@@ -13,7 +13,6 @@ package com.mawen.agent.metrics.converter;
  * @since 2024/3/5
  */
 public enum KeyType {
-
 	Timer,
 	Gauge,
 	Counter,

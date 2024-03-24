@@ -5,6 +5,7 @@ package com.mawen.agent.log4j2.exception;
  * @since 2024/2/22
  */
 public class Log4j2Exception extends RuntimeException{
+
 	public Log4j2Exception(Throwable cause) {
 		super(cause);
 	}

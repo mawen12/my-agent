@@ -3,6 +3,7 @@ package com.mawen.agent.log4j2.impl;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.apache.logging.log4j.Level;
@@ -26,6 +27,7 @@ import org.slf4j.spi.LocationAwareLogger;
  */
 public class AgentLoggerProxy implements LocationAwareLogger, Serializable {
 
+	@Serial
 	private static final long serialVersionUID = -6526111633435401713L;
 	private static final Marker EVENT_MARKER = MarkerFactory.getMarker("EVENT");
 	private static final EventDataConverter CONVERTER = createConverter();

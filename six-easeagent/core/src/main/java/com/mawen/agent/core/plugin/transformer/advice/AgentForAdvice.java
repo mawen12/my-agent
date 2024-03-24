@@ -2,6 +2,7 @@ package com.mawen.agent.core.plugin.transformer.advice;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 				ClassFileLocator.NoOp.INSTANCE,
 				AgentBuilder.PoolStrategy.Default.FAST,
 				AgentBuilder.LocationStrategy.ForClassLoader.STRONG,
-				List.of());
+				Collections.emptyList());
 	}
 
 

@@ -13,7 +13,8 @@ import org.slf4j.Logger;
  * @since 2024/2/22
  */
 public class LoggerProxyFactory extends AbstractLoggerAdapter<AgentLoggerProxy> {
-	private static final LoggerProxyFactory LOGGER_FACTORY = new LoggerProxyFactory();
+
+	private static final LoggerProxyFactory INSTANCE = new LoggerProxyFactory();
 
 	private static final String FQCN = LoggerProxyFactory.class.getName();
 	private static final String PACKAGE = "org.slf4j";
@@ -30,7 +31,7 @@ public class LoggerProxyFactory extends AbstractLoggerAdapter<AgentLoggerProxy> 
 	}
 
 	public static Slf4jLogger getAgentLogger(String name) {
-		return new Slf4jLogger(LOGGER_FACTORY.getLogger(name));
+		return new Slf4jLogger(INSTANCE.getLogger(name));
 	}
 
 	@Override

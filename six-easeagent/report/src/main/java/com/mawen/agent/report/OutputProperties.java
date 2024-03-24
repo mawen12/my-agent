@@ -1,11 +1,6 @@
 package com.mawen.agent.report;
 
-import java.util.Map;
-
-import com.mawen.agent.config.ConfigUtils;
-import com.mawen.agent.config.Configs;
 import com.mawen.agent.plugin.api.config.Config;
-import com.mawen.agent.plugin.api.config.ConfigConst.Observability;
 
 import static com.mawen.agent.config.ConfigUtils.*;
 import static com.mawen.agent.config.report.ReportConfigConst.*;
@@ -37,8 +32,6 @@ public interface OutputProperties {
 
 	String getEndpointAlgorithm();
 
-	boolean updateConfig(Map<String, String> changed);
-
 	static OutputProperties newDefault(Config configs) {
 		return new Default(configs);
 	}
@@ -57,27 +50,6 @@ public interface OutputProperties {
 
 		public Default(Config configs) {
 			extractProp(configs);
-		}
-
-		@Override
-		public boolean updateConfig(Map<String, String> changed) {
-			Config configs = new Configs(changed);
-			int changeItems = 0;
-			changeItems += ConfigUtils.isChanged(OUTPUT_SERVERS, changed, this.servers);
-			changeItems += ConfigUtils.isChanged(Observability.OUTPUT_TIMEOUT, changed, this.timeout);
-			changeItems += ConfigUtils.isChanged(Observability.OUTPUT_ENABLED, changed, String.valueOf(this.enabled));
-			changeItems += ConfigUtils.isChanged(Observability.OUTPUT_SECURITY_PROTOCOL, changed, this.protocol);
-			changeItems += ConfigUtils.isChanged(Observability.OUTPUT_SSL_KEYSTORE_KEY, changed, this.sslKeyStoreType);
-			changeItems += ConfigUtils.isChanged(Observability.OUTPUT_SSL_KEYSTORE_KEY, changed, this.sslKey);
-			changeItems += ConfigUtils.isChanged(Observability.OUTPUT_SSL_KEYSTORE_CERT_CHAIN, changed, this.certificate);
-			changeItems += ConfigUtils.isChanged(Observability.OUTPUT_SSL_TRUSTSTORE_CERTS, changed, this.trustCertificate);
-			changeItems += ConfigUtils.isChanged(Observability.OUTPUT_SSL_TRUSTSTORE_TYPE, changed, this.trustCertificateType);
-			changeItems += ConfigUtils.isChanged(Observability.OUTPUT_ENDPOINT_IDENTIFICATION_ALGORITHM, changed, this.endpointAlgorithm);
-			if (changeItems == 0) {
-				return false;
-			}
-			extractProp(configs);
-			return false;
 		}
 
 		@Override

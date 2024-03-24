@@ -2,7 +2,6 @@ package zipkin2.reporter.brave;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import brave.Span.Kind;
 import brave.Tag;
@@ -17,17 +16,9 @@ import zipkin2.reporter.Reporter;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/29
  */
-final class ConvertSpanReporter implements Reporter<MutableSpan> {
-	static final Logger logger = Logger.getLogger(ConvertSpanReporter.class.getName());
+record ConvertSpanReporter(Reporter<ReportSpan> delegate, Tag<Throwable> errorTag) implements Reporter<MutableSpan> {
+
 	static final Map<Kind, Span.Kind> BRAVE_TO_ZIPKIN_KIND = generateKindMap();
-
-	final Reporter<ReportSpan> delegate;
-	final Tag<Throwable> errorTag;
-
-	ConvertSpanReporter(Reporter<ReportSpan> delegate, Tag<Throwable> errorTag) {
-		this.delegate = delegate;
-		this.errorTag = errorTag;
-	}
 
 	@Override
 	public void report(MutableSpan span) {

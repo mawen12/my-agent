@@ -22,7 +22,6 @@ import com.mawen.agent.report.async.zipkin.AgentByteBoundedQueue;
 import com.mawen.agent.report.encoder.PackedMessage;
 import com.mawen.agent.report.encoder.span.GlobalExtrasSupplier;
 import com.mawen.agent.report.sender.SenderWithEncoder;
-import org.slf4j.LoggerFactory;
 import zipkin2.Call;
 
 /**
@@ -32,8 +31,9 @@ import zipkin2.Call;
 public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 
 	static final Logger logger = Logger.getLogger(DefaultAsyncReporter.class.getName());
+
 	static final String NAME_PREFIX = "DefaultAsyncReporter";
-	private static final org.slf4j.Logger log = LoggerFactory.getLogger(DefaultAsyncReporter.class);
+
 	final AsyncReporterMetrics metrics;
 
 	final AtomicBoolean closed = new AtomicBoolean(false);

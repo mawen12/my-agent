@@ -1,5 +1,7 @@
 package com.mawen.agent.core.plugin.matcher;
 
+import com.mawen.agent.log4j2.Logger;
+import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.asm.Modifier;
 import com.mawen.agent.plugin.matcher.ClassMatcher;
 import com.mawen.agent.plugin.matcher.IClassMatcher;
@@ -21,9 +23,12 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 public enum ClassMatcherConvert implements Converter<IClassMatcher, ElementMatcher.Junction<TypeDescription>> {
 	INSTANCE;
 
+	private static final Logger log = LoggerFactory.getLogger(ClassMatcherConvert.class);
+
 	@Override
 	public ElementMatcher.Junction<TypeDescription> convert(IClassMatcher source) {
-		if (source == null) {
+		if (source == null || !(source instanceof IClassMatcher)) {
+			log.warn("Can not convert IClassMatcher: {}.", source);
 			return null;
 		}
 
@@ -40,10 +45,6 @@ public enum ClassMatcherConvert implements Converter<IClassMatcher, ElementMatch
 		else if (source instanceof NegateClassMatcher matcher) {
 			var notMatcher = this.convert(matcher.getMatcher());
 			return new NegatingMatcher<>(notMatcher);
-		}
-
-		if (!(source instanceof ClassMatcher)) {
-			return null;
 		}
 
 		return this.convert((ClassMatcher)source);

@@ -14,10 +14,10 @@ import zipkin2.reporter.Sender;
  */
 public class SDKKafkaSender extends Sender implements SDKSender {
 
-	private final KafkaSender kafkaSender;
+	private final KafkaSender delegate;
 
 	public SDKKafkaSender(KafkaSender kafkaSender) {
-		this.kafkaSender = kafkaSender;
+		this.delegate = kafkaSender;
 	}
 
 	public static SDKKafkaSender wrap(KafkaSender sender) {
@@ -26,54 +26,54 @@ public class SDKKafkaSender extends Sender implements SDKSender {
 
 	@Override
 	public Encoding encoding() {
-		return kafkaSender.encoding();
+		return delegate.encoding();
 	}
 
 	@Override
 	public int messageMaxBytes() {
-		return kafkaSender.messageMaxBytes();
+		return delegate.messageMaxBytes();
 	}
 
 	@Override
 	public int messageSizeInBytes(List<byte[]> encodedSpans) {
-		return kafkaSender.messageSizeInBytes(encodedSpans);
+		return delegate.messageSizeInBytes(encodedSpans);
 	}
 
 	@Override
 	public int messageSizeInBytes(int encodedSizeInBytes) {
-		return kafkaSender.messageSizeInBytes(encodedSizeInBytes);
+		return delegate.messageSizeInBytes(encodedSizeInBytes);
 	}
 
 	@Override
 	public Call<Void> sendSpans(List<byte[]> encodedSpans) {
-		if (kafkaSender.closeCalled) {
+		if (delegate.closeCalled) {
 			throw new IllegalStateException("closed");
 		} else {
-			byte[] messages = kafkaSender.encoder.encode(encodedSpans);
-			return kafkaSender.new KafkaCall(messages);
+			byte[] messages = delegate.encoder.encode(encodedSpans);
+			return delegate.new KafkaCall(messages);
 		}
 	}
 
 	public Call<Void> sendSpans(byte[] encodedSpans) {
-		if (kafkaSender.closeCalled) {
+		if (delegate.closeCalled) {
 			throw new IllegalStateException("closed");
 		} else {
-			return kafkaSender.new KafkaCall(encodedSpans);
+			return delegate.new KafkaCall(encodedSpans);
 		}
 	}
 
 	@Override
 	public CheckResult check() {
-		return kafkaSender.check();
+		return delegate.check();
 	}
 
 	@Override
 	public boolean isClose() {
-		return kafkaSender.closeCalled;
+		return delegate.closeCalled;
 	}
 
 	@Override
 	public void close() throws IOException {
-		kafkaSender.close();
+		delegate.close();
 	}
 }

@@ -15,7 +15,7 @@ import zipkin2.reporter.Sender;
  */
 public class SimpleSender extends Sender implements SDKSender {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleSender.class);
+	private static final Logger log = LoggerFactory.getLogger(SimpleSender.class);
 
 	@Override
 	public Encoding encoding() {
@@ -35,7 +35,7 @@ public class SimpleSender extends Sender implements SDKSender {
 	@Override
 	public Call<Void> sendSpans(List<byte[]> encodedSpans) {
 		final byte[] bytes = BytesMessageEncoder.JSON.encode(encodedSpans);
-		LOGGER.info("{}",new String(bytes));
+		log.info("{}",new String(bytes));
 		return Call.create(null);
 	}
 
