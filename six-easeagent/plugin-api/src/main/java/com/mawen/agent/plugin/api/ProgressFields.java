@@ -27,39 +27,6 @@ public class ProgressFields {
 		return forwardHeaderSet;
 	}
 
-	public static boolean isProgressFields(String key) {
-		return isForwardedHeader(key) || isResponseHoldTagKey(key) || isServerTags(key);
-	}
-
-	private static boolean isForwardedHeader(String key) {
-		return AGENT_PROGRESS_FORWARDED_HEADERS_CONFIG.equals(key);
-	}
-
-	private static boolean isResponseHoldTagKey(String key) {
-		return key.startsWith(OBSERVABILITY_TRACINGS_TAG_RESPONSE_HEADERS_CONFIG);
-	}
-
-	private static boolean isServerTags(String key) {
-		return key.startsWith(OBSERVABILITY_TRACINGS_SERVICE_TAGS_CONFIG);
-	}
-
-	private static void buildForwardedHeaderSet(String value) {
-		var split = StringUtils.split(value, ",");
-		forwardHeaderSet.clear();
-		if (split == null || split.length == 0) {
-			return;
-		}
-		forwardHeaderSet.addAll(Arrays.asList(split));
-	}
-
-	private static void setResponseHoldTagFields(Map<String, String> fields) {
-		responseHoldTagFields = responseHoldTagFields.rebuild(fields);
-	}
-
-	private static void setServiceTags(Map<String, String> tags) {
-		serviceTags = serviceTags.rebuild(tags);
-	}
-
 	public static boolean isEmpty(String[] fields) {
 		return fields == null || fields.length == 0;
 	}
@@ -95,22 +62,6 @@ public class ProgressFields {
 			this.values = fieldSet.toArray(new String[0]);
 			this.keyValues = keyValues;
 			this.map = map;
-		}
-
-		Fields rebuild(@Nonnull Map<String, String> map) {
-			if (this.map.isEmpty()) {
-				map.entrySet().removeIf(entry -> StringUtils.isEmpty(entry.getValue()));
-				return build(keyPrefix, map);
-			}
-			var newMap = new HashMap<>(this.map);
-			for (var entry : map.entrySet()) {
-				if (StringUtils.isEmpty(entry.getValue())) {
-					newMap.remove(entry.getKey());
-				} else {
-					newMap.put(entry.getKey(), entry.getValue());
-				}
-			}
-			return build(keyPrefix, Collections.unmodifiableMap(newMap));
 		}
 	}
 }

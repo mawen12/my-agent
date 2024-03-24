@@ -8,6 +8,7 @@ import java.util.Set;
 import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.api.config.IConfigFactory;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
+import com.mawen.agent.plugin.utils.NoNull;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -72,7 +73,7 @@ public enum NoOpConfigFactory implements IConfigFactory {
 		@Override
 		public Boolean getBoolean(String name, boolean defVal) {
 			Boolean aBoolean = getBoolean(name);
-			return aBoolean == null ? defVal : aBoolean;
+			return NoNull.of(aBoolean, defVal);
 		}
 
 		@Override

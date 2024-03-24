@@ -76,7 +76,7 @@ public class ThreadLocalCurrentContext {
 		return ctx;
 	}
 
-	public static record CurrentContextRunnable(ThreadLocalCurrentContext threadLocalCurrentContext, Context ctx, Runnable original) implements Runnable {
+	public record CurrentContextRunnable(ThreadLocalCurrentContext threadLocalCurrentContext, Context ctx, Runnable original) implements Runnable {
 
 		@Override
 		public void run() {

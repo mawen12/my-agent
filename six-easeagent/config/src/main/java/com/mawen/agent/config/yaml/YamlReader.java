@@ -19,6 +19,7 @@ import org.yaml.snakeyaml.Yaml;
  * @since 2024/2/25
  */
 public class YamlReader {
+
 	private static final DumperOptions DUMPER_OPTIONS;
 
 	static {
@@ -37,30 +38,6 @@ public class YamlReader {
 			yaml = new Yaml(DUMPER_OPTIONS).load(in);
 		}
 		return this;
-	}
-
-	public static YamlReader merge(YamlReader target, YamlReader source) {
-		var targetMap = target.yaml;
-		var sourceMap = source.yaml;
-
-		merge(targetMap, sourceMap);
-
-		var result = new YamlReader();
-		result.yaml = new HashMap<>(targetMap);
-		return result;
-	}
-
-	private static void merge(Map<String, Object> target, Map<String, Object> source) {
-		source.forEach((key, value) -> {
-			var existing = target.get(key);
-			if (value instanceof Map && existing instanceof Map) {
-				Map<String, Object> result = new LinkedHashMap<>((Map<String, Object>) existing);
-				merge(result, (Map<String, Object>) value);
-				target.put(key, result);
-			} else {
-				target.put(key, value);
-			}
-		});
 	}
 
 	public Map<String, String> compress() {
@@ -99,9 +76,5 @@ public class YamlReader {
 			resultMap.put(String.join(".", keyStack),String.valueOf(v));
 			keyStack.removeLast();
 		});
-	}
-
-	public Map<String, Object> getYaml() {
-		return yaml;
 	}
 }

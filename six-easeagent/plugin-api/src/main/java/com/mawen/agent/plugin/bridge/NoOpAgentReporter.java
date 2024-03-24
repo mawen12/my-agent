@@ -26,11 +26,6 @@ public enum NoOpAgentReporter implements AgentReport {
 
 	@Override
 	public MetricReporterFactory metricReporter() {
-		return new MetricReporterFactory() {
-			@Override
-			public Reporter reporter(IPluginConfig config) {
-				return NoOpReporter.INSTANCE;
-			}
-		};
+		return config -> NoOpReporter.INSTANCE;
 	}
 }

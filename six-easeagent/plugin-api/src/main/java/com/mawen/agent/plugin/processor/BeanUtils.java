@@ -27,9 +27,7 @@ abstract class BeanUtils {
 	}
 
 	static BeanUtils of(final ProcessingEnvironment pe) {
-		return new BeanUtils(pe) {
-
-		};
+		return new BeanUtils(pe) {};
 	}
 
 	Element asElement(TypeMirror t) {

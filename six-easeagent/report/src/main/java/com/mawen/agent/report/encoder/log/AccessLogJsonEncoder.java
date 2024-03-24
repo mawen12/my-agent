@@ -19,7 +19,7 @@ public class AccessLogJsonEncoder extends JsonEncoder<AccessLogInfo> {
 
 	public static final String ENCODER_NAME = ReportConfigConst.ACCESS_LOG_JSON_ENCODER_NAME;
 
-	AccessLogWriter writer;
+	private AccessLogWriter writer;
 
 	@Override
 	public void init(Config config) {

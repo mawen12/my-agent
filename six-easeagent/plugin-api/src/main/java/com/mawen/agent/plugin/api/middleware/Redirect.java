@@ -5,6 +5,7 @@ package com.mawen.agent.plugin.api.middleware;
  * @since 2024/2/24
  */
 public enum Redirect {
+
 	REDIS(MiddlewareConstants.ENV_REDIS, true),
 	ELASTICSEARCH(MiddlewareConstants.ENV_ES, true),
 	KAFKA(MiddlewareConstants.ENV_KAFKA, true),

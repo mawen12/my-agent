@@ -9,6 +9,8 @@ import com.mawen.agent.plugin.api.logging.Logger;
 import com.mawen.agent.plugin.api.metric.name.Tags;
 import com.mawen.agent.plugin.api.trace.Span;
 import com.mawen.agent.plugin.bridge.Agent;
+import com.mawen.agent.plugin.bridge.NoOpLoggerFactory;
+import com.mawen.agent.plugin.utils.NoNull;
 import com.mawen.agent.plugin.utils.SystemEnv;
 import com.mawen.agent.plugin.utils.common.JsonUtil;
 import com.mawen.agent.plugin.utils.common.StringUtils;
@@ -18,13 +20,11 @@ import com.mawen.agent.plugin.utils.common.StringUtils;
  * @since 2024/2/24
  */
 public class RedirectProcessor {
-	private static final Logger LOGGER = Agent.getLogger(RedirectProcessor.class);
-	protected static final String ENV_EASEMESH_TAGS = "EASEMESH_TAGS";
 
 	public static final RedirectProcessor INSTANCE = new RedirectProcessor();
 
 	private volatile Map<Redirect, String> redirectedUris = new HashMap<>();
-	private final Map<String, String> tags = getServiceTagsFromEnv();
+	private final Map<String, String> tags = new HashMap<>();
 
 	public static void redirected(Redirect key, String uris) {
 		INSTANCE.setRedirected(key, uris);
@@ -63,16 +63,9 @@ public class RedirectProcessor {
 			return null;
 		}
 		var remote = INSTANCE.getRedirected(key);
-		if (remote == null) {
-			return null;
-		}
-		if (uris != null) {
-			return uris;
-		} else {
-			return remote;
-		}
-	}
 
+		return NoNull.of(uris, remote);
+	}
 
 	// all
 	public void init() {
@@ -87,31 +80,5 @@ public class RedirectProcessor {
 
 	private synchronized String getRedirected(Redirect key) {
 		return this.redirectedUris.get(key);
-	}
-
-	protected static Map<String, String> getServiceTagsFromEnv() {
-		return getServiceTags(ENV_EASEMESH_TAGS);
-	}
-
-	protected static Map<String, String> getServiceTags(String env) {
-		var str = SystemEnv.get(env);
-		if (StringUtils.isEmpty(env)) {
-			return Collections.emptyMap();
-		}
-		try {
-			var map = JsonUtil.toObject(str, new TypeReference<Map<String, String>>() {});
-			var result = new HashMap<String, String>();
-			for (var entry : map.entrySet()) {
-				if (StringUtils.isEmpty(entry.getKey()) || StringUtils.isEmpty(entry.getValue())) {
-					continue;
-				}
-				result.put(entry.getKey(), entry.getValue());
-			}
-			return result;
-		}
-		catch (Exception e) {
-			LOGGER.warn("get env {} result: `{}` to map fail. {}",env, str, e.getMessage());
-		}
-		return Collections.emptyMap();
 	}
 }

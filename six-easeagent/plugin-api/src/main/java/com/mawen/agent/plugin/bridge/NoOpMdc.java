@@ -7,6 +7,7 @@ import com.mawen.agent.plugin.api.logging.Mdc;
  * @since 2024/3/18
  */
 public enum NoOpMdc implements Mdc {
+
 	INSTANCE;
 
 	@Override

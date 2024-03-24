@@ -5,6 +5,7 @@ package com.mawen.agent.plugin.api.metric.name;
  * @since 2024/2/23
  */
 public enum MetricSubType {
+
 	DEFAULT("00"),
 	ERROR("01"),
 	CHANNEL("02"), // for rabbitmq

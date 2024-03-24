@@ -5,7 +5,6 @@ package com.mawen.agent.config.report;
  * @since 2024/2/25
  */
 public class ReportConfigConst {
-	private ReportConfigConst(){}
 
 	public static final String KAFKA_SENDER_NAME = "kafka";
 	public static final String METRIC_KAFKA_SENDER_NAME = "metricKafka";
@@ -143,4 +142,6 @@ public class ReportConfigConst {
 	public static String join(String... texts) {
 		return String.join(DELIMITER, texts);
 	}
+
+	private ReportConfigConst(){}
 }

@@ -18,7 +18,7 @@ import com.mawen.agent.report.encoder.span.SpanJsonEncoder;
 public class HttpSpanJsonEncoder implements Encoder<ReportSpan>{
 	public static final String ENCODER_NAME = ReportConfigConst.HTTP_SPAN_JSON_ENCODER_NAME;
 
-	SpanJsonEncoder encoder;
+	private SpanJsonEncoder encoder;
 
 	@Override
 	public void init(Config config) {

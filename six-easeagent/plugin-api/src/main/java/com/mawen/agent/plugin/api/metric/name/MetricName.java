@@ -8,22 +8,6 @@ import java.util.Map;
  */
 public record MetricName(MetricSubType metricSubType, String key, MetricType metricType, Map<MetricField, MetricValueFetcher> valueFetcher) {
 
-	public MetricSubType getMetricSubType() {
-		return metricSubType;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public MetricType getMetricType() {
-		return metricType;
-	}
-
-	public Map<MetricField, MetricValueFetcher> getValueFetcher() {
-		return valueFetcher;
-	}
-
 	public static MetricName metricNameFor(String name) {
 		return new MetricName(
 				MetricSubType.valueFor(name.substring(0,2)),

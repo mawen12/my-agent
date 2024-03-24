@@ -91,7 +91,7 @@ public interface Context {
 	 * Looks at the config at the current without removing it from the stack.
 	 *
 	 * @return The config at the top of the stack (the last config of the <tt>Config</tt> object).
-	 * return {@link NoOpIPluginConfig#INSTANCE} if this stack is empty.
+	 * return {@link com.mawen.agent.plugin.bridge.NoOpIPluginConfig#INSTANCE} if this stack is empty.
 	 */
 	IPluginConfig getConfig();
 

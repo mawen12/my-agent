@@ -13,6 +13,7 @@ import com.mawen.agent.plugin.utils.common.JsonUtil;
  * @since 2024/2/24
  */
 public class ResourceConfig {
+
 	private String username;
 	private String password;
 	private String uris;

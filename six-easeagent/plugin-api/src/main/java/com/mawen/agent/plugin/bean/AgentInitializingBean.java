@@ -5,5 +5,6 @@ package com.mawen.agent.plugin.bean;
  * @since 2024/2/24
  */
 public interface AgentInitializingBean {
+
 	void afterPropertiesSet();
 }

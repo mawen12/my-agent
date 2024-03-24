@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import com.mawen.agent.plugin.api.config.Config;
+import com.mawen.agent.plugin.utils.NoNull;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -16,7 +17,7 @@ import com.mawen.agent.plugin.api.config.Config;
  */
 public class Configs implements Config {
 
-	protected Map<String ,String> source;
+	protected Map<String, String> source;
 
 	protected Configs() {
 	}
@@ -37,9 +38,7 @@ public class Configs implements Config {
 
 	@Override
 	public String getString(String name, String defVal) {
-		var val = this.source.get(name);
-
-		return val == null ? defVal : val;
+		return NoNull.of(this.source.get(name), defVal);
 	}
 
 	@Override
@@ -59,8 +58,7 @@ public class Configs implements Config {
 
 	@Override
 	public Integer getInt(String name, int defVal) {
-		var anInt = getInt(name);
-		return anInt == null ? defVal : anInt;
+		return NoNull.of(getInt(name), defVal);
 	}
 
 	@Override
@@ -74,18 +72,16 @@ public class Configs implements Config {
 
 	@Override
 	public Boolean getBoolean(String name, boolean defVal) {
-		var aBoolean = getBoolean(name);
-		return aBoolean == null ? defVal : aBoolean;
+		return NoNull.of(getBoolean(name), defVal);
 	}
 
 	@Override
 	public Boolean getBooleanNullForUnset(String name) {
 		var value = this.source.get(name);
-		if (value == null) {
-			return null;
-		}
 
-		return value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("false");
+		return value != null
+				? value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("false")
+				: null;
 	}
 
 	@Override
@@ -104,8 +100,7 @@ public class Configs implements Config {
 
 	@Override
 	public Double getDouble(String name, double defVal) {
-		var anDouble = getDouble(name);
-		return anDouble == null ? defVal : anDouble;
+		return NoNull.of(getDouble(name), defVal);
 	}
 
 	@Override
@@ -124,8 +119,7 @@ public class Configs implements Config {
 
 	@Override
 	public Long getLong(String name, long defVal) {
-		var aLong = getLong(name);
-		return aLong == null ? defVal : aLong;
+		return NoNull.of(getLong(name), defVal);
 	}
 
 	@Override

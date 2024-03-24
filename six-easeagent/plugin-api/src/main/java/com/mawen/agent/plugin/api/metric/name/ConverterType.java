@@ -5,6 +5,7 @@ package com.mawen.agent.plugin.api.metric.name;
  * @since 2024/2/23
  */
 public enum ConverterType {
+
 	NONE(0),
 	RATE(1),
 	DURATION(2),

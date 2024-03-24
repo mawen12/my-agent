@@ -12,6 +12,7 @@ import com.mawen.agent.plugin.api.metric.Snapshot;
  * @since 2024/2/23
  */
 public enum MetricValueFetcher {
+
 	CountingCount(Counter::getCount, Counter.class),
 	SnapshotMaxValue(Snapshot::getMax, Snapshot.class),
 	SnapshotMeanValue(Snapshot::getMean, Snapshot.class),
@@ -36,10 +37,6 @@ public enum MetricValueFetcher {
 	private final Function func;
 	private final Class clazz;
 	private final Function checker;
-
-	public static <T, V> Function<T, V> wrapIgnoreZeroFunc(Function<T, V> origin) {
-		return null;
-	}
 
 	<T, V> MetricValueFetcher(Function<T, V> function,  Class<T> clazz) {
 		this(function, clazz, v -> v);

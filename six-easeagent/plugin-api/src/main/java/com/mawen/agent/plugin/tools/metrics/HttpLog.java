@@ -47,17 +47,16 @@ public class HttpLog {
 
 	private Map<String, String> getQueries(AccessLogServerInfo serverInfo) {
 		var serviceTags = ProgressFields.getServiceTags();
-		var meshTags = RedirectProcessor.tags();
-		if (serviceTags.isEmpty() && meshTags.isEmpty()) {
+		if (serviceTags.isEmpty()) {
 			return serverInfo.findQueries();
 		}
-		var queries = new HashMap<>(meshTags);
+		var queries = new HashMap<String, String>();
 		queries.putAll(serviceTags);
 		queries.putAll(serverInfo.findQueries());
 		return queries;
 	}
 
-	public String getLogString(AccessLogInfo accessLog, boolean success, Long beginTime, AccessLogServerInfo serverInfo ) {
+	public String getLogString(AccessLogInfo accessLog, boolean success, Long beginTime, AccessLogServerInfo serverInfo) {
 		this.finish(accessLog, success, beginTime, serverInfo);
 		return JsonUtil.toJson(List.of(accessLog));
 	}

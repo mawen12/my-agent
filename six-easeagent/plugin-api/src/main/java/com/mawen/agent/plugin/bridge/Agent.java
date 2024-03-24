@@ -32,6 +32,7 @@ import com.mawen.agent.plugin.report.AgentReport;
  * @since 2024/2/23
  */
 public final class Agent {
+
 	public static AgentInfo agentInfo;
 	public static MetricRegistrySupplier metricRegistrySupplier = NoOpMetricsRegistrySupplier.INSTANCE;
 	public static IContextManager initializeContextSupplier = () -> NoOpContext.NO_OP_CONTEXT;

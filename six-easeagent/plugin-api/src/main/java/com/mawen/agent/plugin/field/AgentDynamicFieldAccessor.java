@@ -10,13 +10,13 @@ import com.mawen.agent.plugin.bridge.Agent;
  * @since 2024/2/24
  */
 public class AgentDynamicFieldAccessor {
-	private static final Logger logger = Agent.loggerFactory.getLogger(AgentDynamicFieldAccessor.class);
+	private static final Logger log = Agent.loggerFactory.getLogger(AgentDynamicFieldAccessor.class);
 
 	public static final String DYNAMIC_FIELD_NAME = "agent_dynamic_$$$_data";
 
 	public static <T> T getDynamicFieldValue(Object target) {
 		if (!(target instanceof DynamicFieldAccessor dynamicFieldAccessor)) {
-			logger.warn(target.getClass().getName()," must implements DynamicFieldAccessor");
+			log.warn(target.getClass().getName()," must implements DynamicFieldAccessor");
 			return null;
 		}
 
@@ -25,7 +25,7 @@ public class AgentDynamicFieldAccessor {
 
 	public static void setDynamicFieldValue(Object target, Object value) {
 		if (!(target instanceof DynamicFieldAccessor dynamicFieldAccessor)) {
-			logger.warn(target.getClass().getName()," must implements DynamicFieldAccessor");
+			log.warn(target.getClass().getName()," must implements DynamicFieldAccessor");
 			return;
 		}
 		dynamicFieldAccessor.setAgent$$DynamicField$$Data(value);

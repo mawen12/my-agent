@@ -12,6 +12,7 @@ import com.mawen.agent.plugin.api.config.PluginConfigChangeListener;
  * @since 2024/2/23
  */
 public class NoOpIPluginConfig implements IPluginConfig {
+
 	public static NoOpIPluginConfig INSTANCE = new NoOpIPluginConfig("Noop", "Noop", "Noop");
 
 	private final String domain;

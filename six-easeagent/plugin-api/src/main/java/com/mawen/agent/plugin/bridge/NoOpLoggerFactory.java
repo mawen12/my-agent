@@ -8,6 +8,7 @@ import com.mawen.agent.plugin.api.logging.Logger;
  * @since 2024/2/24
  */
 public enum NoOpLoggerFactory implements ILoggerFactory {
+
 	INSTANCE;
 
 	@Override

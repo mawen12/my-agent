@@ -21,7 +21,7 @@ public class SpanJsonEncoder extends JsonEncoder<ReportSpan> {
 
 	public static final String ENCODER_NAME = ReportConfigConst.SPAN_JSON_ENCODER_NAME;
 
-	AgentV2SpanWriter writer;
+	private AgentV2SpanWriter writer;
 
 	@Override
 	public void init(Config config) {

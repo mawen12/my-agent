@@ -7,6 +7,7 @@ import com.mawen.agent.plugin.Ordered;
  * @since 2024/2/24
  */
 public interface BeanProvider extends Ordered {
+
 	@Override
 	default int order() {
 		return BeanOrder.HIGH.getOrder();
