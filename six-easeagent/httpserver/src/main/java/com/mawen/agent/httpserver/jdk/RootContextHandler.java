@@ -20,14 +20,7 @@ public class RootContextHandler implements HttpHandler {
 	DefaultRoutes routes = new DefaultRoutes();
 
 	@Override
-	public void handle(HttpExchange exchange) throws IOException {
-		var uri = exchange.getRequestURI().getPath();
-		var method = exchange.getRequestMethod();
-		var inetRemote = exchange.getRemoteAddress();
-		exchange.getRequestBody();
-		exchange.getRequestHeaders();
-		// todo complete
-	}
+	public void handle(HttpExchange exchange) throws IOException {}
 
 	public void addRoute(IHttpHandler handler) {
 		this.routes.addRoute(handler);

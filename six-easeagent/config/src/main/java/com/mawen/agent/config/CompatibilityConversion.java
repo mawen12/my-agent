@@ -150,7 +150,7 @@ public class CompatibilityConversion {
 		boolean isChange();
 	}
 
-	static record FinalConversion(String key, boolean change) implements Conversion<String> {
+	record FinalConversion(String key, boolean change) implements Conversion<String> {
 
 		@Override
 		public String transform(Map<String, String> configs, String value) {
@@ -164,7 +164,7 @@ public class CompatibilityConversion {
 		}
 	}
 
-	static record MultipleFinalConversion(List<FinalConversion> conversions, boolean change) implements Conversion<List<String>> {
+	record MultipleFinalConversion(List<FinalConversion> conversions, boolean change) implements Conversion<List<String>> {
 
 		@Override
 		public List<String> transform(Map<String, String> configs, String value) {
@@ -181,7 +181,7 @@ public class CompatibilityConversion {
 		}
 	}
 
-	static record SingleConversion(String domain, String namespace, String id, String property) implements Conversion<String> {
+	record SingleConversion(String domain, String namespace, String id, String property) implements Conversion<String> {
 
 		@Override
 		public String transform(Map<String, String> configs, String value) {
@@ -196,7 +196,7 @@ public class CompatibilityConversion {
 		}
 	}
 
-	static record MultipleConversion(String domain, List<String> namespaces, String id, String property) implements Conversion<List<String>> {
+	record MultipleConversion(String domain, List<String> namespaces, String id, String property) implements Conversion<List<String>> {
 
 		@Override
 		public List<String> transform(Map<String, String> configs, String value) {
@@ -214,7 +214,7 @@ public class CompatibilityConversion {
 			return true;
 		}
 
-		static record SingleBuilder(String domain, String namespace) implements BiFunction<String, String, Conversion<?>> {
+		record SingleBuilder(String domain, String namespace) implements BiFunction<String, String, Conversion<?>> {
 
 			@Override
 			public Conversion<?> apply(String id, String property) {
@@ -227,7 +227,7 @@ public class CompatibilityConversion {
 		}
 	}
 
-	static record MultipleBuilder(String domain, List<String> namespaces) implements BiFunction<String, String, Conversion<?>> {
+	record MultipleBuilder(String domain, List<String> namespaces) implements BiFunction<String, String, Conversion<?>> {
 
 		@Override
 		public Conversion<?> apply(String id, String property) {

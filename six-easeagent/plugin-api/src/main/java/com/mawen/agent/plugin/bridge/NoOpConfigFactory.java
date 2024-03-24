@@ -107,11 +107,6 @@ public enum NoOpConfigFactory implements IConfigFactory {
 		}
 
 		@Override
-		public Runnable addChangeListener(ConfigChangeListener listener) {
-			return null;
-		}
-
-		@Override
 		public Set<String> keySet() {
 			return Collections.emptySet();
 		}
@@ -119,16 +114,6 @@ public enum NoOpConfigFactory implements IConfigFactory {
 		@Override
 		public Map<String, String> getConfigs() {
 			return Collections.emptyMap();
-		}
-
-		@Override
-		public void updateConfigs(Map<String, String> changes) {
-			// NOP
-		}
-
-		@Override
-		public void updateConfigsNotNotify(Map<String, String> changes) {
-			// NOP
 		}
 	}
 }

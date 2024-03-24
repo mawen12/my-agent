@@ -1,7 +1,6 @@
 package com.mawen.agent.config;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -9,28 +8,21 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import com.mawen.agent.log4j2.Logger;
-import com.mawen.agent.log4j2.LoggerFactory;
-import com.mawen.agent.plugin.api.config.ChangeItem;
 import com.mawen.agent.plugin.api.config.Config;
-import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/25
  */
 public class Configs implements Config {
-	private static final Logger log = LoggerFactory.getLogger(Configs.class);
 
 	protected Map<String ,String> source;
-	protected ConfigNotifier notifier;
 
 	protected Configs() {
 	}
 
 	public Configs(Map<String, String> source) {
 		this.source = new TreeMap<>(source);
-		this.notifier = new ConfigNotifier("");
 	}
 
 	@Override
@@ -146,11 +138,6 @@ public class Configs implements Config {
 	}
 
 	@Override
-	public Runnable addChangeListener(ConfigChangeListener listener) {
-		return this.notifier.addChangeListener(listener);
-	}
-
-	@Override
 	public Set<String> keySet() {
 		return this.source.keySet();
 	}
@@ -160,30 +147,13 @@ public class Configs implements Config {
 		return new TreeMap<>(this.source);
 	}
 
-	@Override
-	public void updateConfigs(Map<String, String> changes) {
-		var dump = new TreeMap<>(this.source);
-		var items = new LinkedList<ChangeItem>();
-		changes.forEach((name, value) -> {
-			var old = dump.get(name);
-			if (!Objects.equals(old, value)) {
-				dump.put(name, value);
-				items.add(new ChangeItem(name, name, old, value));
-			}
-		});
-		if (!items.isEmpty()) {
-			log.info("change items: {}",items);
-			this.source = dump;
-			this.notifier.handleChanges(items);
+
+	public void mergeConfigs(Configs configs) {
+		var merged = configs.getConfigs();
+		if (merged.isEmpty()) {
+			return;
 		}
-	}
 
-	@Override
-	public void updateConfigsNotNotify(Map<String, String> changes) {
-		this.source.putAll(changes);
-	}
-
-	protected boolean hasText(String text) {
-		return text != null && !text.trim().isEmpty();
+		this.source.putAll(merged);
 	}
 }

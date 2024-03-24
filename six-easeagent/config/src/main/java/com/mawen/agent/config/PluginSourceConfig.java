@@ -3,6 +3,8 @@ package com.mawen.agent.config;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -39,12 +41,16 @@ public class PluginSourceConfig {
 		return new PluginSourceConfig(domain, namespace, id, pluginSource, properties);
 	}
 
+	/**
+	 * @since 0.0.2-SNAPSHOT
+	 */
 	public Map<String , String> getProperties() {
-		var result = new HashMap<String, String>();
-		for (var entry : properties.entrySet()) {
-			result.put(entry.getKey().property(), entry.getValue());
-		}
-		return result;
+		Function<Map.Entry<PluginProperty, String>, String> keyGetter = entry -> entry.getKey().property();
+		Function<Map.Entry<PluginProperty, String>, String> valueGetter = Map.Entry::getValue;
+
+		return properties.entrySet()
+				.stream()
+				.collect(Collectors.toMap(keyGetter, valueGetter));
 	}
 
 	public String getDomain() {

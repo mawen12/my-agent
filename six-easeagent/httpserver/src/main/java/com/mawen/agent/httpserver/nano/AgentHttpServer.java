@@ -19,12 +19,6 @@ public class AgentHttpServer extends RouterNanoHTTPD {
 		Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
 	}
 
-	public void addHttpRoutes(List<AgentHttpHandler> agentHttpHandlers) {
-		for (var agentHttpHandler : agentHttpHandlers) {
-			this.addRoute(agentHttpHandler.getPath(), agentHttpHandler.getClass());
-		}
-	}
-
 	public void addHttpRoute(AgentHttpHandler handler) {
 		this.addRoute(handler.getPath(), handler.getClass());
 	}

@@ -64,7 +64,6 @@ public class PluginLoader {
 			log.info("loading provider: {}", provider.getClass().getName());
 
 			try {
-				log.debugIfEnabled("provider for:{} at {}", provider.getPluginClassName(), provider.getAdviceTo());
 				PluginRegistry.register(provider);
 			}
 			catch (Exception | LinkageError e) {

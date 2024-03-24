@@ -11,14 +11,13 @@ import static com.mawen.agent.plugin.matcher.loader.ClassLoaderMatcher.*;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /**
+ * 将 {@link IClassLoaderMatcher} 转换为 ByteBuddy 中的 {@link ElementMatcher}
+ *
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
 public enum ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher, ElementMatcher<ClassLoader>> {
 	INSTANCE;
-
-	private static final ElementMatcher<ClassLoader> agentLoaderMatcher = is(Bootstrap.class.getClassLoader())
-			.or(is(FinalClassLoaderSupplier.CLASSLOADER));
 
 	@Override
 	public ElementMatcher<ClassLoader> convert(IClassLoaderMatcher source) {
@@ -37,27 +36,20 @@ public enum ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher, 
 				case BOOTSTRAP_NAME -> ElementMatchers.isBootstrapClassLoader();
 				case EXTERNAL_NAME -> ElementMatchers.isExtensionClassLoader();
 				case SYSTEM_NAME -> ElementMatchers.isSystemClassLoader();
-				case AGENT_NAME -> agentLoaderMatcher;
+				case AGENT_NAME -> is(Bootstrap.class.getClassLoader())
+						.or(is(FinalClassLoaderSupplier.CLASSLOADER));
 				default -> new NameMatcher(source.getClassLoaderName());
 			};
 		}
 
-		if (negate) {
-			return not(matcher);
-		}
-		else {
-			return matcher;
-		}
+		return negate ? not(matcher) : matcher;
 	}
 
 	record NameMatcher(String className) implements ElementMatcher<ClassLoader> {
 
 		@Override
 		public boolean matches(ClassLoader target) {
-			if (target == null) {
-				return this.className == null;
-			}
-			return this.className.equals(target.getClass().getCanonicalName());
+			return target == null ? this.className == null : this.className.equals(target.getClass().getCanonicalName());
 		}
 	}
 }

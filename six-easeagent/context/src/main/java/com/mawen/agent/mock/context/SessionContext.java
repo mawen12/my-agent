@@ -310,7 +310,7 @@ public class SessionContext implements InitializeContext {
 	}
 
 	private <V> V change(Object o) {
-		return o == null ? null : (V) o;
+		return NoNull.of((V) o, null);
 	}
 
 	private Cleaner importForwardedHeaders(Getter getter, Setter setter) {

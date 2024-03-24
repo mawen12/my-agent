@@ -44,12 +44,28 @@ public final class Agent {
 
 	public static Supplier<URLClassLoader> agentClassLoader = () -> null;
 
+	public static void setAgentInfo(AgentInfo agentInfo) {
+		Agent.agentInfo = agentInfo;
+	}
+
 	public static AgentInfo getAgentInfo() {
 		return agentInfo;
 	}
 
+	public static void setAgentClassLoader(Supplier<URLClassLoader> agentClassLoader) {
+		Agent.agentClassLoader = agentClassLoader;
+	}
+
 	public static URLClassLoader getAgentClassLoader() {
 		return agentClassLoader.get();
+	}
+
+	public static void setDispatcher(IDispatcher dispatcher) {
+		Agent.dispatcher = dispatcher;
+	}
+
+	public static IDispatcher getDispatcher() {
+		return dispatcher;
 	}
 
 	/**

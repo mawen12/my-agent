@@ -13,6 +13,8 @@ import net.bytebuddy.matcher.NegatingMatcher;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /**
+ * 将 {@link IClassMatcher} 转换为 ByteBuddy 中的 {@link ElementMatcher}
+ *
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */

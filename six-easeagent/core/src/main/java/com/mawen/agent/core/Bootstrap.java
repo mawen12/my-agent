@@ -2,39 +2,32 @@ package com.mawen.agent.core;
 
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.lang.management.ManagementFactory;
 import java.net.URLClassLoader;
 import java.util.concurrent.TimeUnit;
-
-import javax.management.ObjectName;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.mawen.agent.config.ConfigAware;
 import com.mawen.agent.config.ConfigFactory;
-import com.mawen.agent.config.ConfigManagerMXBean;
 import com.mawen.agent.config.Configs;
-import com.mawen.agent.config.GlobalConfigs;
-import com.mawen.agent.config.WrappedConfigManager;
-import com.mawen.agent.core.config.CanaryListUpdateAgentHttpHandler;
-import com.mawen.agent.core.config.CanaryUpdateAgentHttpHandler;
-import com.mawen.agent.core.config.PluginPropertiesHttpHandler;
-import com.mawen.agent.core.config.PluginPropertyHttpHandler;
-import com.mawen.agent.core.config.ServiceUpdateAgentHttpHandler;
 import com.mawen.agent.core.info.AgentInfoFactory;
 import com.mawen.agent.core.plugin.BaseLoader;
 import com.mawen.agent.core.plugin.BridgeDispatcher;
 import com.mawen.agent.core.plugin.PluginLoader;
-import com.mawen.agent.httpserver.nano.AgentHttpHandlerProvider;
 import com.mawen.agent.httpserver.nano.AgentHttpServer;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.mock.context.ContextManager;
 import com.mawen.agent.plugin.api.config.ConfigConst;
+import com.mawen.agent.plugin.api.dispatcher.IDispatcher;
 import com.mawen.agent.plugin.api.metric.MetricProvider;
 import com.mawen.agent.plugin.api.middleware.RedirectProcessor;
 import com.mawen.agent.plugin.api.trace.TracingProvider;
 import com.mawen.agent.plugin.bean.AgentInitializingBean;
 import com.mawen.agent.plugin.bean.BeanProvider;
 import com.mawen.agent.plugin.bridge.Agent;
+import com.mawen.agent.plugin.bridge.AgentInfo;
 import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 import com.mawen.agent.report.AgentReportAware;
@@ -53,11 +46,14 @@ public class Bootstrap {
 	private static final Logger log = LoggerFactory.getLogger(Bootstrap.class);
 
 	private static final int DEF_AGENT_SERVER_PORT = 9900;
-	static final String MX_BEAN_OBJECT_NAME = "com.mawen.agent:type=ConfigManager";
 
 	private static ContextManager contextManager;
 
 	private static AgentBuilder builder;
+
+	public static void setContextManager(ContextManager contextManager) {
+		Bootstrap.contextManager = contextManager;
+	}
 
 	private Bootstrap() {
 	}
@@ -68,7 +64,7 @@ public class Bootstrap {
 
 		// add bootstrap classes
 		var bootstrapClassSet = AppendBootstrapClassLoaderSearch.by(inst, ClassInjector.UsingInstrumentation.Target.BOOTSTRAP);
-		log.debugIfEnabled("Injected class: {}", bootstrapClassSet);
+		log.info("Injected class: {}", bootstrapClassSet);
 
 		// initiate configuration
 		var configPath = ConfigFactory.getConfigPath();
@@ -79,15 +75,13 @@ public class Bootstrap {
 		var classLoader = Bootstrap.class.getClassLoader();
 		var cfg = ConfigFactory.loadConfigs(configPath, classLoader);
 
-		wrapConfig(cfg, classLoader);
+		initAgentInfo(classLoader, AgentInfoFactory::loadAgentInfo, Agent::setAgentInfo); // init AgentInfo
 
-		initAgentInfo(classLoader); // init AgentInfo
+		initAgentClassLoader(classLoader, Agent::setAgentClassLoader); // init ClassLoader
 
-		initAgentClassLoader(classLoader); // init ClassLoader
+		initContextManager(cfg, ContextManager::build, Bootstrap::setContextManager); // init context
 
-		initContextManager(cfg); // init context
-
-		initDispatcher(); // init Dispatcher
+		initDispatcher(BridgeDispatcher::new, Agent::setDispatcher); // init Dispatcher
 
 		initHttpServer(cfg); // init HttpServer
 
@@ -95,7 +89,7 @@ public class Bootstrap {
 
 		initReporter(cfg); // init Reporter
 
-		initPlugins(cfg, false); // init Plugins
+		initPlugins(cfg); // init Plugins
 
 		initProvider(cfg, Agent.agentReport); // init Provider & Beans
 
@@ -107,21 +101,35 @@ public class Bootstrap {
 		log.info("Initialization has took: {}ms", TimeUnit.MILLISECONDS.toMillis(System.currentTimeMillis() - begin));
 	}
 
-	private static void initAgentInfo(ClassLoader classLoader) {
-		Agent.agentInfo = AgentInfoFactory.loadAgentInfo(classLoader);
+	/**
+	 * @since 0.0.2-SNAPSHOT
+	 */
+	private static void initAgentInfo(ClassLoader classLoader, Function<ClassLoader, AgentInfo> agentInfoGetter, Consumer<AgentInfo> agentInfoSetter) {
+		AgentInfo agentInfo = agentInfoGetter.apply(classLoader);
+		agentInfoSetter.accept(agentInfo);
 	}
 
-	private static void initAgentClassLoader(ClassLoader classLoader) {
-		GlobalAgentHolder.setAgentLoader((URLClassLoader) classLoader);
-		Agent.agentClassLoader = GlobalAgentHolder::getAgentLoader;
+	/**
+	 * @since 0.0.2-SNAPSHOT
+	 */
+	private static void initAgentClassLoader(ClassLoader classLoader, Consumer<Supplier<URLClassLoader>> agentClassLoaderSetter) {
+		agentClassLoaderSetter.accept(() -> (URLClassLoader) classLoader);
 	}
 
-	private static void initContextManager(Configs cfg) {
-		contextManager = ContextManager.build(cfg);
+	/**
+	 * @since 0.0.2-SNAPSHOT
+	 */
+	private static void initContextManager(Configs cfg, Function<Configs, ContextManager> contextManagerGetter, Consumer<ContextManager> contextManagerSetter) {
+		ContextManager contextManager = contextManagerGetter.apply(cfg);
+		contextManagerSetter.accept(contextManager);
 	}
 
-	private static void initDispatcher() {
-		Agent.dispatcher = new BridgeDispatcher();
+	/**
+	 * @since 0.0.2-SNAPSHOT
+	 */
+	private static void initDispatcher(Supplier<IDispatcher> supplier, Consumer<IDispatcher> dispatcherSetter) {
+		IDispatcher dispatcher = supplier.get();
+		dispatcherSetter.accept(dispatcher);
 	}
 
 	private static void initHttpServer(Configs config) {
@@ -130,8 +138,6 @@ public class Bootstrap {
 		if (port == null) {
 			port = DEF_AGENT_SERVER_PORT;
 		}
-		var portStr = System.getProperty(ConfigFactory.AGENT_SERVER_PORT, String.valueOf(port));
-		port = Integer.parseInt(portStr);
 
 		var agentHttpServer = new AgentHttpServer(port);
 
@@ -140,29 +146,20 @@ public class Bootstrap {
 			agentHttpServer.startServer();
 			log.info("start agent http server on port:{}", port);
 		}
-		GlobalAgentHolder.setAgentHttpServer(agentHttpServer);
-
-		// add httpHandler
-		agentHttpServer.addHttpRoute(new ServiceUpdateAgentHttpHandler());
-		agentHttpServer.addHttpRoute(new CanaryUpdateAgentHttpHandler());
-		agentHttpServer.addHttpRoute(new CanaryListUpdateAgentHttpHandler());
-		agentHttpServer.addHttpRoute(new PluginPropertyHttpHandler());
-		agentHttpServer.addHttpRoute(new PluginPropertiesHttpHandler());
 	}
 
 	private static void initRedirection() {
 		RedirectProcessor.INSTANCE.init();
 	}
 
-	private static void initReporter(GlobalConfigs configs) {
+	private static void initReporter(Configs configs) {
 		log.info("init reporter >>>>>");
 		var agentReport = DefaultAgentReport.create(configs);
-		GlobalAgentHolder.setAgentReport(agentReport);
 		Agent.agentReport = agentReport;
 		log.info("init reporter success!");
 	}
 
-	private static void initPlugins(Configs cfg, boolean test) {
+	private static void initPlugins(Configs cfg) {
 		log.info("init plugins >>>>>");
 		builder = getAgentBuilder(cfg, false);
 		builder = PluginLoader.load(builder);
@@ -183,10 +180,6 @@ public class Bootstrap {
 		}
 		if (provider instanceof AgentReportAware reportAware) {
 			reportAware.setAgentReport(report);
-		}
-		if (provider instanceof AgentHttpHandlerProvider httpHandlerProvider) {
-			GlobalAgentHolder.getAgentHttpServer()
-					.addHttpRoutes(httpHandlerProvider.getAgentHttpHandlers());
 		}
 		if (provider instanceof AgentInitializingBean initializingBean) {
 			initializingBean.afterPropertiesSet();
@@ -239,24 +232,4 @@ public class Bootstrap {
 		return builder;
 	}
 
-	private static void wrapConfig(GlobalConfigs conf, ClassLoader classLoader) {
-		var wrappedConfigManager = new WrappedConfigManager(classLoader, conf);
-		registerMBeans(wrappedConfigManager);
-		GlobalAgentHolder.setWrappedConfigManager(wrappedConfigManager);
-	}
-
-	private static void registerMBeans(ConfigManagerMXBean conf) {
-		var begin = System.currentTimeMillis();
-		ObjectName mxBeanName = null;
-		try {
-			var mbs = ManagementFactory.getPlatformMBeanServer();
-			mxBeanName = new ObjectName(MX_BEAN_OBJECT_NAME);
-			mbs.registerMBean(conf, mxBeanName);
-			log.info("Register {} as MBean {}, use time: {}", conf.getClass().getName(), mxBeanName, (System.currentTimeMillis() - begin));
-		}
-		catch (Exception e) {
-			log.warn("Register {} as MBean failed, {}", conf.getClass().getName(), e);
-			throw new RuntimeException(e);
-		}
-	}
 }

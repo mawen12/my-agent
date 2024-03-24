@@ -55,7 +55,6 @@ public class ContextManager implements IContextManager {
 
 	public static ContextManager build(Configs configs) {
 		log.info("build context manager.");
-		ProgressFieldsManager.init(configs);
 		PluginConfigManager pluginConfigManager = PluginConfigManager.builder(configs).build();
 
 		LoggerFactoryImpl loggerFactory = LoggerFactoryImpl.build();

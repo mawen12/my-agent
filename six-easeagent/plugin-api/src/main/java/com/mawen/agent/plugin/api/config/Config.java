@@ -36,13 +36,7 @@ public interface Config {
 
 	List<String> getStringList(String name);
 
-	Runnable addChangeListener(ConfigChangeListener listener);
-
 	Set<String> keySet();
 
 	Map<String, String> getConfigs();
-
-	void updateConfigs(Map<String, String> changes);
-
-	void updateConfigsNotNotify(Map<String, String> changes);
 }

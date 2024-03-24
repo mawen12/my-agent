@@ -4,18 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.instrument.Instrumentation;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
-import com.google.common.io.Closeables;
 import com.mawen.agent.plugin.AppendBootstrapLoader;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.ClassFileLocator;
@@ -27,6 +28,8 @@ import net.bytebuddy.pool.TypePool;
  * @since 2024/3/5
  */
 public final class AppendBootstrapClassLoaderSearch {
+
+	private static final String DEFAULT_PATH = "/META-INF/services/";
 
 	private static final File TMP_FILE = new File(
 			AccessController.doPrivileged(
@@ -40,56 +43,64 @@ public final class AppendBootstrapClassLoaderSearch {
 	);
 
 	static Set<String> by(Instrumentation inst, ClassInjector.UsingInstrumentation.Target target) throws IOException {
-		var names = findClassAnnotationAutoService(AppendBootstrapLoader.class);
+		var names = findClassAnnotationAutoService(DEFAULT_PATH + AppendBootstrapLoader.class.getName());
+
 		Map<TypeDescription, byte[]> types = types(names);
+
 		ClassInjector.UsingInstrumentation.of(TMP_FILE, target, inst).inject(types);
+
 		return names;
 	}
 
-	private static Set<String> findClassAnnotationAutoService(Class<?> clazz) throws IOException {
-		final var loader = AppendBootstrapClassLoaderSearch.class.getClassLoader();
+	/**
+	 * @since 0.0.2-SNAPSHOT
+	 */
+	private static Set<String> findClassAnnotationAutoService(String resourcePath) throws IOException {
+		ClassLoader classLoader = AppendBootstrapClassLoaderSearch.class.getClassLoader();
+		Enumeration<URL> resources = classLoader.getResources(resourcePath);
+		Iterable<URL> iterable = resources::asIterator;
 
-		return FluentIterable.from(Collections.list(loader.getResources("/META-INF/services/" + clazz.getName())))
-				.transform(input -> {
-					try {
-						var connection = input.openConnection();
-						var inputStream = connection.getInputStream();
-						return new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-					}
-					catch (IOException e) {
-						throw new IllegalStateException(e);
-					}
-				})
-				.transformAndConcat((Function<InputStreamReader, Iterable<String>>) input -> {
-					try {
-						return CharStreams.readLines(input);
-					}
-					catch (IOException e) {
-						throw new IllegalStateException(e);
-					}
-					finally {
-						Closeables.closeQuietly(input);
-					}
-				})
-				.toSet();
+		return StreamSupport.stream(iterable.spliterator(), false)
+				.flatMap(AppendBootstrapClassLoaderSearch::readLines)
+				.collect(Collectors.toSet());
 	}
 
+	/**
+	 * @since 0.0.2-SNAPSHOT
+	 */
+	private static Stream<String> readLines(URL input) {
+		try(InputStreamReader reader = new InputStreamReader(input.openConnection().getInputStream(), StandardCharsets.UTF_8)) {
+			return CharStreams.readLines(reader).stream();
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * @since 0.0.2-SNAPSHOT
+	 */
 	private static Map<TypeDescription, byte[]> types(Set<String> names) {
 		var loader = AppendBootstrapClassLoaderSearch.class.getClassLoader();
 		var locator = ClassFileLocator.ForClassLoader.of(loader);
 		var pool = TypePool.Default.of(locator);
 
-		Map<TypeDescription, String> map = Maps.uniqueIndex(names, input -> pool.describe(input).resolve());
+		Function<String, TypeDescription> keyFunction = name -> pool.describe(name).resolve();
+		Function<String, byte[]> valueFunction = name -> AppendBootstrapClassLoaderSearch.locate(locator,name);
 
-		return Maps.transformValues(map,
-				input -> {
-					try {
-						return locator.locate(input).resolve();
-					}
-					catch (IOException e) {
-						throw new IllegalStateException(e);
-					}
-				});
+		return names.stream().collect(Collectors.toMap(keyFunction, valueFunction));
+	}
+
+	/**
+	 * @since 0.0.2-SNAPSHOT
+	 */
+	private static byte[] locate(ClassFileLocator locator, String name) {
+		try {
+			return locator.locate(name).resolve();
+		}
+		catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	private AppendBootstrapClassLoaderSearch() {

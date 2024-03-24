@@ -14,6 +14,8 @@ import net.bytebuddy.matcher.NegatingMatcher;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /**
+ * 将 {@link IMethodMatcher} 转换为 ByteBuddy 中的 {@link ElementMatcher}
+ *
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
@@ -22,7 +24,7 @@ public enum MethodMatcherConvert implements Converter<IMethodMatcher, ElementMat
 
 	@Override
 	public ElementMatcher.Junction<MethodDescription> convert(IMethodMatcher source) {
-		if (source == null) {
+		if (source == null || !(source instanceof NegatingMatcher)) {
 			return null;
 		}
 
@@ -39,10 +41,6 @@ public enum MethodMatcherConvert implements Converter<IMethodMatcher, ElementMat
 		else if (source instanceof NegateMethodMatcher matcher) {
 			var notMatcher = this.convert(matcher.getMatcher());
 			return new NegatingMatcher<>(notMatcher);
-		}
-
-		if (!(source instanceof MethodMatcher)) {
-			return null;
 		}
 
 		return this.convert((MethodMatcher) source);

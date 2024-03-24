@@ -7,7 +7,7 @@ import java.io.File;
  * @since 2024/2/26
  */
 public class MockConfigLoader {
-	public static GlobalConfigs loadFromFile(File file) {
+	public static Configs loadFromFile(File file) {
 		return ConfigLoader.loadFromFile(file);
 	}
 }

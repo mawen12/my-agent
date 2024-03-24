@@ -25,17 +25,17 @@ public class ConfigLoader {
 		return filename.endsWith(".yaml") || filename.endsWith(".yml");
 	}
 
-	static GlobalConfigs loadFromClasspath(ClassLoader classLoader, String file) {
+	static Configs loadFromClasspath(ClassLoader classLoader, String file) {
 		try (var in = classLoader.getResourceAsStream(file)) {
 			return ConfigLoader.loadFromStream(in, file);
 		}
 		catch (IOException e) {
 			log.warn("Load config file: {} by classloader: {} failure: {}", file, classLoader.toString(), e);
 		}
-		return new GlobalConfigs(Collections.emptyMap());
+		return new Configs(Collections.emptyMap());
 	}
 
-	static GlobalConfigs loadFromStream(InputStream in, String filename) throws IOException {
+	static Configs loadFromStream(InputStream in, String filename) throws IOException {
 		if (in != null) {
 			Map<String, String> map;
 			if (checkYaml(filename)) {
@@ -49,9 +49,9 @@ public class ConfigLoader {
 			} else {
 				map = extractPropsMap(in);
 			}
-			return new GlobalConfigs(map);
+			return new Configs(map);
 		} else {
-			return new GlobalConfigs(Collections.emptyMap());
+			return new Configs(Collections.emptyMap());
 		}
 	}
 
@@ -64,13 +64,13 @@ public class ConfigLoader {
 				.collect(Collectors.toMap(Function.identity(), name -> String.valueOf(properties.getProperty(name))));
 	}
 
-	static GlobalConfigs loadFromFile(File file) {
+	static Configs loadFromFile(File file) {
 		try (var in = new FileInputStream(file)) {
 			return ConfigLoader.loadFromStream(in, file.getAbsolutePath());
 		}
 		catch (IOException e) {
 			log.warn("Load config file failure: {}", file.getAbsolutePath());
 		}
-		return new GlobalConfigs(Collections.emptyMap());
+		return new Configs(Collections.emptyMap());
 	}
 }

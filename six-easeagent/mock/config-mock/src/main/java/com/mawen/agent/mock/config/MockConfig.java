@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.HashMap;
 
 import com.mawen.agent.config.Configs;
-import com.mawen.agent.config.GlobalConfigs;
 import com.mawen.agent.config.MockConfigLoader;
 import com.mawen.agent.config.PluginConfigManager;
 
@@ -15,7 +14,7 @@ import com.mawen.agent.config.PluginConfigManager;
 public class MockConfig {
 	private static final String MOCK_CONFIG_YAML_FILE = "mock_agent.yaml";
 	private static final String MOCK_CONFIG_PROP_FILE = "mock_agent.properties";
-	private static final GlobalConfigs CONFIGS;
+	private static final Configs CONFIGS;
 	private static final PluginConfigManager PLUGIN_CONFIG_MANAGER;
 
 	static {
@@ -28,7 +27,7 @@ public class MockConfig {
 		initConfigs.put("observability.tracings.output.enabled", "true");
 		initConfigs.put("plugin.observability.global.tracing.enabled", "true");
 		initConfigs.put("plugin.observability.global.metric.enabled", "true");
-		CONFIGS = new GlobalConfigs(initConfigs);
+		CONFIGS = new Configs(initConfigs);
 		var classLoader = Thread.currentThread().getContextClassLoader();
 		var url = classLoader.getResource(MOCK_CONFIG_YAML_FILE);
 		if (url == null) {

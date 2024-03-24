@@ -9,6 +9,7 @@ import com.mawen.agent.plugin.api.config.Config;
  * @since 2024/2/25
  */
 public class AutoRefreshConfigItem<T> {
+
 	private volatile T value;
 
 	public AutoRefreshConfigItem(Config config, String name, BiFunction<Config, String, T> func) {

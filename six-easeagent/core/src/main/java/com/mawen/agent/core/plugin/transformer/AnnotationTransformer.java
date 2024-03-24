@@ -21,19 +21,17 @@ import net.bytebuddy.utility.JavaModule;
  */
 public class AnnotationTransformer implements AgentBuilder.Transformer {
 	private final AsmVisitorWrapper visitorWrapper;
-	private final MethodTransformation methodTransformation;
 	private final AnnotationDescription annotationDescription;
 
 	public AnnotationTransformer(MethodTransformation methodTransformation) {
-		this.methodTransformation = methodTransformation;
 		this.annotationDescription = AnnotationDescription.Builder
 				.ofType(AgentInstrumented.class)
-				.define("value", methodTransformation.getIndex())
+				.define("value", methodTransformation.index())
 				.build();
 		var forMethod = new MemberAttributeExtension.ForMethod()
 				.annotateMethod(this.annotationDescription);
 		this.visitorWrapper = new ForMethodDelegate(annotationDescription.getAnnotationType(), forMethod, methodTransformation)
-				.on(methodTransformation.getMatcher());
+				.on(methodTransformation.matcher());
 	}
 
 

@@ -21,31 +21,26 @@ import static com.mawen.agent.config.report.ReportConfigConst.*;
  * @since 2024/2/25
  */
 public class ReportConfigAdapter {
-	private static final Logger LOGGER = Agent.loggerFactory.getLogger(ReportConfigAdapter.class);
+	private static final Logger log = Agent.loggerFactory.getLogger(ReportConfigAdapter.class);
 
 	private ReportConfigAdapter() {
 	}
 
-	public static void convertConfig(Map<String, String> config) {
-		var cfg = extractAndConvertReporterConfig(config);
-		config.putAll(cfg);
-	}
-
 	public static Map<String, String> extractReporterConfig(Config configs) {
-		var cfg = ConfigUtils.extractByPrefix(configs.getConfigs(), REPORT);
+		var config = ConfigUtils.extractByPrefix(configs.getConfigs(), REPORT);
 
 		// default config
-		cfg.put(TRACE_SENDER, NoNull.of(cfg.get(TRACE_ENCODER), SPAN_JSON_ENCODER_NAME));
-		cfg.put(METRIC_ENCODER, NoNull.of(cfg.get(METRIC_ENCODER), METRIC_JSON_ENCODER_NAME));
-		cfg.put(LOG_ENCODER, NoNull.of(cfg.get(LOG_ENCODER), LOG_DATA_JSON_ENCODER_NAME));
-		cfg.put(LOG_ACCESS_ENCODER, NoNull.of(cfg.get(LOG_ACCESS_ENCODER), ACCESS_LOG_JSON_ENCODER_NAME));
+		config.put(TRACE_SENDER, NoNull.of(config.get(TRACE_ENCODER), SPAN_JSON_ENCODER_NAME));
+		config.put(METRIC_ENCODER, NoNull.of(config.get(METRIC_ENCODER), METRIC_JSON_ENCODER_NAME));
+		config.put(LOG_ENCODER, NoNull.of(config.get(LOG_ENCODER), LOG_DATA_JSON_ENCODER_NAME));
+		config.put(LOG_ACCESS_ENCODER, NoNull.of(config.get(LOG_ACCESS_ENCODER), ACCESS_LOG_JSON_ENCODER_NAME));
 
-		cfg.put(TRACE_SENDER_NAME, NoNull.of(cfg.get(TRACE_SENDER_NAME), getDefaultAppender(cfg)));
-		cfg.put(METRIC_SENDER_NAME, NoNull.of(cfg.get(METRIC_SENDER_NAME), getDefaultAppender(cfg)));
-		cfg.put(LOG_SENDER_NAME, NoNull.of(cfg.get(LOG_SENDER_NAME), getDefaultAppender(cfg)));
-		cfg.put(LOG_ACCESS_SENDER_NAME, NoNull.of(cfg.get(LOG_ACCESS_SENDER_NAME), getDefaultAppender(cfg)));
+		config.put(TRACE_SENDER_NAME, NoNull.of(config.get(TRACE_SENDER_NAME), getDefaultAppender(config)));
+		config.put(METRIC_SENDER_NAME, NoNull.of(config.get(METRIC_SENDER_NAME), getDefaultAppender(config)));
+		config.put(LOG_SENDER_NAME, NoNull.of(config.get(LOG_SENDER_NAME), getDefaultAppender(config)));
+		config.put(LOG_ACCESS_SENDER_NAME, NoNull.of(config.get(LOG_ACCESS_SENDER_NAME), getDefaultAppender(config)));
 
-		return cfg;
+		return config;
 	}
 
 	public static String getDefaultAppender(Map<String, String> cfg) {
@@ -96,7 +91,7 @@ public class ReportConfigAdapter {
 		extract.remove(join(TRACE_ASYNC, "target"));
 
 		if (!StringUtils.isEmpty(outputCfg.get(TRACE_SENDER_NAME))) {
-			LOGGER.info("Reporter V2 config trace sender as: {}", outputCfg.get(TRACE_SENDER_NAME));
+			log.info("Reporter V2 config trace sender as: {}", outputCfg.get(TRACE_SENDER_NAME));
 		}
 		else if ("system".equals(target)) {
 			// check output servers
@@ -117,7 +112,7 @@ public class ReportConfigAdapter {
 		}
 		else if (!StringUtils.isEmpty(target)) {
 			outputCfg.put(TRACE_SENDER_NAME, CONSOLE_SENDER_NAME);
-			LOGGER.info("Unsupported output configuration item:{}={}", TRACE_OUTPUT_TARGET_V1, target);
+			log.info("Unsupported output configuration item:{}={}", TRACE_OUTPUT_TARGET_V1, target);
 		}
 		outputCfg.putAll(extract);
 

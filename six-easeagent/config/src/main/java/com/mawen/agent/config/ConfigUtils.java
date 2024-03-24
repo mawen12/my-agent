@@ -37,12 +37,6 @@ public class ConfigUtils {
 			}
 		};
 		process.run();
-		configs.addChangeListener(list -> {
-			boolean hasChange = list.stream().map(ChangeItem::fullName).anyMatch(fn -> fn.equals(name));
-			if (hasChange) {
-				process.run();
-			}
-		});
 	}
 
 	@SafeVarargs
@@ -106,7 +100,7 @@ public class ConfigUtils {
 	public static PluginProperty pluginProperty(String path) {
 		var configs = path.split("\\" + ConfigConst.DELIMITER);
 		if (configs.length < 5) {
-			throw new ValidateUtils.ValidException(String.format("Property[%s] must be format: %s", path,
+			throw new ValidException(String.format("Property[%s] must be format: %s", path,
 					ConfigConst.join(ConfigConst.PLUGIN, "<Domain>", "<Namespace>", "<Id>", "<Property>")));
 		}
 
@@ -122,7 +116,7 @@ public class ConfigUtils {
 
 	public static String requireNonEmpty(String obj, String message) {
 		if (obj == null || obj.trim().isEmpty()) {
-			throw new ValidateUtils.ValidException(message);
+			throw new ValidException(message);
 		}
 		return obj.trim();
 	}

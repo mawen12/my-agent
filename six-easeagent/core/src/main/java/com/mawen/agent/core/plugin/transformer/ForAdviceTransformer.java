@@ -21,13 +21,11 @@ import net.bytebuddy.utility.JavaModule;
 public class ForAdviceTransformer implements AgentBuilder.Transformer {
 
 	private final AgentForAdvice transformer;
-	private final MethodTransformation methodTransformation;
 
 	public ForAdviceTransformer(MethodTransformation methodTransformation) {
-		this.methodTransformation = methodTransformation;
 
-		var value = new MethodIdentityJavaConstant(methodTransformation.getIndex());
-		var stackManipulation = new AgentJavaConstantValue(value, methodTransformation.getIndex());
+		var value = new MethodIdentityJavaConstant(methodTransformation.index());
+		var stackManipulation = new AgentJavaConstantValue(value, methodTransformation.index());
 		var typeDescription = value.getTypeDescription();
 
 		var factory = new AgentAdvice.OffsetMapping.ForStackManipulation.Factory<>(Index.class,
@@ -36,8 +34,7 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
 		var agentForAdvice = new AgentForAdvice(AgentAdvice.withCustomMapping().bind(factory));
 		this.transformer = agentForAdvice
 				.include(getClass().getClassLoader())
-				.advice(methodTransformation.getMatcher(),
-						CommonInlineAdvice.class.getCanonicalName());
+				.advice(methodTransformation.matcher(), CommonInlineAdvice.class.getCanonicalName());
 	}
 
 	@Override

@@ -100,28 +100,15 @@ public class ConfigFactory {
 	 * 	1.{@code -Dagent.config.path=/agent/agent.properties}
 	 * 	2.{@code export AGENT_CONFIG_PATH=/agent/agent.properties}
 	 * </pre>
-	 *
-	 * <p>OTEL Config:
-	 * <pre>
-	 * 	1.{@code -Dotel.javagent.configuration-file=/agent/agent.properties}
-	 * 	2.{@code export OTEL_JAVAAGENT_CONFIGURATION_FILE=/agent/agent.properties}
-	 * </pre>
-	 *
 	 */
 	public static String getConfigPath() {
 		// get config path from -Dagent.config.path=/agent/agent.properties || export AGENT_CONFIG_PATH=/agent/agent.properties
-		var path = ConfigPropertiesUtils.getString(AGENT_CONFIG_PATH_PROP_KEY);
-
-		if (StringUtils.isEmpty(path)) {
-			// eg: -Dotel.javagent.configuration-file=/agent/agent.properties || export OTEL_JAVAAGENT_CONFIGURATION_FILE=/agent/agent.properties
-			path = OtelSdkConfigs.getConfigPath();
-		}
-		return path;
+		return ConfigPropertiesUtils.getString(AGENT_CONFIG_PATH_PROP_KEY);
 	}
 
-	public static GlobalConfigs loadConfigs(String pathname, ClassLoader loader) {
+	public static Configs loadConfigs(String pathname, ClassLoader loader) {
 		// load property configuration file if exist
-		var configs = loadDefaultConfigs(loader, CONFIG_PROP_FILE);
+		Configs configs = loadDefaultConfigs(loader, CONFIG_PROP_FILE);
 
 		// load yaml configuration file if exist
 		var yConfigs = loadDefaultConfigs(loader, CONFIG_YAML_FILE);
@@ -134,17 +121,11 @@ public class ConfigFactory {
 			configs.mergeConfigs(configFromOuterFile);
 		}
 
-		// override by opentelemetry sdk env config
-		configs.updateConfigsNotNotify(OtelSdkConfigs.updateEnvCfg());
-
-		// check environment cfg override
-		configs.updateConfigsNotNotify(updateEnvCfg());
-
-		log.debugIfEnabled("Loaded conf:\n{}", configs.toPrettyDisplay());
+		log.debugIfEnabled("Loaded conf:\n{}", configs.toString());
 		return configs;
 	}
 
-	private static GlobalConfigs loadDefaultConfigs(ClassLoader loader, String file) {
+	private static Configs loadDefaultConfigs(ClassLoader loader, String file) {
 		var globalConfigs = JarFileConfigLoader.load(file);
 		return NoNull.of(globalConfigs, ConfigLoader.loadFromClasspath(loader, file));
 	}

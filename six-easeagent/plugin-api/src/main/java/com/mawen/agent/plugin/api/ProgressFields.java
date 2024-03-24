@@ -28,10 +28,6 @@ public class ProgressFields {
 		return forwardHeaderSet;
 	}
 
-	public static Consumer<Map<String, String>> changeListener() {
-		return values -> new Change().putAll(values).flush();
-	}
-
 	public static boolean isProgressFields(String key) {
 		return isForwardedHeader(key) || isResponseHoldTagKey(key) || isServerTags(key);
 	}
@@ -116,38 +112,6 @@ public class ProgressFields {
 				}
 			}
 			return build(keyPrefix, Collections.unmodifiableMap(newMap));
-		}
-	}
-
-	static class Change {
-		private final Map<String, String> responseHoldTags = new HashMap<>();
-		private final Map<String, String> serverTags = new HashMap<>();
-
-		public Change putAll(Map<String, String> map) {
-			for (var entry : map.entrySet()) {
-				put(entry.getKey(), entry.getValue());
-			}
-			return this;
-		}
-
-		public void put(String key, String value) {
-			if (ProgressFields.isForwardedHeader(key)) {
-				buildForwardedHeaderSet(value);
-			}
-			else if (ProgressFields.isResponseHoldTagKey(key)) {
-				responseHoldTags.put(key, value);
-			} else if (ProgressFields.isServerTags(key)) {
-				serverTags.put(key, value);
-			}
-		}
-
-		private void flush() {
-			if (!responseHoldTags.isEmpty()) {
-				setResponseHoldTagFields(responseHoldTags);
-			}
-			if (!serverTags.isEmpty()) {
-				setServiceTags(serverTags);
-			}
 		}
 	}
 }

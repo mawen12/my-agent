@@ -15,7 +15,7 @@ import com.mawen.agent.plugin.api.config.ConfigConst;
 public class JarFileConfigLoader {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JarFileConfigLoader.class);
 
-	static GlobalConfigs load(String file) {
+	static Configs load(String file) {
 		var agentJarPath = System.getProperty(ConfigConst.AGENT_JAR_PATH);
 		if (agentJarPath == null) {
 			return null;
