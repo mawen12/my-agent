@@ -2,8 +2,6 @@ package com.mawen.agent.config;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -11,9 +9,7 @@ import java.util.stream.Collectors;
 
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
-import com.mawen.agent.plugin.api.config.ChangeItem;
 import com.mawen.agent.plugin.api.config.Config;
-import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.api.config.IConfigFactory;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
@@ -25,7 +21,6 @@ import com.mawen.agent.plugin.api.config.IPluginConfig;
 public class PluginConfigManager implements IConfigFactory {
 	private static final Logger log = LoggerFactory.getLogger(PluginConfigManager.class);
 
-	private Runnable shutdownRunnable;
 	private final Config config;
 	private final Map<Key, PluginSourceConfig> pluginSourceConfigs;
 	private final Map<Key, PluginConfig> pluginConfigs;
@@ -85,66 +80,12 @@ public class PluginConfigManager implements IConfigFactory {
 		return sourceConfig.getProperties();
 	}
 
-	public void shutdown() {
-		shutdownRunnable.run();
-	}
-
-	protected synchronized void onChange(Map<String, String> sources) {
-		var sourceKeys = keys(sources.keySet());
-		var newSources = buildNewSources(sourceKeys, sources);
-		for (var sourceKey : sourceKeys) {
-			pluginSourceConfigs.put(sourceKey, PluginSourceConfig.build(sourceKey.domain(), sourceKey.namespace(), sourceKey.id(), newSources));
-		}
-		var changeKeys = buildChangeKeys(sourceKeys);
-
-		for (var changeKey : changeKeys) {
-			final var oldConfig = pluginConfigs.remove(changeKey);
-			final var newConfig = getConfig(changeKey.domain(), changeKey.namespace(), changeKey.id(), oldConfig);
-			if (oldConfig == null) {
-				continue;
-			}
-			try {
-				oldConfig.foreachConfigChangeListener(listener -> listener.onChange(oldConfig, newConfig));
-			}
-			catch (Exception e) {
-				log.warn("change config<{}> fail: {}", changeKey.toString(), e.getMessage());
-			}
-		}
-	}
-
 	private Set<Key> keys(Set<String> keys) {
 		return keys.stream()
 				.filter(ConfigUtils::isPluginConfig)
 				.map(ConfigUtils::pluginProperty)
 				.map(property -> new Key(property.domain(), property.namespace(), property.id()))
 				.collect(Collectors.toSet());
-	}
-
-	private Map<String, String> buildNewSources(Set<Key> sourceKeys, Map<String, String> sources) {
-		var newSources = new HashMap<String, String>();
-		for (var sourceKey : sourceKeys) {
-			if (pluginSourceConfigs.containsKey(sourceKey)) {
-				newSources.putAll(pluginSourceConfigs.get(sourceKey).getSource());
-			}
-		}
-		newSources.putAll(sources);
-		return newSources;
-	}
-
-	private Set<Key> buildChangeKeys(Set<Key> sourceKeys) {
-		var changeKeys = new HashSet<>(sourceKeys);
-		for (var key : sourceKeys) {
-			if (!ConfigUtils.isGlobal(key.namespace())) {
-				continue;
-			}
-			for (var oldKey : pluginConfigs.keySet()) {
-				if (!key.id.equals(oldKey.id)) {
-					continue;
-				}
-				changeKeys.add(oldKey);
-			}
-		}
-		return changeKeys;
 	}
 
 	@Override
@@ -163,22 +104,10 @@ public class PluginConfigManager implements IConfigFactory {
 				for (var key : pluginSourceConfigs.keySet()) {
 					getConfig(key.domain(), key.namespace(), key.id());
 				}
-				shutdownRunnable = config.addChangeListener(new ChangeListener());
 			}
 			return PluginConfigManager.this;
 		}
 	}
 
 	public record Key(String domain, String namespace, String id) {}
-
-	class ChangeListener implements ConfigChangeListener {
-		@Override
-		public void onChange(List<ChangeItem> list) {
-			var sources = new HashMap<String, String>();
-			for (var item : list) {
-				sources.put(item.fullName(), item.newValue());
-			}
-			PluginConfigManager.this.onChange(sources);
-		}
-	}
 }

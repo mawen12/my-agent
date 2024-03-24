@@ -1,12 +1,8 @@
 package com.mawen.agent.report;
 
-import java.util.List;
-
 import com.mawen.agent.config.Configs;
 import com.mawen.agent.config.report.ReportConfigAdapter;
-import com.mawen.agent.plugin.api.config.ChangeItem;
 import com.mawen.agent.plugin.api.config.Config;
-import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 import com.mawen.agent.plugin.api.logging.AccessLogInfo;
 import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.plugin.report.metric.MetricReporterFactory;
@@ -20,7 +16,7 @@ import com.mawen.agent.report.trace.TraceReport;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/27
  */
-public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
+public class DefaultAgentReport implements AgentReport {
 
 	private final TraceReport traceReport;
 	private final MetricReporterFactory metricReporterFactory;
@@ -34,21 +30,12 @@ public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
 		this.traceReport = new TraceReport(this.reportConfig);
 		this.accessLogReporter = new AccessLogReporter(reportConfig);
 		this.metricReporterFactory = MetricReporterFactoryImpl.create(reportConfig);
-
-		this.config.addChangeListener(this);
 	}
 
 	public static AgentReport create(Config config) {
 		ReporterLoader.load();
 		return new DefaultAgentReport(config);
 	}
-
-	@Override
-	public void onChange(List<ChangeItem> list) {
-		var changes = ReportConfigAdapter.extractReporterConfig(config);
-		this.reportConfig.updateConfigs(changes);
-	}
-
 	@Override
 	public void report(ReportSpan log) {
 		this.traceReport.report(log);

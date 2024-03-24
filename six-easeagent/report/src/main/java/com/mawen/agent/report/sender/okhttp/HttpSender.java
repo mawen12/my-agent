@@ -1,7 +1,6 @@
 package com.mawen.agent.report.sender.okhttp;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -134,27 +133,6 @@ public class HttpSender implements Sender{
 	@Override
 	public boolean isAvailable() {
 		return this.enabled;
-	}
-
-	@Override
-	public void updateConfigs(Map<String, String> changes) {
-		this.config.updateConfigsNotNotify(changes);
-
-		var newUsername = StringUtils.noEmptyOf(config.getString(usernameKey), config.getString(SERVER_USER_NAME_KEY));
-		var newPassword = StringUtils.noEmptyOf(config.getString(passwordKey), config.getString(SERVER_PASSWORD_KEY));
-		// check new client
-		var renewClient = !getUrl(this.config).equals(this.url)
-				|| !org.apache.commons.lang3.StringUtils.equals(newUsername, this.username)
-				|| !org.apache.commons.lang3.StringUtils.equals(newPassword, this.password)
-				|| !org.apache.commons.lang3.StringUtils.equals(this.config.getString(TLS_CA_CERT), this.tlsCaCert)
-				|| !org.apache.commons.lang3.StringUtils.equals(this.config.getString(TLS_CERT), this.tlsCert)
-				|| org.apache.commons.lang3.StringUtils.equals(this.config.getString(TLS_KEY), this.tlsKey);
-
-		if (renewClient) {
-			clearClient();
-			extractConfig(config);
-			newClient();
-		}
 	}
 
 	@Override

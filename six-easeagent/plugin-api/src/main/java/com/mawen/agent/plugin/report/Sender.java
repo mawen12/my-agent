@@ -1,7 +1,6 @@
 package com.mawen.agent.plugin.report;
 
 import java.io.Closeable;
-import java.util.Map;
 
 import com.mawen.agent.plugin.api.config.Config;
 
@@ -20,6 +19,4 @@ public interface Sender extends Closeable {
 	Call<Void> send(EncodedData encodedData);
 
 	boolean isAvailable();
-
-	void updateConfigs(Map<String, String> changes);
 }

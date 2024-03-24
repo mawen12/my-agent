@@ -1,7 +1,6 @@
 package com.mawen.agent.httpserver.nano;
 
 import java.io.IOException;
-import java.util.List;
 
 import com.mawen.agent.httpserver.nanohttpd.router.RouterNanoHTTPD;
 

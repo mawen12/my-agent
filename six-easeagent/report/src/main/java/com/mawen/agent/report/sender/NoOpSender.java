@@ -1,7 +1,6 @@
 package com.mawen.agent.report.sender;
 
 import java.io.IOException;
-import java.util.Map;
 
 import com.google.auto.service.AutoService;
 import com.mawen.agent.config.report.ReportConfigConst;
@@ -37,11 +36,6 @@ public class NoOpSender implements Sender{
 	@Override
 	public boolean isAvailable() {
 		return true;
-	}
-
-	@Override
-	public void updateConfigs(Map<String, String> changes) {
-		// ignored
 	}
 
 	@Override

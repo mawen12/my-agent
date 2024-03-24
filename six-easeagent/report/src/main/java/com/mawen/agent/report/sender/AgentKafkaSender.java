@@ -83,39 +83,6 @@ public class AgentKafkaSender implements Sender {
 	}
 
 	@Override
-	public void updateConfigs(Map<String, String> changes) {
-		var name = changes.get(join(prefix, APPEND_TYPE_KEY));
-		if (StringUtils.isNotEmpty(name) && !SENDER_NAME.equals(name)) {
-			try {
-				this.close();
-				return;
-			}
-			catch (IOException e) {
-				// ignored
-			}
-		}
-
-		boolean refresh = false;
-		for (var key : changes.keySet()) {
-			if (key.startsWith(OUTPUT_SERVER_V2) || key.startsWith(this.topicKey)) {
-				refresh = true;
-				break;
-			}
-		}
-
-		if (refresh) {
-			try {
-				this.sender.close();
-			}
-			catch (IOException e) {
-				// ignored
-			}
-			this.config.updateConfigsNotNotify(changes);
-			this.init(config, prefix);
-		}
-	}
-
-	@Override
 	public void close() throws IOException {
 		if (this.sender != null) {
 			this.sender.close();

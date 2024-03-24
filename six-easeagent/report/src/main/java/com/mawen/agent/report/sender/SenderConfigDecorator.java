@@ -4,14 +4,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.mawen.agent.config.Configs;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
-import com.mawen.agent.plugin.api.config.ChangeItem;
 import com.mawen.agent.plugin.api.config.Config;
-import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 import com.mawen.agent.plugin.report.Call;
 import com.mawen.agent.plugin.report.EncodedData;
 import com.mawen.agent.plugin.report.Encoder;
@@ -25,7 +22,7 @@ import static com.mawen.agent.config.report.ReportConfigConst.*;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/4
  */
-public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeListener {
+public class SenderConfigDecorator implements SenderWithEncoder {
 	private static final Logger log = LoggerFactory.getLogger(SenderConfigDecorator.class);
 
 	private final Sender sender;
@@ -40,37 +37,8 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 		this.prefix = prefix;
 		this.encoderKey = getEncoderKey(prefix);
 
-		config.addChangeListener(this);
 		this.senderConfig = new Configs(extractSenderConfig(this.prefix, config));
 		this.packerConfig = new Configs(extractSenderConfig(encoderKey, config));
-	}
-
-	@Override
-	public void onChange(List<ChangeItem> list) {
-		Map<String, String> changes = filterChanges(list);
-		if (changes.isEmpty()) {
-			return;
-		}
-		Map<String, String> senderChanges = new TreeMap<>();
-		Map<String, String> packerChanges = new TreeMap<>();
-
-		changes.forEach((key, value) -> {
-			if (key.startsWith(encoderKey)) {
-				packerChanges.put(key, value);
-			} else {
-				senderChanges.put(key, value);
-			}
-		});
-
-		if (!packerChanges.isEmpty()) {
-			this.packerConfig.updateConfigs(packerChanges);
-			this.updateEncoder(packerChanges);
-		}
-
-		if (!senderChanges.isEmpty()) {
-			this.senderConfig.updateConfigs(senderChanges);
-			this.updateConfigs(senderChanges);
-		}
 	}
 
 	@Override
@@ -98,34 +66,9 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 	}
 
 	@Override
-	public void updateConfigs(Map<String, String> changes) {
-		var name = changes.get(join(this.prefix, APPEND_TYPE_KEY));
-		if (name == null || name.equals(name())) {
-			this.sender.updateConfigs(changes);
-		} else {
-			try {
-				this.sender.close();
-			}
-			catch (IOException e) {
-				log.warn("Sender update fail, can not close sender: {}", this.sender.name());
-			}
-		}
-	}
-
-	@Override
 	public void close() throws IOException {
 		sender.close();
 	}
-
-	protected void updateEncoder(Map<String, String> changes) {
-		var name = changes.get(this.encoderKey);
-		if (name == null || name.equals(this.packer.name())) {
-			return;
-		}
-		this.packer = ReporterRegistry.getEncoder(packerConfig.getString(this.encoderKey));
-		this.packer.init(packerConfig);
-	}
-
 
 	@Override
 	public <T> Encoder<T> getEncoder() {
@@ -157,18 +100,6 @@ public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeLis
 
 		// outputServer config
 		cfg.putAll(extractByPrefix(config, REPORT));
-
-		return cfg;
-	}
-
-	private Map<String, String> filterChanges(List<ChangeItem> list) {
-		Map<String, String> cfg = new HashMap<>();
-		list.stream().filter(one -> {
-			var name = one.fullName();
-			return name.startsWith(REPORT)
-					|| name.startsWith(encoderKey)
-					|| name.startsWith(prefix);
-		}).forEach(one -> cfg.put(one.fullName(), one.newValue()));
 
 		return cfg;
 	}

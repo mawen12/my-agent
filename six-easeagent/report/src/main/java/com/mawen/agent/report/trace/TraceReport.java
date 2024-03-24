@@ -1,14 +1,8 @@
 package com.mawen.agent.report.trace;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.mawen.agent.config.AutoRefreshConfigItem;
 import com.mawen.agent.config.report.ReportConfigConst;
-import com.mawen.agent.plugin.api.config.ChangeItem;
 import com.mawen.agent.plugin.api.config.Config;
-import com.mawen.agent.plugin.api.config.ConfigChangeListener;
 import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.report.tracing.ReportSpan;
@@ -27,7 +21,6 @@ public class TraceReport {
 
 	public TraceReport(Config reportConfig) {
 		spanRefreshableReporter = initSpanRefreshableReporter(reportConfig);
-		reportConfig.addChangeListener(new InternalListener());
 	}
 
 	public void report(ReportSpan span) {
@@ -60,23 +53,5 @@ public class TraceReport {
 		reporter.startFlushThread();
 
 		return new RefreshableReporter<>(reporter, reportConfig);
-	}
-
-	private class InternalListener implements ConfigChangeListener {
-
-		@Override
-		public void onChange(List<ChangeItem> list) {
-			var cfg = filterChanges(list);
-
-			if (cfg.isEmpty()) {
-				return;
-			}
-
-			spanRefreshableReporter.refresh(cfg);
-		}
-
-		private Map<String, String> filterChanges(List<ChangeItem> list) {
-			return list.stream().collect(Collectors.toMap(ChangeItem::fullName, ChangeItem::newValue));
-		}
 	}
 }

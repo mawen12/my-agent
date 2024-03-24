@@ -179,11 +179,6 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 		}
 	}
 
-	@Override
-	public void onChange(List<ChangeItem> list) {
-		// skip
-	}
-
 	void flush(AgentBufferNextMessage<S> bundler, AgentByteBoundedQueue<S> pending) {
 		if (closed.get()) {
 			throw new IllegalArgumentException("closed");

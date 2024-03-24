@@ -1,10 +1,8 @@
 package com.mawen.agent.report.sender.metric;
 
 import java.io.IOException;
-import java.util.Map;
 
 import com.google.auto.service.AutoService;
-import com.mawen.agent.config.Configs;
 import com.mawen.agent.config.report.ReportConfigConst;
 import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.report.Call;
@@ -61,29 +59,6 @@ public class MetricKafkaSender implements Sender {
 	@Override
 	public boolean isAvailable() {
 		return true;
-	}
-
-	@Override
-	public void updateConfigs(Map<String, String> changes) {
-		if (Utils.isOutputPropertiesChange(changes) && this.outputProperties.updateConfig(changes)) {
-			appenderManager.refresh();
-		}
-		// check topic
-		var cfg = this.props.asReportConfig().getConfigs();
-		cfg.putAll(changes);
-		var nProps = MetricProps.newDefault(new Configs(cfg), this.prefix);
-		if (nProps.getTopic().equals(this.props.getTopic())) {
-			try {
-				this.close();
-			}
-			catch (IOException e) {
-				// ignored
-			}
-			this.props = nProps;
-			this.logger = null;
-			lazyInitLogger();
-		}
-		// check enabled
 	}
 
 	@Override
