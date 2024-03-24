@@ -19,6 +19,10 @@ import com.mawen.agent.plugin.api.trace.Setter;
 import com.mawen.agent.plugin.api.trace.Span;
 import com.mawen.agent.plugin.api.trace.SpanContext;
 import com.mawen.agent.plugin.api.trace.Tracing;
+import com.mawen.agent.plugin.bridge.trace.EmptySpanContext;
+import com.mawen.agent.plugin.bridge.trace.NoOpScope;
+import com.mawen.agent.plugin.bridge.trace.NoOpSpan;
+import com.mawen.agent.plugin.bridge.trace.NoOpTracing;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -110,7 +114,7 @@ public class NoOpContext {
 
 		@Override
 		public Tracing currentTracing() {
-			return NoOpTracer.NO_OP_TRACING;
+			return NoOpTracing.INSTANCE;
 		}
 
 		@Override
@@ -175,12 +179,12 @@ public class NoOpContext {
 
 		@Override
 		public Span consumerSpan(MessagingRequest request) {
-			return NoOpTracer.NO_OP_SPAN;
+			return NoOpSpan.INSTANCE;
 		}
 
 		@Override
 		public Span producerSpan(MessagingRequest request) {
-			return NoOpTracer.NO_OP_SPAN;
+			return NoOpSpan.INSTANCE;
 		}
 
 		@Override
@@ -195,7 +199,7 @@ public class NoOpContext {
 
 		@Override
 		public Span nextSpan() {
-			return NoOpTracer.NO_OP_SPAN;
+			return NoOpSpan.INSTANCE;
 		}
 
 		@Override
@@ -224,7 +228,7 @@ public class NoOpContext {
 
 		@Override
 		public SpanContext getSpanContext() {
-			return NoOpTracer.NO_OP_SPAN_CONTEXT;
+			return EmptySpanContext.INSTANCE;
 		}
 
 		@Override
@@ -258,12 +262,12 @@ public class NoOpContext {
 
 		@Override
 		public Span span() {
-			return NoOpTracer.NO_OP_SPAN;
+			return NoOpSpan.INSTANCE;
 		}
 
 		@Override
 		public Scope scope() {
-			return NoOpTracer.NO_OP_SCOPE;
+			return NoOpScope.INSTANCE;
 		}
 
 		@Override

@@ -1,6 +1,5 @@
 package com.mawen.agent.plugin.elasticsearch.interceptor;
 
-import com.mawen.agent.plugin.api.config.AutoRefreshPluginConfigImpl;
 import com.mawen.agent.plugin.api.config.AutoRefreshPluginConfigRegistry;
 import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.api.config.IPluginConfig;

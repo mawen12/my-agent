@@ -1,18 +1,11 @@
 package com.mawen.agent.plugin.api.middleware;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.mawen.agent.plugin.api.logging.Logger;
 import com.mawen.agent.plugin.api.metric.name.Tags;
 import com.mawen.agent.plugin.api.trace.Span;
-import com.mawen.agent.plugin.bridge.Agent;
-import com.mawen.agent.plugin.bridge.NoOpLoggerFactory;
 import com.mawen.agent.plugin.utils.NoNull;
-import com.mawen.agent.plugin.utils.SystemEnv;
-import com.mawen.agent.plugin.utils.common.JsonUtil;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 
 /**

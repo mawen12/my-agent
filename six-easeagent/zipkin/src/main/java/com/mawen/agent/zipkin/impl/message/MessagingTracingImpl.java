@@ -10,7 +10,9 @@ import com.mawen.agent.plugin.api.trace.Message;
 import com.mawen.agent.plugin.api.trace.MessagingRequest;
 import com.mawen.agent.plugin.api.trace.MessagingTracing;
 import com.mawen.agent.plugin.api.trace.Span;
-import com.mawen.agent.plugin.bridge.NoOpTracer;
+import com.mawen.agent.plugin.bridge.trace.EmptyMessagingTracing;
+import com.mawen.agent.plugin.bridge.trace.NoOpSpan;
+import com.mawen.agent.plugin.utils.NoNull;
 import com.mawen.agent.zipkin.impl.MessageImpl;
 import com.mawen.agent.zipkin.impl.RemoteGetterImpl;
 import com.mawen.agent.zipkin.impl.RemoteSetterImpl;
@@ -54,7 +56,7 @@ public class MessagingTracingImpl<R extends MessagingRequest> implements Messagi
 
 	public static MessagingTracing<MessagingRequest> build(brave.Tracing tracing) {
 		if (tracing == null) {
-			return NoOpTracer.NO_OP_MESSAGING_TRACING;
+			return EmptyMessagingTracing.INSTANCE;
 		}
 		brave.messaging.MessagingTracing messagingTracing = brave.messaging.MessagingTracing.newBuilder(tracing).build();
 		return new MessagingTracingImpl<>(messagingTracing);
@@ -95,13 +97,13 @@ public class MessagingTracingImpl<R extends MessagingRequest> implements Messagi
 		Tracing tracing = messagingTracing.tracing();
 		brave.Span span = SpanImpl.nextBraveSpan(tracing, this.zipkinProducerExtractor, request);
 		if (span.isNoop()) {
-			return NoOpTracer.NO_OP_SPAN;
+			return NoOpSpan.INSTANCE;
 		}
 
 		setMessageInfo(span, request);
 		Span eSpan = SpanImpl.build(messagingTracing.tracing(), span, request.cacheScope(), zipkinProducerInjector);
 		producerInjector.inject(eSpan, request);
-		return NoOpTracer.noNullSpan(eSpan);
+		return NoNull.of(eSpan, NoOpSpan.INSTANCE);
 	}
 
 	@Override
@@ -109,12 +111,12 @@ public class MessagingTracingImpl<R extends MessagingRequest> implements Messagi
 		Tracing tracing = messagingTracing.tracing();
 		brave.Span span = SpanImpl.nextBraveSpan(tracing, this.zipkinConsumerExtractor, request);
 		if (span.isNoop()) {
-			return NoOpTracer.NO_OP_SPAN;
+			return NoOpSpan.INSTANCE;
 		}
 
 		setMessageInfo(span, request);
 		Span eSpan = SpanImpl.build(messagingTracing.tracing(), span, request.cacheScope(), this.zipkinConsumerInjector);
-		return NoOpTracer.noNullSpan(eSpan);
+		return NoNull.of(eSpan, NoOpSpan.INSTANCE);
 	}
 
 	private void setMessageInfo(brave.Span span, MessagingRequest request) {

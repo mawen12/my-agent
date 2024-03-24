@@ -1,6 +1,7 @@
 package com.mawen.agent.plugin.api.trace;
 
-import com.mawen.agent.plugin.bridge.NoOpTracer.EmptyExtractor;
+
+import com.mawen.agent.plugin.bridge.trace.EmptyExtractor;
 
 /**
  * Used to continue an incoming trace. For example, by reading http headers.
@@ -11,14 +12,13 @@ import com.mawen.agent.plugin.bridge.NoOpTracer.EmptyExtractor;
  *
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/24
- * @see Tracing#nextSpan(Message)
+ * @see Tracing#nextSpan()
  */
 public interface Extractor<R extends MessagingRequest> {
 
 	/**
 	 * Returns either a trace context or sampling flags parsed from the request.
-	 * If nothing was parsable, sampling flags will be set to {@link com.mawen.agent.plugin.bridge.NoOpTracer},
-	 * {@link EmptyExtractor#INSTANCE}.
+	 * If nothing was parsable, sampling flags will be set to {@link EmptyExtractor#INSTANCE}.
 	 *
 	 * @param request holds propagation fields. For example, an incoming message or http request.
 	 */

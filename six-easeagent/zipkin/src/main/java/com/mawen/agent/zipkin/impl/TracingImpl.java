@@ -19,7 +19,11 @@ import com.mawen.agent.plugin.api.trace.Scope;
 import com.mawen.agent.plugin.api.trace.Span;
 import com.mawen.agent.plugin.api.trace.SpanContext;
 import com.mawen.agent.plugin.bridge.NoOpContext;
-import com.mawen.agent.plugin.bridge.NoOpTracer;
+import com.mawen.agent.plugin.bridge.trace.EmptySpanContext;
+import com.mawen.agent.plugin.bridge.trace.NoOpScope;
+import com.mawen.agent.plugin.bridge.trace.NoOpSpan;
+import com.mawen.agent.plugin.bridge.trace.NoOpTracing;
+import com.mawen.agent.plugin.utils.NoNull;
 import com.mawen.agent.zipkin.impl.message.MessagingTracingImpl;
 
 /**
@@ -54,22 +58,19 @@ public class TracingImpl implements ITracing {
 	}
 
 	public static ITracing build(Supplier<InitializeContext> supplier, brave.Tracing tracing) {
-		if (tracing == null) {
-			return NoOpTracer.NO_OP_TRACING;
-		}
-		return new TracingImpl(supplier, tracing);
+		return tracing != null ? new TracingImpl(supplier, tracing) : NoOpTracing.INSTANCE;
 	}
 
 	@Override
 	public SpanContext exportAsync() {
 		TraceContext traceContext = currentTraceContext();
-		return traceContext != null ? new SpanContextImpl(traceContext) : NoOpTracer.NO_OP_SPAN_CONTEXT;
+		return traceContext != null ? new SpanContextImpl(traceContext) : EmptySpanContext.INSTANCE;
 	}
 
 	@Override
 	public Scope importAsync(SpanContext snapshot) {
 		if (snapshot.isNoop()) {
-			return NoOpTracer.NO_OP_SCOPE;
+			return NoOpScope.INSTANCE;
 		}
 
 		Object context = snapshot.unwrap();
@@ -81,7 +82,7 @@ public class TracingImpl implements ITracing {
 			log.warn("import async span to brave.Tracing fail: SpanContext.unwrap() result Class<{}> must be Class<{}>",
 					context.getClass().getName(), TraceContext.class.getName());
 		}
-		return NoOpTracer.NO_OP_SCOPE;
+		return NoOpScope.INSTANCE;
 	}
 
 	@Override
@@ -146,11 +147,11 @@ public class TracingImpl implements ITracing {
 
 	@Override
 	public Span currentSpan() {
-		Span span = NoOpTracer.NO_OP_SPAN;
+		Span span = NoOpSpan.INSTANCE;
 		if (tracer != null) {
 			span = build(tracer.currentSpan());
 		}
-		return NoOpTracer.noNullSpan(span);
+		return NoNull.of(span, NoOpSpan.INSTANCE);
 	}
 
 	@Override

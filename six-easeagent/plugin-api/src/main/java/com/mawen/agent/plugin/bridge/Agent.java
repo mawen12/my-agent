@@ -5,8 +5,6 @@ import java.util.function.Supplier;
 
 import com.mawen.agent.plugin.api.Context;
 import com.mawen.agent.plugin.api.Reporter;
-import com.mawen.agent.plugin.api.config.AutoRefreshPluginConfigImpl;
-import com.mawen.agent.plugin.api.config.AutoRefreshPluginConfigRegistry;
 import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.api.config.IConfigFactory;
 import com.mawen.agent.plugin.api.config.IPluginConfig;

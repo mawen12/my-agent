@@ -105,7 +105,7 @@ public class ConverterAdapter extends AbstractConverter {
 		var map = nameFactory.counterNames(key);
 		consumerMetric(map, metricSubType, v -> {
 			Optional.ofNullable(counters.get(v.name()))
-					.ifPresent(c -> v.getValueFetcher().forEach((fieldName, fetcher) -> appendField(output, fieldName, fetcher, CounterImpl.build(c))));
+					.ifPresent(c -> v.valueFetcher().forEach((fieldName, fetcher) -> appendField(output, fieldName, fetcher, CounterImpl.build(c))));
 		});
 	}
 
@@ -120,7 +120,7 @@ public class ConverterAdapter extends AbstractConverter {
 		var map = nameFactory.meterNames(key);
 		consumerMetric(map, metricSubType, v -> Optional
 				.ofNullable(meters.get(v.name()))
-				.ifPresent(m -> v.getValueFetcher().forEach((fieldName, fetcher) -> appendField(output, fieldName, fetcher, MeterImpl.build(m)))));
+				.ifPresent(m -> v.valueFetcher().forEach((fieldName, fetcher) -> appendField(output, fieldName, fetcher, MeterImpl.build(m)))));
 	}
 
 	@Override
@@ -130,7 +130,7 @@ public class ConverterAdapter extends AbstractConverter {
 				.ofNullable(timers.get(v.name()))
 				.ifPresent(t -> {
 					final var snapshot = t.getSnapshot();
-					v.getValueFetcher().forEach((fieldName, fetcher) -> {
+					v.valueFetcher().forEach((fieldName, fetcher) -> {
 						if (fetcher.getClazz().equals(com.mawen.agent.plugin.api.metric.Snapshot.class)) {
 							appendField(output, fieldName, fetcher, SnapshotImpl.build(snapshot));
 						}
@@ -152,7 +152,7 @@ public class ConverterAdapter extends AbstractConverter {
 	}
 
 	private void keys(Set<String> origins, Set<String> results) {
-		origins.forEach(s -> results.add(MetricName.metricNameFor(s).getKey()));
+		origins.forEach(s -> results.add(MetricName.metricNameFor(s).key()));
 	}
 
 	private double convertDuration(Long duration) {

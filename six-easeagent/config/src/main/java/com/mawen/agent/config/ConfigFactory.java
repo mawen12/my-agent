@@ -3,14 +3,11 @@ package com.mawen.agent.config;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.utils.ImmutableMap;
 import com.mawen.agent.plugin.utils.NoNull;
-import com.mawen.agent.plugin.utils.SystemEnv;
-import com.mawen.agent.plugin.utils.common.JsonUtil;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 
 /**

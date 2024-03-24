@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.mawen.agent.plugin.report.EncodedData;
 
 /**
@@ -12,7 +11,6 @@ import com.mawen.agent.plugin.report.EncodedData;
  * @since 2024/2/23
  */
 public class AccessLogInfo {
-	public static final TypeReference<AccessLogInfo> TYPE_REFERENCE = new TypeReference<>() {};
 
 	@JsonProperty("span_id")
 	protected String spanId;

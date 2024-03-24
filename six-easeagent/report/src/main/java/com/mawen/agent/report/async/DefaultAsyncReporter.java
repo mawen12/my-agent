@@ -2,9 +2,7 @@ package com.mawen.agent.report.async;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -14,7 +12,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.mawen.agent.plugin.api.config.ChangeItem;
 import com.mawen.agent.plugin.report.EncodedData;
 import com.mawen.agent.plugin.report.Encoder;
 import com.mawen.agent.report.async.zipkin.AgentBufferNextMessage;
@@ -250,12 +247,6 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 		flushThread.setName("TempAsyncReporter{" + this.sender + "}");
 		flushThread.setDaemon(true);
 		flushThread.start();
-	}
-
-	private Map<String, String> filterChanges(List<ChangeItem> list) {
-		Map<String, String> cfg = new HashMap<>();
-		list.forEach(one -> cfg.put(one.fullName(),one.newValue()));
-		return cfg;
 	}
 
 	public static final class Builder {

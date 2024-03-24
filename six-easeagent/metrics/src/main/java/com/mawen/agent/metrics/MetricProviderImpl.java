@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import com.mawen.agent.config.ConfigAware;
-import com.mawen.agent.metrics.config.PluginMetricsConfig;
 import com.mawen.agent.metrics.converter.ConverterAdapter;
 import com.mawen.agent.metrics.converter.KeyType;
 import com.mawen.agent.metrics.converter.MetricsAdditionalAttributes;

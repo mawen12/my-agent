@@ -1,7 +1,5 @@
 package com.mawen.agent.plugin.bridge;
 
-import com.mawen.agent.plugin.api.Reporter;
-import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.api.logging.AccessLogInfo;
 import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.plugin.report.metric.MetricReporterFactory;

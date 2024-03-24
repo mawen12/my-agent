@@ -1,7 +1,7 @@
 package com.mawen.agent.plugin.api.trace;
 
 
-import com.mawen.agent.plugin.bridge.NoOpTracer;
+import com.mawen.agent.plugin.bridge.trace.NoOpSpan;
 
 /**
  * This provides utilities needed for trace instrumentation.
@@ -31,7 +31,7 @@ public interface Tracing {
 	boolean hasCurrentSpan();
 
 	/**
-	 * Returns the current span is scope or {@link NoOpTracer#NO_OP_SPAN} if there isn't one.
+	 * Returns the current span is scope or {@link NoOpSpan#INSTANCE} if there isn't one.
 	 * as it is a stable type and will never return null.
 	 *
 	 * @return {@link Span}

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.mawen.agent.plugin.api.config.IPluginConfig;
-import com.mawen.agent.plugin.api.config.PluginConfigChangeListener;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -83,10 +82,5 @@ public class NoOpIPluginConfig implements IPluginConfig {
 	@Override
 	public Set<String> keySet() {
 		return Collections.emptySet();
-	}
-
-	@Override
-	public void addChangeListener(PluginConfigChangeListener listener) {
-
 	}
 }

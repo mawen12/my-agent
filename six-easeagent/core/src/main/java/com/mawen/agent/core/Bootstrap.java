@@ -11,7 +11,6 @@ import java.util.function.Supplier;
 import com.mawen.agent.config.ConfigAware;
 import com.mawen.agent.config.ConfigFactory;
 import com.mawen.agent.config.Configs;
-import com.mawen.agent.core.info.AgentInfoFactory;
 import com.mawen.agent.core.plugin.BaseLoader;
 import com.mawen.agent.core.plugin.BridgeDispatcher;
 import com.mawen.agent.core.plugin.PluginLoader;
@@ -27,7 +26,6 @@ import com.mawen.agent.plugin.api.trace.TracingProvider;
 import com.mawen.agent.plugin.bean.AgentInitializingBean;
 import com.mawen.agent.plugin.bean.BeanProvider;
 import com.mawen.agent.plugin.bridge.Agent;
-import com.mawen.agent.plugin.bridge.AgentInfo;
 import com.mawen.agent.plugin.report.AgentReport;
 import com.mawen.agent.plugin.utils.common.StringUtils;
 import com.mawen.agent.report.AgentReportAware;
@@ -75,8 +73,6 @@ public class Bootstrap {
 		var classLoader = Bootstrap.class.getClassLoader();
 		var cfg = ConfigFactory.loadConfigs(configPath, classLoader);
 
-		initAgentInfo(classLoader, AgentInfoFactory::loadAgentInfo, Agent::setAgentInfo); // init AgentInfo
-
 		initAgentClassLoader(classLoader, Agent::setAgentClassLoader); // init ClassLoader
 
 		initContextManager(cfg, ContextManager::build, Bootstrap::setContextManager); // init context
@@ -99,14 +95,6 @@ public class Bootstrap {
 
 		log.info("installBegin use time: {}ms", (System.currentTimeMillis() - installBegin));
 		log.info("Initialization has took: {}ms", TimeUnit.MILLISECONDS.toMillis(System.currentTimeMillis() - begin));
-	}
-
-	/**
-	 * @since 0.0.2-SNAPSHOT
-	 */
-	private static void initAgentInfo(ClassLoader classLoader, Function<ClassLoader, AgentInfo> agentInfoGetter, Consumer<AgentInfo> agentInfoSetter) {
-		AgentInfo agentInfo = agentInfoGetter.apply(classLoader);
-		agentInfoSetter.accept(agentInfo);
 	}
 
 	/**

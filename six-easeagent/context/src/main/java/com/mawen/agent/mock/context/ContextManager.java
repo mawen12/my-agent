@@ -28,9 +28,9 @@ import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.bridge.NoOpLoggerFactory;
 import com.mawen.agent.plugin.bridge.NoOpMdc;
 import com.mawen.agent.plugin.bridge.NoOpReporter;
-import com.mawen.agent.plugin.bridge.NoOpTracer;
 import com.mawen.agent.plugin.bridge.metric.NoOpMetricsRegistry;
 import com.mawen.agent.plugin.bridge.metric.NoOpMetricsRegistrySupplier;
+import com.mawen.agent.plugin.bridge.trace.NoOpTracing;
 import com.mawen.agent.plugin.utils.NoNull;
 
 /**
@@ -97,7 +97,7 @@ public class ContextManager implements IContextManager {
 			SessionContext context = LOCAL_SESSION_CONTEXT.get();
 			ITracing tracing = context.getTracing();
 			if (tracing == null || tracing.isNoop()) {
-				context.setCurrentTracing(NoNull.of(tracingSupplier.get(this), NoOpTracer.NO_OP_TRACING));
+				context.setCurrentTracing(NoNull.of(tracingSupplier.get(this), NoOpTracing.INSTANCE));
 			}
 			if (context.getSupplier() == null) {
 				context.setSupplier(this);

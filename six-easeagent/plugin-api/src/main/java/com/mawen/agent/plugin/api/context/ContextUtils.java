@@ -31,33 +31,4 @@ public class ContextUtils {
 		return getEndTime(context) - getBeginTime(context);
 	}
 
-	public static Long getDuration(Context context, Object startKey) {
-		var now = SystemClock.now();
-		return now - (Long) context.remove(startKey);
-	}
-
-	/**
-	 * Get data from context
-	 *
-	 * @param context Store data
-	 * @param key key is the type of data. Like {@code value.getClass()}
-	 * @param <T> The type of data
-	 * @return data
-	 */
-	public static <T> T getFormContext(Context context, Object key) {
-		return context.get(key);
-	}
-
-	/**
-	 * Remove data from context
-	 *
-	 * @param context data store
-	 * @param key key is the type of data.
-	 * @param <T> The type of data
-	 * @return data
-	 */
-	public static <T> T removeFromContext(Context context, Object key) {
-		return context.remove(key);
-	}
-
 }

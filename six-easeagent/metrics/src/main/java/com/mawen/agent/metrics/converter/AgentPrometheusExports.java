@@ -136,7 +136,7 @@ public class AgentPrometheusExports extends Collector implements Collector.Descr
 
 		@Override
 		protected void writeValue(MetricName metricName, SortedMap<String, Counter> metric, Map<String, Object> values) {
-			abstractConverter.writeCounters(metricName.getKey(), metricName.getMetricSubType(), metric, values);
+			abstractConverter.writeCounters(metricName.key(), metricName.metricSubType(), metric, values);
 		}
 	}
 
@@ -153,7 +153,7 @@ public class AgentPrometheusExports extends Collector implements Collector.Descr
 
 		@Override
 		protected void writeValue(MetricName metricName, SortedMap<String, Meter> metric, Map<String, Object> values) {
-			abstractConverter.writeMeters(metricName.getKey(), metricName.getMetricSubType(), metric, values);
+			abstractConverter.writeMeters(metricName.key(), metricName.metricSubType(), metric, values);
 		}
 	}
 
@@ -169,7 +169,7 @@ public class AgentPrometheusExports extends Collector implements Collector.Descr
 
 		@Override
 		protected void writeValue(MetricName metricName, SortedMap<String, Timer> metric, Map<String, Object> values) {
-			abstractConverter.writeTimers(metricName.getKey(), metricName.getMetricSubType(), metric, values);
+			abstractConverter.writeTimers(metricName.key(), metricName.metricSubType(), metric, values);
 		}
 	}
 
@@ -187,7 +187,7 @@ public class AgentPrometheusExports extends Collector implements Collector.Descr
 
 		@Override
 		protected void writeValue(MetricName metricName, SortedMap<String, Histogram> metric, Map<String, Object> values) {
-			abstractConverter.writeHistograms(metricName.getKey(), metricName.getMetricSubType(), metric, values);
+			abstractConverter.writeHistograms(metricName.key(), metricName.metricSubType(), metric, values);
 		}
 	}
 
@@ -204,7 +204,7 @@ public class AgentPrometheusExports extends Collector implements Collector.Descr
 
 		@Override
 		protected void writeValue(MetricName metricName, SortedMap<String, Gauge> metric, Map<String, Object> values) {
-			abstractConverter.writeGauges(metricName.getKey(), metricName.getMetricSubType(), metric, values);
+			abstractConverter.writeGauges(metricName.key(), metricName.metricSubType(), metric, values);
 		}
 	}
 }

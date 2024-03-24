@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.mawen.agent.plugin.api.ProgressFields;
 import com.mawen.agent.plugin.api.logging.AccessLogInfo;
-import com.mawen.agent.plugin.api.middleware.RedirectProcessor;
 import com.mawen.agent.plugin.api.trace.Span;
 import com.mawen.agent.plugin.utils.SystemClock;
 import com.mawen.agent.plugin.utils.common.HostAddress;

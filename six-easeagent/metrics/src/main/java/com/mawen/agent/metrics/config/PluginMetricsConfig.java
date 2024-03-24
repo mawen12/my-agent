@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.api.config.Const;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
-import com.mawen.agent.plugin.api.config.PluginConfigChangeListener;
 import com.mawen.agent.plugin.utils.NoNull;
 
 /**

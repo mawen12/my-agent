@@ -6,8 +6,6 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mawen.agent.plugin.api.logging.Logger;
-import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.utils.common.HostAddress;
 
 /**
@@ -15,7 +13,6 @@ import com.mawen.agent.plugin.utils.common.HostAddress;
  * @since 2024/2/25
  */
 public class AdditionalAttributes {
-	private static final Logger LOGGER = Agent.getLogger(AdditionalAttributes.class);
 
 	public final Map<String, Object> attributes;
 

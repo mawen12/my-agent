@@ -11,8 +11,8 @@ import com.mawen.agent.plugin.bridge.Agent;
  * @since 2024/2/24
  */
 public class AutoRefreshPluginConfigRegistry {
-	private static final AutoRefreshConfigSupplier<IPluginConfig> AUTO_REFRESH_CONFIG_IMPL_SUPPLIER
-			= new AutoRefreshConfigSupplier<>() {
+	private static final AutoRefreshConfigSupplier<IPluginConfig> AUTO_REFRESH_CONFIG_IMPL_SUPPLIER = new AutoRefreshConfigSupplier<>() {
+
 		@Override
 		public AutoRefreshPluginConfigImpl newInstance() {
 			return new AutoRefreshPluginConfigImpl();
@@ -39,15 +39,27 @@ public class AutoRefreshPluginConfigRegistry {
 	                                                      String id, AutoRefreshConfigSupplier<C> supplier) {
 		var key = new Key(domain, namespace, id, supplier.getType());
 		var autoRefreshConfig = configs.get(key);
+		if (autoRefreshConfig != null) {
+			triggerChange(domain, namespace, id, autoRefreshConfig);
+		}
 
 		synchronized (configs) {
 			autoRefreshConfig = configs.get(key);
 			if (autoRefreshConfig != null) {
+				triggerChange(domain, namespace, id, autoRefreshConfig);
 				return (C) autoRefreshConfig;
 			}
 			var newConfig = supplier.newInstance();
+			triggerChange(domain, namespace, id, newConfig);
 			configs.put(key, newConfig);
 			return newConfig;
+		}
+	}
+
+	private static <C extends IPluginConfig> void triggerChange(String domain, String namespace, String id, C newConfig) {
+		var config = Agent.getConfig(domain, namespace, id);
+		if (newConfig instanceof AutoRefreshPluginConfigImpl autoRefreshPluginConfig) {
+			autoRefreshPluginConfig.setConfig(config);
 		}
 	}
 

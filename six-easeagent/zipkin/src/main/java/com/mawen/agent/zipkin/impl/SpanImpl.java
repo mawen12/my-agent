@@ -11,7 +11,7 @@ import brave.propagation.TraceContextOrSamplingFlags;
 import com.mawen.agent.plugin.api.trace.Request;
 import com.mawen.agent.plugin.api.trace.Scope;
 import com.mawen.agent.plugin.api.trace.Span;
-import com.mawen.agent.plugin.bridge.NoOpTracer;
+import com.mawen.agent.plugin.bridge.trace.NoOpSpan;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -44,7 +44,7 @@ public class SpanImpl implements Span {
 
 	public static Span build(Tracing tracing, brave.Span span, boolean cachedScope, TraceContext.Injector<? extends Request> injector) {
 		if (span == null) {
-			return NoOpTracer.NO_OP_SPAN;
+			return NoOpSpan.INSTANCE;
 		}
 
 		TraceContext.Injector<Request> ci = (TraceContext.Injector<Request>) injector;

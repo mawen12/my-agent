@@ -26,7 +26,7 @@ import com.mawen.agent.plugin.api.trace.Span;
 import com.mawen.agent.plugin.api.trace.Tracing;
 import com.mawen.agent.plugin.bridge.NoOpCleaner;
 import com.mawen.agent.plugin.bridge.NoOpIPluginConfig;
-import com.mawen.agent.plugin.bridge.NoOpTracer;
+import com.mawen.agent.plugin.bridge.trace.NoOpTracing;
 import com.mawen.agent.plugin.field.NullObject;
 import com.mawen.agent.plugin.utils.NoNull;
 
@@ -37,7 +37,7 @@ import com.mawen.agent.plugin.utils.NoNull;
 public class SessionContext implements InitializeContext {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class.getName());
 
-	private ITracing tracing = NoOpTracer.NO_OP_TRACING;
+	private ITracing tracing = NoOpTracing.INSTANCE;
 	private Supplier<InitializeContext> supplier;
 	private final Deque<IPluginConfig> configs = new ArrayDeque<>();
 	private final Deque<Object> retStack = new ArrayDeque<>();
@@ -69,7 +69,7 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public Tracing currentTracing() {
-		return NoNull.of(tracing, NoOpTracer.NO_OP_TRACING);
+		return NoNull.of(tracing, NoOpTracing.INSTANCE);
 	}
 
 	@Override
@@ -306,7 +306,7 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public void setCurrentTracing(ITracing tracing) {
-		this.tracing = NoNull.of(tracing, NoOpTracer.NO_OP_TRACING);
+		this.tracing = NoNull.of(tracing, NoOpTracing.INSTANCE);
 	}
 
 	private <V> V change(Object o) {

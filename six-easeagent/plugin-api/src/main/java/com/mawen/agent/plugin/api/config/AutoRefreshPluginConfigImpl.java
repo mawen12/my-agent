@@ -76,4 +76,8 @@ public class AutoRefreshPluginConfigImpl implements IPluginConfig {
 	public IPluginConfig getConfig() {
 		return config;
 	}
+
+	public void setConfig(IPluginConfig config) {
+		this.config = config;
+	}
 }

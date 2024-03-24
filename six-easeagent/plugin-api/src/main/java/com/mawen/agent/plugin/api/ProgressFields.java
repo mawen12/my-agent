@@ -1,6 +1,5 @@
 package com.mawen.agent.plugin.api;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,8 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-
-import com.mawen.agent.plugin.utils.common.StringUtils;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
