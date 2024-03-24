@@ -63,7 +63,7 @@ public class YamlReader {
 				return;
 			}
 
-			if (v instanceof List list) {
+			if (v instanceof List) {
 				var value = ((List<Object>) v).stream()
 						.map(String::valueOf)
 						.collect(Collectors.joining(","));

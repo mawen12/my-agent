@@ -22,7 +22,7 @@ import com.mawen.agent.plugin.utils.common.StringUtils;
  * @since 2024/2/26
  */
 public class PluginConfig implements IPluginConfig {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PluginConfig.class);
+	private static final Logger log = LoggerFactory.getLogger(PluginConfig.class);
 
 	private final Set<PluginConfigChangeListener> listeners;
 	private final String domain;
@@ -182,7 +182,7 @@ public class PluginConfig implements IPluginConfig {
 				action.accept(oldListener);
 			}
 			catch (Exception e) {
-				LOGGER.error("PluginConfigChangeListener<{}> change plugin config fail : {}",oldListener.getClass(), e.getMessage());
+				log.error("PluginConfigChangeListener<{}> change plugin config fail : {}",oldListener.getClass(), e.getMessage());
 			}
 		}
 	}

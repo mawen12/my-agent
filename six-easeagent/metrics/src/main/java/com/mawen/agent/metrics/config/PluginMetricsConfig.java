@@ -17,11 +17,9 @@ public class PluginMetricsConfig implements MetricsConfig {
 	private volatile boolean enabled;
 	private volatile int interval;
 	private volatile TimeUnit intervalUnit;
-	private Runnable callback;
 
 	public PluginMetricsConfig(IPluginConfig config) {
 		set(config);
-		config.addChangeListener(new PluginConfigChange());
 	}
 
 	@Override
@@ -39,11 +37,6 @@ public class PluginMetricsConfig implements MetricsConfig {
 		return intervalUnit;
 	}
 
-	@Override
-	public void setIntervalChangeCallback(Runnable runnable) {
-		this.callback = runnable;
-	}
-
 	private void set(IPluginConfig config) {
 		this.enabled = config.enabled();
 		this.interval = NoNull.of(config.getInt(ConfigConst.Observability.KEY_COMM_INTERVAL), Const.METRIC_DEFAULT_INTERVAL);
@@ -53,19 +46,6 @@ public class PluginMetricsConfig implements MetricsConfig {
 		}
 		catch (IllegalArgumentException e) {
 			this.intervalUnit = TimeUnit.SECONDS;
-		}
-	}
-
-	class PluginConfigChange implements PluginConfigChangeListener {
-
-		@Override
-		public void onChange(IPluginConfig oldConfig, IPluginConfig newConfig) {
-			var oldInterval = PluginMetricsConfig.this.interval;
-			set(newConfig);
-			var runnable = callback;
-			if (oldInterval != PluginMetricsConfig.this.interval && runnable != null) {
-				runnable.run();
-			}
 		}
 	}
 }

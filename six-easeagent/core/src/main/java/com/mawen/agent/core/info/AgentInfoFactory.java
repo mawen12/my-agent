@@ -14,7 +14,9 @@ import com.mawen.agent.plugin.bridge.AgentInfo;
  */
 public class AgentInfoFactory {
 	private static final Logger log = LoggerFactory.getLogger(AgentInfoFactory.class);
+
 	private static final String AGENT_TYPE = "Agent";
+
 	private static final String VERSION_FILE = "version.txt";
 
 	public static AgentInfo loadAgentInfo(ClassLoader loader) {

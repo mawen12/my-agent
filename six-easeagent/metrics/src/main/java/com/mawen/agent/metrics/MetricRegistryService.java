@@ -92,11 +92,11 @@ public class MetricRegistryService {
 				additionalLabelNames.add(METRIC_TYPE_LABEL_NAME);
 				additionalLabelValues.add(METRIC_SUB_TYPE_LABEL_NAME);
 
-				additionalLabelNames.add(metricName.getMetricType().name());
-				additionalLabelValues.add(metricName.getMetricSubType().name());
+				additionalLabelNames.add(metricName.metricType().name());
+				additionalLabelValues.add(metricName.metricSubType().name());
 
 				additionalLabelNames.add(tags.getKeyFieldName());
-				additionalLabelValues.add(metricName.getKey());
+				additionalLabelValues.add(metricName.key());
 
 				builder.append(tags.getCategory());
 				builder.append(".");

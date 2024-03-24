@@ -24,8 +24,4 @@ public record LoggerFactoryImpl(AgentLoggerFactory<LoggerImpl> loggerFactory) im
 		}
 		return new LoggerFactoryImpl(loggerFactory);
 	}
-
-	public AgentLoggerFactory<LoggerImpl> factory() {
-		return loggerFactory;
-	}
 }

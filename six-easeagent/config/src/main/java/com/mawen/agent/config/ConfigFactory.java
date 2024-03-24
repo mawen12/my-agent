@@ -50,48 +50,6 @@ public class ConfigFactory {
 		}
 	}
 
-	private ConfigFactory() {
-	}
-
-	/**
-	 * update config value from environment variables and java properties
-	 *
-	 * <p> java properties > environment variables > env:AGENT_ENV_CONFIG={} > default
-	 */
-	static Map<String, String> updateEnvCfg() {
-		var envCfg = new TreeMap<String, String>();
-
-		var configEnv = SystemEnv.get(AGENT_ENV_CONFIG);
-		if (StringUtils.isNotEmpty(configEnv)) {
-			var map = JsonUtil.toMap(configEnv);
-			var strMap = new HashMap<String, String>();
-			if (!map.isEmpty()) {
-				for (Map.Entry<String, Object> entry : map.entrySet()) {
-					strMap.put(entry.getKey(), entry.getValue().toString());
-				}
-			}
-			envCfg.putAll(strMap);
-		}
-
-		// override by environment variables, eg: export AGENT_NAME=xxx
-		for (var entry : AGENT_ENV_KEY_TO_PROPS.entrySet()) {
-			var value = SystemEnv.get(entry.getKey());
-			if (StringUtils.isNotEmpty(value)) {
-				envCfg.put(entry.getValue(), value);
-			}
-		}
-
-		// override by java properties; eg: java -Dagent-name=xxx
-		for (var entry : AGENT_CONFIG_KEYS_TO_PROPS.entrySet()) {
-			var value = System.getProperty(entry.getKey());
-			if (StringUtils.isNotEmpty(value)) {
-				envCfg.put(entry.getValue(), value);
-			}
-		}
-
-		return envCfg;
-	}
-
 	/**
 	 * Get config file path from system properties or environment variables
 	 *
@@ -128,5 +86,8 @@ public class ConfigFactory {
 	private static Configs loadDefaultConfigs(ClassLoader loader, String file) {
 		var globalConfigs = JarFileConfigLoader.load(file);
 		return NoNull.of(globalConfigs, ConfigLoader.loadFromClasspath(loader, file));
+	}
+
+	private ConfigFactory() {
 	}
 }

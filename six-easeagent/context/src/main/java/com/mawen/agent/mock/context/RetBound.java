@@ -15,6 +15,7 @@ public class RetBound {
 
 	public RetBound(int size) {
 		this.size = size;
+		this.local = new HashMap<>();
 	}
 
 	public int getSize() {
@@ -22,16 +23,10 @@ public class RetBound {
 	}
 
 	public Object get(String key) {
-		if (local == null) {
-			return null;
-		}
 		return local.get(key);
 	}
 
 	public void put(String key, Object value) {
-		if (local == null) {
-			this.local = new HashMap<>();
-		}
 		this.local.put(key, value);
 	}
 }

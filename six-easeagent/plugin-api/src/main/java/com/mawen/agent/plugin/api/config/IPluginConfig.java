@@ -51,6 +51,4 @@ public interface IPluginConfig {
 	IPluginConfig getGlobal();
 
 	Set<String> keySet();
-
-	void addChangeListener(PluginConfigChangeListener listener);
 }

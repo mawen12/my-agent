@@ -15,24 +15,6 @@ public final class ConfigPropertiesUtils {
 
 	private ConfigPropertiesUtils() {}
 
-	public static boolean getBoolean(String propertyName, boolean defaultValue) {
-		var strValue = getString(propertyName);
-		return NoNull.of(Boolean.parseBoolean(strValue), defaultValue);
-	}
-
-	public static int getInt(String propertyName, int defaultValue) {
-		var strValue = getString(propertyName);
-		if (strValue == null) {
-			return defaultValue;
-		}
-		try {
-			return Integer.parseInt(strValue);
-		}
-		catch (NumberFormatException e) {
-			return defaultValue;
-		}
-	}
-
 	public static String getString(String propertyName) {
 		var value = System.getProperty(propertyName);
 

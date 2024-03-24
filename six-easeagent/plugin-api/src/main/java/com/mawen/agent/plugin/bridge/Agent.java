@@ -33,7 +33,6 @@ import com.mawen.agent.plugin.report.AgentReport;
  */
 public final class Agent {
 
-	public static AgentInfo agentInfo;
 	public static MetricRegistrySupplier metricRegistrySupplier = NoOpMetricsRegistrySupplier.INSTANCE;
 	public static IContextManager initializeContextSupplier = () -> NoOpContext.NO_OP_CONTEXT;
 	public static ILoggerFactory loggerFactory = NoOpLoggerFactory.INSTANCE;
@@ -44,14 +43,6 @@ public final class Agent {
 	public static IDispatcher dispatcher = NoOpDispatcher.INSTANCE;
 
 	public static Supplier<URLClassLoader> agentClassLoader = () -> null;
-
-	public static void setAgentInfo(AgentInfo agentInfo) {
-		Agent.agentInfo = agentInfo;
-	}
-
-	public static AgentInfo getAgentInfo() {
-		return agentInfo;
-	}
 
 	public static void setAgentClassLoader(Supplier<URLClassLoader> agentClassLoader) {
 		Agent.agentClassLoader = agentClassLoader;
@@ -125,16 +116,6 @@ public final class Agent {
 	 */
 	public static IPluginConfig getConfig(String domain, String namespace, String name) {
 		return configFactory.getConfig(domain, namespace, name);
-	}
-
-	/**
-	 * get or create an AutoRefreshPluginConfigImpl
-	 *
-	 * @return {@link AutoRefreshPluginConfigImpl}
-	 * @see AutoRefreshPluginConfigRegistry#getOrCreate(String, String, String)
-	 */
-	public static AutoRefreshPluginConfigImpl getOrCreateAutoRefreshConfig(String domain, String namespace, String name) {
-		return AutoRefreshPluginConfigRegistry.getOrCreate(domain, namespace, name);
 	}
 
 	/**

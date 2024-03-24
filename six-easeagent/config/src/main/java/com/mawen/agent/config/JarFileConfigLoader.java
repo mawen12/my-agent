@@ -13,7 +13,7 @@ import com.mawen.agent.plugin.api.config.ConfigConst;
  * @since 2024/2/26
  */
 public class JarFileConfigLoader {
-	private static final Logger LOGGER = LoggerFactory.getLogger(JarFileConfigLoader.class);
+	private static final Logger log = LoggerFactory.getLogger(JarFileConfigLoader.class);
 
 	static Configs load(String file) {
 		var agentJarPath = System.getProperty(ConfigConst.AGENT_JAR_PATH);
@@ -30,11 +30,11 @@ public class JarFileConfigLoader {
 				return ConfigLoader.loadFromStream(in, file);
 			}
 			catch (IOException e) {
-				LOGGER.warn("Load config file:{} failure: {}", file, e);
+				log.warn("Load config file:{} failure: {}", file, e);
 			}
 		}
 		catch (IOException e) {
-			LOGGER.warn("create JarFile:{} failure:{}", agentJarPath, e);
+			log.warn("create JarFile:{} failure:{}", agentJarPath, e);
 		}
 
 		return null;

@@ -12,7 +12,7 @@ import com.mawen.agent.plugin.interceptor.Interceptor;
  */
 public abstract class ElasticsearchBaseInterceptor implements Interceptor {
 
-	protected AutoRefreshPluginConfigImpl config;
+	protected IPluginConfig config;
 
 	@Override
 	public void init(IPluginConfig config, String className, String methodName, String methodDescriptor) {

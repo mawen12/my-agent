@@ -30,7 +30,6 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
 
 	private Config config;
 	private final List<MetricRegistry> registries = new ArrayList<>();
-	private final List<AutoRefreshReporter> reporters = new ArrayList<>();
 	private AgentReport agentReport;
 	private Supplier<Map<String, Object>> additionalAttributes;
 
@@ -40,10 +39,6 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
 
 	public List<MetricRegistry> getRegistries() {
 		return registries;
-	}
-
-	public List<AutoRefreshReporter> getReporters() {
-		return reporters;
 	}
 
 	public AgentReport getAgentReport() {
@@ -76,12 +71,6 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
 		}
 	}
 
-	public void registerReporter(AutoRefreshReporter reporter) {
-		synchronized (reporters) {
-			reporters.add(reporter);
-		}
-	}
-
 	public static List<KeyType> keyTypes(NameFactory nameFactory) {
 		var keyTypes = new ArrayList<KeyType>();
 		for (var metricType : nameFactory.metricTypes()) {
@@ -100,14 +89,9 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
 
 		@Override
 		public MetricRegistry newMetricRegistry(IPluginConfig config, NameFactory nameFactory, Tags tags) {
-			var metricsConfig = new PluginMetricsConfig(config);
 			var keyTypes = keyTypes(nameFactory);
 			var converterAdapter = new ConverterAdapter(nameFactory, keyTypes, additionalAttributes, tags);
-			var reporter = agentReport.metricReporter().reporter(config);
 			var metricRegistry = MetricRegistryService.DEFAULT.createMetricRegistry(converterAdapter, additionalAttributes, tags);
-			var autoRefreshReporter = new AutoRefreshReporter(metricRegistry, metricsConfig, converterAdapter, reporter::report);
-			autoRefreshReporter.run();
-			registerReporter(autoRefreshReporter);
 
 			var result = MetricRegistryImpl.build(metricRegistry);
 			registerMetricRegistry(result);

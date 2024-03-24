@@ -39,5 +39,4 @@ public class MetricBeanProviderImpl implements BeanProvider, AgentHttpHandlerPro
 	public void setAgentReport(AgentReport report) {
 		this.metricProvider.setAgentReport(report);
 	}
-
 }

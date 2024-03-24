@@ -13,6 +13,4 @@ public interface MetricsConfig {
 	int getInterval();
 
 	TimeUnit getIntervalUnit();
-
-	void setIntervalChangeCallback(Runnable runnable);
 }

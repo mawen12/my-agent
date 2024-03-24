@@ -62,7 +62,7 @@ public class ContextManager implements IContextManager {
 		Mdc mdc = NoOpMdc.INSTANCE;
 		if (loggerFactory != null) {
 			iLoggerFactory = loggerFactory;
-			mdc = new LoggerMdc(loggerFactory.factory().mdc());
+			mdc = new LoggerMdc(loggerFactory.loggerFactory().mdc());
 		}
 
 		ContextManager contextManager = new ContextManager(configs, pluginConfigManager, iLoggerFactory, mdc);

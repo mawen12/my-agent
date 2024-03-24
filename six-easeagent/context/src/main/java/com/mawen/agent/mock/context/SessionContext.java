@@ -354,7 +354,7 @@ public class SessionContext implements InitializeContext {
 		}
 	}
 
-	public static record CurrentContextRunnable(AsyncContext asyncContext, Runnable task) implements Runnable {
+	public record CurrentContextRunnable(AsyncContext asyncContext, Runnable task) implements Runnable {
 		@Override
 		public void run() {
 			try (var cleaner = asyncContext.importToCurrent()) {

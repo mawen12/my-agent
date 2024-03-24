@@ -35,37 +35,4 @@ public class RefreshableReporter<S> implements Reporter<S> {
 	public void report(S s) {
 		this.asyncReporter.report(s);
 	}
-
-	public synchronized void refresh(Map<String, String> cfg) {
-		String name = cfg.get(TRACE_SENDER_NAME);
-		SenderWithEncoder sender = asyncReporter.getSender();
-		if (sender != null) {
-			if (StringUtils.isNotEmpty(name) && !sender.name().equals(name)) {
-				try {
-					sender.close();
-				}
-				catch (IOException e) {
-					// ignored
-				}
-				sender = ReporterRegistry.getSender(TRACE_SENDER, this.reportConfig);
-				asyncReporter.setSender(sender);
-			}
-		} else {
-			sender = ReporterRegistry.getSender(TRACE_SENDER, this.reportConfig);
-			asyncReporter.setSender(sender);
-		}
-
-		traceProperties = new TraceAsyncProps(this.reportConfig);
-		asyncReporter.setTraceProperties(traceProperties);
-		asyncReporter.setPending(traceProperties.getQueuedMaxItems(), traceProperties.getMessageMaxBytes());
-		asyncReporter.setMessageTimeoutNanos(messageTimeout(traceProperties.getMessageMaxBytes()));
-		asyncReporter.startFlushThread();
-	}
-
-	protected long messageTimeout(long timeout) {
-		if (timeout < 0) {
-			timeout = 1000L;
-		}
-		return TimeUnit.MILLISECONDS.toNanos(timeout);
-	}
 }

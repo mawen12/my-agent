@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/24
  */
-public abstract class AutoRefreshConfigSupplier<T extends AutoRefreshPluginConfig> {
+public abstract class AutoRefreshConfigSupplier<T extends IPluginConfig> {
 	private final Type type;
 
 	public AutoRefreshConfigSupplier() {

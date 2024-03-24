@@ -7,8 +7,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.mawen.agent.log4j2.Logger;
-import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.api.config.Config;
 import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.api.config.IConfigFactory;
@@ -19,7 +17,6 @@ import com.mawen.agent.plugin.api.config.IPluginConfig;
  * @since 2024/2/26
  */
 public class PluginConfigManager implements IConfigFactory {
-	private static final Logger log = LoggerFactory.getLogger(PluginConfigManager.class);
 
 	private final Config config;
 	private final Map<Key, PluginSourceConfig> pluginSourceConfigs;

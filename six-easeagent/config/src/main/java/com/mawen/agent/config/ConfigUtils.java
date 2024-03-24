@@ -24,7 +24,8 @@ import com.mawen.agent.plugin.api.config.ConfigConst;
  */
 public class ConfigUtils {
 
-	private ConfigUtils() {
+	public static <R> void bindProp(String name, Config configs, BiFunction<Config, String, R> func, Consumer<R> consumer) {
+		bindProp(name, configs, func, consumer, null);
 	}
 
 	public static <R> void bindProp(String name, Config configs, BiFunction<Config, String, R> func, Consumer<R> consumer, R def) {
@@ -46,17 +47,6 @@ public class ConfigUtils {
 			}
 		}
 		return null;
-	}
-
-	public static <R> void bindProp(String name, Config configs, BiFunction<Config, String, R> func, Consumer<R> consumer) {
-		bindProp(name, configs, func, consumer, null);
-	}
-
-	public static Map<String, String> json2KVMap(String json) throws IOException {
-		var mapper = new ObjectMapper();
-		var node = mapper.readTree(json);
-		var list = extractKVs(null, node);
-		return list.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	public static List<Map.Entry<String, String>> extractKVs(String prefix, JsonNode node) {
@@ -113,13 +103,6 @@ public class ConfigUtils {
 				ConfigConst.join(Arrays.copyOfRange(configs, 4, configs.length)));
 	}
 
-	public static String requireNonEmpty(String obj, String message) {
-		if (obj == null || obj.trim().isEmpty()) {
-			throw new ValidException(message);
-		}
-		return obj.trim();
-	}
-
 	public static String buildPluginProperty(String domain, String namespace, String id, String property) {
 		return String.format(ConfigConst.PLUGIN_FORMAT, domain, namespace, id, property);
 	}
@@ -174,10 +157,6 @@ public class ConfigUtils {
 		return extract;
 	}
 
-	public static int isChanged(String name, Map<String, String> map, String check) {
-		if (map.get(name) == null || map.get(name).equals(check)) {
-			return 0;
-		}
-		return 1;
+	private ConfigUtils() {
 	}
 }
