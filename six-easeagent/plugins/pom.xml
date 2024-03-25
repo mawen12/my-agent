@@ -13,6 +13,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>elasticsearch</module>
+        <module>jdbc</module>
+        <module>redis</module>
     </modules>
 
     <dependencyManagement>

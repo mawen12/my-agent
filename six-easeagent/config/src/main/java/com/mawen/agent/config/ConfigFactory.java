@@ -24,28 +24,6 @@ public class ConfigFactory {
 	public static final String AGENT_SYSTEM = "system";
 	public static final String AGENT_SERVER_PORT = "agent.server.port";
 	public static final String AGENT_SERVER_ENABLED = "agent.server.enabled";
-	public static final String AGENT_ENV_CONFIG = "AGENT_ENV_CONFIG";
-
-	private static final Map<String ,String> AGENT_CONFIG_KEYS_TO_PROPS =
-			ImmutableMap.<String, String>builder()
-					.put("agent.name", AGENT_SERVICE)
-					.put("agent.system", AGENT_SYSTEM)
-					.put("agent.server.port", AGENT_SERVER_PORT)
-					.put("agent.server.enabled", AGENT_SERVER_ENABLED)
-					.build();
-
-	// OTEL_SERVICE_NAME=xxx
-	private static final Map<String, String> AGENT_ENV_KEY_TO_PROPS = new HashMap<>();
-
-	static {
-		for (Map.Entry<String, String> entry : AGENT_CONFIG_KEYS_TO_PROPS.entrySet()) {
-			// dot.case -> UPPER_UNDERSCORE
-			AGENT_ENV_KEY_TO_PROPS.put(
-					ConfigPropertiesUtils.toEnvVarName(entry.getKey()),
-					entry.getValue()
-			);
-		}
-	}
 
 	/**
 	 * Get config file path from system properties or environment variables

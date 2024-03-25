@@ -31,4 +31,11 @@ public class ContextUtils {
 		return getEndTime(context) - getBeginTime(context);
 	}
 
+	public static <T> T getFromContext(Context context, Object key) {
+		return context.get(key);
+	}
+
+	public static <T> T removeFromContext(Context context, Object key) {
+		return context.remove(key);
+	}
 }

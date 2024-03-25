@@ -21,10 +21,6 @@ import com.mawen.agent.log4j2.LoggerFactory;
 public class ConfigLoader {
 	private static final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
 
-	private static boolean checkYaml(String filename) {
-		return filename.endsWith(".yaml") || filename.endsWith(".yml");
-	}
-
 	static Configs loadFromClasspath(ClassLoader classLoader, String file) {
 		try (var in = classLoader.getResourceAsStream(file)) {
 			return ConfigLoader.loadFromStream(in, file);
@@ -36,32 +32,20 @@ public class ConfigLoader {
 	}
 
 	static Configs loadFromStream(InputStream in, String filename) throws IOException {
+		Map<String, String> map = Collections.emptyMap();
 		if (in != null) {
-			Map<String, String> map;
 			if (checkYaml(filename)) {
 				try {
 					map = new YamlReader().load(in).compress();
 				}
 				catch (Exception e) {
 					log.warn("Wrong Yaml format, load config file failure: {}", filename);
-					map = Collections.emptyMap();
 				}
 			} else {
 				map = extractPropsMap(in);
 			}
-			return new Configs(map);
-		} else {
-			return new Configs(Collections.emptyMap());
 		}
-	}
-
-	private static Map<String, String> extractPropsMap(InputStream in) throws IOException {
-		var properties = new Properties();
-		properties.load(in);
-
-		return properties.stringPropertyNames()
-				.stream()
-				.collect(Collectors.toMap(Function.identity(), name -> String.valueOf(properties.getProperty(name))));
+		return new Configs(map);
 	}
 
 	static Configs loadFromFile(File file) {
@@ -72,5 +56,18 @@ public class ConfigLoader {
 			log.warn("Load config file failure: {}", file.getAbsolutePath());
 		}
 		return new Configs(Collections.emptyMap());
+	}
+
+	private static boolean checkYaml(String filename) {
+		return filename.endsWith(".yaml") || filename.endsWith(".yml");
+	}
+
+	private static Map<String, String> extractPropsMap(InputStream in) throws IOException {
+		var properties = new Properties();
+		properties.load(in);
+
+		return properties.stringPropertyNames()
+				.stream()
+				.collect(Collectors.toMap(Function.identity(), name -> String.valueOf(properties.getProperty(name))));
 	}
 }

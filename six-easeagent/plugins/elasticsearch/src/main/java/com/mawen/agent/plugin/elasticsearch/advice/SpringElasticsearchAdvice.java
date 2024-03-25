@@ -27,7 +27,7 @@ public class SpringElasticsearchAdvice implements Points {
 	public Set<IMethodMatcher> getMethodMatcher() {
 		return MethodMatcher
 				.multiBuilder()
-				.matcher(MethodMatcher.builder().nameStartWith("set").build())
+				.match(MethodMatcher.builder().nameStartWith("set").build())
 				.build();
 	}
 }

@@ -35,12 +35,7 @@ public class ReportConfigAdapter {
 
 	public static String getDefaultAppender(Map<String, String> cfg) {
 		var outputAppender = cfg.get(join(OUTPUT_SERVER_V2, APPEND_TYPE_KEY));
-
-		if (StringUtils.isEmpty(outputAppender)) {
-			return Const.DEFAULT_APPEND_TYPE;
-		}
-
-		return outputAppender;
+		return StringUtils.isNotEmpty(outputAppender) ? outputAppender : Const.DEFAULT_APPEND_TYPE;
 	}
 
 	private ReportConfigAdapter() {

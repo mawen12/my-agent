@@ -383,7 +383,7 @@ public class MethodMatcher implements IMethodMatcher {
 			return this;
 		}
 
-		public MethodMatchersBuilder matcher(IMethodMatcher matcher) {
+		public MethodMatchersBuilder match(IMethodMatcher matcher) {
 			if (matcher == null) {
 				return this;
 			}
