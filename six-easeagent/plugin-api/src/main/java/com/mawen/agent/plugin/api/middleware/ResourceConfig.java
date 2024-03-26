@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.utils.SystemEnv;
 import com.mawen.agent.plugin.utils.common.JsonUtil;
 

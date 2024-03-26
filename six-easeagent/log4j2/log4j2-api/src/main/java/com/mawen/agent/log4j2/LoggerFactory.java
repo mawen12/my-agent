@@ -11,7 +11,7 @@ import com.mawen.agent.log4j2.api.AgentLoggerFactory;
  * @since 2024/2/22
  */
 public class LoggerFactory {
-	public static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(LoggerFactory.class.getName());
+	public static final java.util.logging.Logger log = java.util.logging.Logger.getLogger(LoggerFactory.class.getName());
 	protected static final AgentLoggerFactory<AgentLogger> FACTORY;
 
 	static {
@@ -21,7 +21,7 @@ public class LoggerFactory {
 					.build();
 		}
 		catch (Exception e) {
-			LOGGER.log(Level.WARNING, String.format("build agent logger factory fail: %s<%s>.", e.getClass().getName(), e.getMessage()));
+			log.log(Level.WARNING, String.format("build agent logger factory fail: %s<%s>.", e.getClass().getName(), e.getMessage()));
 		}
 		FACTORY = factory;
 	}
@@ -48,7 +48,12 @@ public class LoggerFactory {
 		return getLogger(clazz.getName());
 	}
 
-	public record NoopLogger(String name) implements Logger {
+	public static class NoopLogger implements Logger {
+		private final String name;
+
+		public NoopLogger(String name) {
+			this.name = name;
+		}
 
 		@Override
 		public String getName() {

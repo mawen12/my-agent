@@ -39,14 +39,15 @@ public class PluginConfig implements IPluginConfig {
 		Boolean b = getBoolean(Const.ENABLED_CONFIG);
 		if (b == null) {
 			enabled = false;
-		} else {
+		}
+		else {
 			enabled = b;
 		}
 	}
 
 	public static PluginConfig build(String domain, String id, Map<String, String> global, String namespace,
 	                                 Map<String, String> cover, PluginConfig oldConfig) {
-		return new PluginConfig(domain,namespace,id,global,cover);
+		return new PluginConfig(domain, namespace, id, global, cover);
 	}
 
 	@Override

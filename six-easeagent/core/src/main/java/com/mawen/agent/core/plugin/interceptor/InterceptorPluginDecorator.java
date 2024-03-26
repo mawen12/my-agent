@@ -22,7 +22,7 @@ public class InterceptorPluginDecorator implements Interceptor {
 
 	private final Interceptor interceptor;
 	private final AgentPlugin plugin;
-	private final IPluginConfig config;
+	private final AutoRefreshPluginConfigImpl config;
 
 	public InterceptorPluginDecorator(Interceptor interceptor, AgentPlugin plugin) {
 		this.interceptor = interceptor;
@@ -50,9 +50,9 @@ public class InterceptorPluginDecorator implements Interceptor {
 
 	@Override
 	public void before(MethodInfo methodInfo, Context context) {
-		IPluginConfig cfg = getConfig();
+		IPluginConfig cfg = this.config.getConfig();
 		InitializeContext innerContext = (InitializeContext) context;
-		innerContext.pushConfig(config);
+		innerContext.pushConfig(cfg);
 		if (cfg == null || cfg.enabled() || cfg instanceof NoOpIPluginConfig) {
 			innerContext.pushRetBound();
 			this.interceptor.before(methodInfo, context);

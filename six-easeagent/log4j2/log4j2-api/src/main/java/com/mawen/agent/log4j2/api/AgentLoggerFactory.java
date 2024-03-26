@@ -76,7 +76,10 @@ public class AgentLoggerFactory<T extends AgentLogger> {
 		return mdc;
 	}
 
-	public record Builder<T extends AgentLogger>(ClassLoader classLoader, Function<Logger, T> loggerSupplier, Class<T> tClass) {
+	public static class Builder<T extends AgentLogger> {
+		private  final ClassLoader classLoader;
+		private final Function<Logger, T> loggerSupplier;
+		private final Class<T> tClass;
 
 		public Builder(@Nonnull ClassLoader classLoader, @Nonnull Function<Logger, T> loggerSupplier, @Nonnull Class<T> tClass) {
 			this.classLoader = classLoader;
@@ -103,6 +106,7 @@ public class AgentLoggerFactory<T extends AgentLogger> {
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		private Mdc buildMdc() throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
 			Class<?> mdcClass = classLoader.loadClass("com.mawen.agent.log4j2.impl.MdcProxy");
 

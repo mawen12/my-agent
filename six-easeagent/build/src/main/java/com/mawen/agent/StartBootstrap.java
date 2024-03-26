@@ -19,7 +19,7 @@ public class StartBootstrap {
 	}
 
 	public static void premain(String agentArgs, Instrumentation inst, String javaAgentJarPath) {
-		log.info("StartBootstrap classloader: {}", Thread.currentThread().getContextClassLoader());
+		log.info("StartBootstrap classloader: {}", Thread.currentThread().getContextClassLoader().getClass());
 
 		try {
 			Bootstrap.start(agentArgs, inst, javaAgentJarPath);

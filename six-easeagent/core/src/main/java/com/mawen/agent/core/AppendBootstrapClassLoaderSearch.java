@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -58,19 +60,22 @@ public final class AppendBootstrapClassLoaderSearch {
 	private static Set<String> findClassAnnotationAutoService(String resourcePath) throws IOException {
 		ClassLoader classLoader = AppendBootstrapClassLoaderSearch.class.getClassLoader();
 		Enumeration<URL> resources = classLoader.getResources(resourcePath);
-		Iterable<URL> iterable = resources::asIterator;
 
-		return StreamSupport.stream(iterable.spliterator(), false)
-				.flatMap(AppendBootstrapClassLoaderSearch::readLines)
-				.collect(Collectors.toSet());
+		Set<String> sets = new HashSet<>();
+		while (resources.hasMoreElements()) {
+			URL url = resources.nextElement();
+			sets.addAll(AppendBootstrapClassLoaderSearch.readLines(url));
+		}
+
+		return sets;
 	}
 
 	/**
 	 * @since 0.0.2-SNAPSHOT
 	 */
-	private static Stream<String> readLines(URL input) {
+	private static List<String> readLines(URL input) {
 		try(InputStreamReader reader = new InputStreamReader(input.openConnection().getInputStream(), StandardCharsets.UTF_8)) {
-			return CharStreams.readLines(reader).stream();
+			return CharStreams.readLines(reader);
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);

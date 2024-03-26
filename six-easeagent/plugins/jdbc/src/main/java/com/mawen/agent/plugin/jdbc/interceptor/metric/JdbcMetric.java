@@ -1,7 +1,6 @@
 package com.mawen.agent.plugin.jdbc.interceptor.metric;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +20,6 @@ import com.mawen.agent.plugin.api.metric.ServiceMetric;
 import com.mawen.agent.plugin.api.metric.ServiceMetricSupplier;
 import com.mawen.agent.plugin.api.metric.Timer;
 import com.mawen.agent.plugin.api.metric.name.MetricField;
-import com.mawen.agent.plugin.api.metric.name.MetricName;
 import com.mawen.agent.plugin.api.metric.name.MetricSubType;
 import com.mawen.agent.plugin.api.metric.name.MetricValueFetcher;
 import com.mawen.agent.plugin.api.metric.name.NameFactory;

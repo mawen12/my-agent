@@ -198,7 +198,7 @@ public class Bootstrap {
 				.with(AgentBuilder.LocationStrategy.ForClassLoader.STRONG
 						.withFallbackTo(ClassFileLocator.ForClassLoader.ofSystemLoader()));
 
-		AgentBuilder.Ignored ignored = Bootstrap.builder.ignore(isSynthetic())
+		AgentBuilder.Ignored ignored = builder.ignore(isSynthetic())
 				.or(nameStartsWith("sun."))
 				.or(nameStartsWith("com.sun."))
 				.or(nameStartsWith("brave."))

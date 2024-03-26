@@ -3,6 +3,7 @@ package com.mawen.agent.log4j2;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -21,12 +22,12 @@ public class ClassLoaderUtils {
 	}
 
 	public static URL[] getAllURLs(ClassLoader classLoader, Function<URL, Boolean> filter) {
-		var list = new ArrayList<URL>();
+		List<URL> list = new ArrayList<>();
 		Function<URL, Boolean> f = (filter != null) ? filter : url -> true;
 		try {
-			var enumeration = classLoader.getResources("META-INF");
+			Enumeration<URL> enumeration = classLoader.getResources("META-INF");
 			fillUrls(list,enumeration,f);
-			var enumeration2 = classLoader.getResources("");
+			Enumeration<URL> enumeration2 = classLoader.getResources("");
 			fillUrls(list,enumeration2,f);
 		}
 		catch (IOException e) {
@@ -37,10 +38,11 @@ public class ClassLoaderUtils {
 
 	private static void fillUrls(List<URL> list, Enumeration<URL> enumeration, @Nonnull Function<URL, Boolean> filter) throws IOException {
 		while (enumeration.hasMoreElements()) {
-			var url = enumeration.nextElement();
-			var urlConnection = url.openConnection();
-			var resultUrl = url;
-			if (urlConnection instanceof JarURLConnection jarURLConnection) {
+			URL url = enumeration.nextElement();
+			URLConnection urlConnection = url.openConnection();
+			URL resultUrl = url;
+			if (urlConnection instanceof JarURLConnection) {
+				JarURLConnection jarURLConnection = (JarURLConnection) urlConnection;
 				resultUrl = jarURLConnection.getJarFileURL();
 			}
 			if (list.contains(resultUrl)) {
@@ -53,7 +55,7 @@ public class ClassLoaderUtils {
 	}
 
 	private static boolean filter(Function<URL, Boolean> filter, URL url) {
-		var f = filter.apply(url);
+		Boolean f = filter.apply(url);
 		return  f != null && f;
 	}
 }

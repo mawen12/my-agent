@@ -1,6 +1,5 @@
 package com.mawen.agent.plugin.elasticsearch.interceptor;
 
-import com.mawen.agent.plugin.api.config.ConfigConst;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.api.metric.MetricRegistry;
 import com.mawen.agent.plugin.api.metric.ServiceMetricRegistry;

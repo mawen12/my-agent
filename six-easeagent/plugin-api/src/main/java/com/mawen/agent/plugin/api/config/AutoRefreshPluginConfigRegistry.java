@@ -11,7 +11,7 @@ import com.mawen.agent.plugin.bridge.Agent;
  * @since 2024/2/24
  */
 public class AutoRefreshPluginConfigRegistry {
-	private static final AutoRefreshConfigSupplier<IPluginConfig> AUTO_REFRESH_CONFIG_IMPL_SUPPLIER = new AutoRefreshConfigSupplier<IPluginConfig>() {
+	private static final AutoRefreshConfigSupplier<AutoRefreshPluginConfigImpl> AUTO_REFRESH_CONFIG_IMPL_SUPPLIER = new AutoRefreshConfigSupplier<AutoRefreshPluginConfigImpl>() {
 
 		@Override
 		public AutoRefreshPluginConfigImpl newInstance() {
@@ -31,12 +31,12 @@ public class AutoRefreshPluginConfigRegistry {
 	 * @param id        String
 	 * @return {@link AutoRefreshPluginConfigImpl}
 	 */
-	public static IPluginConfig getOrCreate(String domain, String namespace, String id) {
+	public static AutoRefreshPluginConfigImpl getOrCreate(String domain, String namespace, String id) {
 		return getOrCreate(domain, namespace, id, AUTO_REFRESH_CONFIG_IMPL_SUPPLIER);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <C extends IPluginConfig> C getOrCreate(String domain, String namespace,
+	public static <C extends AutoRefreshPluginConfigImpl> C getOrCreate(String domain, String namespace,
 	                                                      String id, AutoRefreshConfigSupplier<C> supplier) {
 		Key key = new Key(domain, namespace, id, supplier.getType());
 		IPluginConfig autoRefreshConfig = configs.get(key);

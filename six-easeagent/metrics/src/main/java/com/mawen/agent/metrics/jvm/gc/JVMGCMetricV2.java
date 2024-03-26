@@ -2,7 +2,6 @@ package com.mawen.agent.metrics.jvm.gc;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
-import java.util.List;
 import java.util.Map;
 
 import javax.management.NotificationEmitter;

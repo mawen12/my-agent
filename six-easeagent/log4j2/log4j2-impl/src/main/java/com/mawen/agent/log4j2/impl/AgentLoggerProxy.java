@@ -3,7 +3,6 @@ package com.mawen.agent.log4j2.impl;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serial;
 import java.io.Serializable;
 
 import org.apache.logging.log4j.Level;
@@ -27,7 +26,6 @@ import org.slf4j.spi.LocationAwareLogger;
  */
 public class AgentLoggerProxy implements LocationAwareLogger, Serializable {
 
-	@Serial
 	private static final long serialVersionUID = -6526111633435401713L;
 	private static final Marker EVENT_MARKER = MarkerFactory.getMarker("EVENT");
 	private static final EventDataConverter CONVERTER = createConverter();
@@ -46,8 +44,8 @@ public class AgentLoggerProxy implements LocationAwareLogger, Serializable {
 
 	@Override
 	public void log(final Marker marker, final String fqcn, final int level, final String message, final Object[] params, Throwable throwable) {
-		final var log4jLevel = getLevel(level);
-		final var log4jMarker = getMarker(marker);
+		final Level log4jLevel = getLevel(level);
+		final org.apache.logging.log4j.Marker log4jMarker = getMarker(marker);
 
 		if (!logger.isEnabled(log4jLevel, log4jMarker, message, params)) {
 			return;
@@ -384,21 +382,28 @@ public class AgentLoggerProxy implements LocationAwareLogger, Serializable {
 	}
 
 	private static Level getLevel(final int i) {
-		return switch (i) {
-			case TRACE_INT -> Level.TRACE;
-			case DEBUG_INT -> Level.DEBUG;
-			case INFO_INT -> Level.INFO;
-			case WARN_INT -> Level.WARN;
-			case ERROR_INT -> Level.ERROR;
-			default -> Level.ERROR;
-		};
+		switch (i) {
+			case TRACE_INT:
+				return Level.TRACE;
+			case DEBUG_INT:
+				return Level.DEBUG;
+			case INFO_INT:
+				return Level.INFO;
+			case WARN_INT:
+				return Level.WARN;
+			case ERROR_INT:
+				return Level.ERROR;
+			default:
+				return Level.ERROR;
+		}
 	}
 
 	private static org.apache.logging.log4j.Marker getMarker(final Marker marker) {
 		if (marker == null) {
 			return null;
 		}
-		else if (marker instanceof Log4jMarker log4jMarker) {
+		else if (marker instanceof Log4jMarker) {
+			Log4jMarker log4jMarker = (Log4jMarker) marker;
 			return log4jMarker.getLog4jMarker();
 		}
 		else {
