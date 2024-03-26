@@ -32,35 +32,52 @@ public enum ClassMatcherConvert implements Converter<IClassMatcher, ElementMatch
 			return null;
 		}
 
-		if (source instanceof AndClassMatcher andMatcher) {
-			var leftMatcher = this.convert(andMatcher.getLeft());
-			var rightMatcher = this.convert(andMatcher.getRight());
+		if (source instanceof AndClassMatcher) {
+			AndClassMatcher andMatcher = (AndClassMatcher) source;
+			ElementMatcher.Junction<TypeDescription> leftMatcher = this.convert(andMatcher.getLeft());
+			ElementMatcher.Junction<TypeDescription> rightMatcher = this.convert(andMatcher.getRight());
 			return leftMatcher.and(rightMatcher);
 		}
-		else if (source instanceof OrClassMatcher orMatcher) {
-			var leftMatcher = this.convert(orMatcher.getLeft());
-			var rightMatcher = this.convert(orMatcher.getRight());
+		else if (source instanceof OrClassMatcher) {
+			OrClassMatcher orMatcher = (OrClassMatcher) source;
+			ElementMatcher.Junction<TypeDescription> leftMatcher = this.convert(orMatcher.getLeft());
+			ElementMatcher.Junction<TypeDescription> rightMatcher = this.convert(orMatcher.getRight());
 			return leftMatcher.or(rightMatcher);
 		}
-		else if (source instanceof NegateClassMatcher matcher) {
-			var notMatcher = this.convert(matcher.getMatcher());
+		else if (source instanceof NegateClassMatcher) {
+			NegateClassMatcher matcher = (NegateClassMatcher) source;
+			ElementMatcher.Junction<TypeDescription> notMatcher = this.convert(matcher.getMatcher());
 			return new NegatingMatcher<>(notMatcher);
 		}
 
-		return this.convert((ClassMatcher)source);
+		return this.convert((ClassMatcher) source);
 	}
 
 	private ElementMatcher.Junction<TypeDescription> convert(ClassMatcher matcher) {
-		var name = matcher.getName();
-		ElementMatcher.Junction<TypeDescription> c = switch (matcher.getMatchType()) {
-			case NAMED -> named(name);
-			case SUPER_CLASS -> hasSuperType(named(name));
-			case INTERFACE -> hasSuperType(named(name));
-			case ANNOTATION -> isAnnotatedWith(named(name));
-			default -> null;
-		};
+		String name = matcher.getName();
+		ElementMatcher.Junction<TypeDescription> c;
 
-		var mc = fromModifier(matcher.getModifier(), false);
+		switch (matcher.getMatchType()) {
+			case NAMED: {
+				c = named(name);
+				break;
+			}
+			case SUPER_CLASS: {
+				c= hasSuperType(named(name));
+				break;
+			}
+			case INTERFACE: {
+				c = hasSuperType(named(name));
+				break;
+			}
+			case ANNOTATION: {
+				c= isAnnotatedWith(named(name));
+				break;
+			}
+			default: c= null;
+		}
+
+		ElementMatcher.Junction<TypeDescription> mc = fromModifier(matcher.getModifier(), false);
 		if (mc != null) {
 			c = c.and(mc);
 		}
@@ -82,7 +99,8 @@ public enum ClassMatcherConvert implements Converter<IClassMatcher, ElementMatch
 			if ((modifier & Modifier.ACC_PUBLIC) != 0) {
 				if (mc != null) {
 					mc = not ? mc.or(isPublic()) : mc.and(isPublic());
-				} else {
+				}
+				else {
 					mc = isPublic();
 				}
 			}
@@ -90,7 +108,8 @@ public enum ClassMatcherConvert implements Converter<IClassMatcher, ElementMatch
 			if ((modifier & Modifier.ACC_PRIVATE) != 0) {
 				if (mc != null) {
 					mc = not ? mc.or(isPrivate()) : mc.and(isPrivate());
-				} else {
+				}
+				else {
 					mc = isPrivate();
 				}
 			}
@@ -98,7 +117,8 @@ public enum ClassMatcherConvert implements Converter<IClassMatcher, ElementMatch
 			if ((modifier & Modifier.ACC_INTERFACE) != 0) {
 				if (mc != null) {
 					mc = not ? mc.or(isInterface()) : mc.and(isInterface());
-				} else {
+				}
+				else {
 					mc = isInterface();
 				}
 			}
@@ -106,7 +126,8 @@ public enum ClassMatcherConvert implements Converter<IClassMatcher, ElementMatch
 			if ((modifier & Modifier.ACC_PROTECTED) != 0) {
 				if (mc != null) {
 					mc = not ? mc.or(isProtected()) : mc.and(isProtected());
-				} else {
+				}
+				else {
 					mc = isProtected();
 				}
 			}

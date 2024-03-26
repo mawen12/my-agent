@@ -5,9 +5,12 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
+import com.mawen.agent.plugin.api.metric.Counter;
+import com.mawen.agent.plugin.api.metric.Meter;
 import com.mawen.agent.plugin.api.metric.MetricRegistry;
 import com.mawen.agent.plugin.api.metric.ServiceMetric;
 import com.mawen.agent.plugin.api.metric.name.MetricField;
+import com.mawen.agent.plugin.api.metric.name.MetricName;
 import com.mawen.agent.plugin.api.metric.name.MetricSubType;
 import com.mawen.agent.plugin.api.metric.name.MetricValueFetcher;
 import com.mawen.agent.plugin.api.metric.name.NameFactory;
@@ -65,19 +68,19 @@ public class ElasticsearchMetric extends ServiceMetric {
 
 	public void collectMetric(String key, long duration, boolean success) {
 		metricRegistry.timer(this.nameFactory.timerName(key, MetricSubType.DEFAULT)).update(duration, TimeUnit.MILLISECONDS);
-		final var defaultMeter = metricRegistry.meter(nameFactory.meterName(key, MetricSubType.DEFAULT));
-		final var defaultCounter = metricRegistry.counter(nameFactory.counterName(key, MetricSubType.DEFAULT));
+		final Meter defaultMeter = metricRegistry.meter(nameFactory.meterName(key, MetricSubType.DEFAULT));
+		final Counter defaultCounter = metricRegistry.counter(nameFactory.counterName(key, MetricSubType.DEFAULT));
 
 		if (!success) {
-			final var errorMeter = metricRegistry.meter(nameFactory.meterName(key, MetricSubType.ERROR));
-			final var errorCount = metricRegistry.counter(nameFactory.counterName(key, MetricSubType.ERROR));
+			final Meter errorMeter = metricRegistry.meter(nameFactory.meterName(key, MetricSubType.ERROR));
+			final Counter errorCount = metricRegistry.counter(nameFactory.counterName(key, MetricSubType.ERROR));
 			errorMeter.mark();
 			errorCount.inc();
 		}
 		defaultMeter.mark();
 		defaultCounter.inc();
 
-		var gaugeName = nameFactory.gaugeNames(key).get(MetricSubType.DEFAULT);
+		MetricName gaugeName = nameFactory.gaugeNames(key).get(MetricSubType.DEFAULT);
 		metricRegistry.gauge(gaugeName.name()
 //				, () -> () ->
 //				new LastMinutesCounterGauge((long) (defaultMeter.getOneMinuteRate() * 60),

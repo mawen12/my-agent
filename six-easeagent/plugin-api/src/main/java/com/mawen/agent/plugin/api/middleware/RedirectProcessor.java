@@ -3,6 +3,7 @@ package com.mawen.agent.plugin.api.middleware;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import com.mawen.agent.plugin.api.metric.name.Tags;
 import com.mawen.agent.plugin.api.trace.Span;
 import com.mawen.agent.plugin.utils.NoNull;
@@ -24,20 +25,20 @@ public class RedirectProcessor {
 	}
 
 	public static void setTagsIfRedirected(Redirect key, Span span, String uris) {
-		var remote = getRemote(key, uris);
+		String remote = getRemote(key, uris);
 		if (!StringUtils.isEmpty(remote)) {
 			span.tag(MiddlewareConstants.REDIRECTED_LABEL_REMOTE_TAG_NAME, remote);
 		}
 	}
 
 	public static void setTagsIfRedirected(Redirect key, Tags tags) {
-		var remote = INSTANCE.getRedirected(key);
+		String remote = INSTANCE.getRedirected(key);
 		if (remote == null) {
 			return;
 		}
-		var serviceTags = INSTANCE.getTags();
+		Map<String, String> serviceTags = INSTANCE.getTags();
 		if (serviceTags != null && !serviceTags.isEmpty()) {
-			for (var entry : serviceTags.entrySet()) {
+			for (Map.Entry<String, String> entry : serviceTags.entrySet()) {
 				tags.put(entry.getKey(), entry.getValue());
 			}
 		}
@@ -55,20 +56,21 @@ public class RedirectProcessor {
 		if (!key.hasConfig()) {
 			return null;
 		}
-		var remote = INSTANCE.getRedirected(key);
+		String remote = INSTANCE.getRedirected(key);
 
 		return NoNull.of(uris, remote);
 	}
 
 	// all
 	public void init() {
-		for (var redirect : Redirect.values()) { // init
+		for (Redirect redirect : Redirect.values()) { // init
 			// ignore
 		}
 	}
 
 	private synchronized void setRedirected(Redirect key, String uris) {
-		this.redirectedUris = Map.of(key, uris);
+		this.redirectedUris = Maps.newHashMap();
+		this.redirectedUris.put(key, uris);
 	}
 
 	private synchronized String getRedirected(Redirect key) {

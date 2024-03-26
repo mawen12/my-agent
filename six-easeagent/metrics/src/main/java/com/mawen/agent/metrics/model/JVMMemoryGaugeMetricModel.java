@@ -10,7 +10,34 @@ import com.mawen.agent.plugin.tools.metrics.GaugeMetricModel;
  * @since 2024/3/5
  */
 
-public record JVMMemoryGaugeMetricModel(Long bytesInit, Long bytesUsed, Long bytesCommitted, Long bytesMax) implements GaugeMetricModel {
+public class JVMMemoryGaugeMetricModel implements GaugeMetricModel {
+	private final Long bytesInit;
+	private final Long bytesUsed;
+	private final Long bytesCommitted;
+	private final Long bytesMax;
+
+	public JVMMemoryGaugeMetricModel(Long bytesInit, Long bytesUsed, Long bytesCommitted, Long bytesMax) {
+		this.bytesInit = bytesInit;
+		this.bytesUsed = bytesUsed;
+		this.bytesCommitted = bytesCommitted;
+		this.bytesMax = bytesMax;
+	}
+
+	public Long bytesInit() {
+		return bytesInit;
+	}
+
+	public Long bytesUsed() {
+		return bytesUsed;
+	}
+
+	public Long bytesCommitted() {
+		return bytesCommitted;
+	}
+
+	public Long bytesMax() {
+		return bytesMax;
+	}
 
 	@Override
 	public Map<String, Object> toHashMap() {

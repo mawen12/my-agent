@@ -20,15 +20,15 @@ public class ElasticsearchPerformRequestMetricsInterceptor extends Elasticsearch
 
 	@Override
 	public void before(MethodInfo methodInfo, Context context) {
-		var request = (Request) methodInfo.getArgs()[0];
+		Request request = (Request) methodInfo.getArgs()[0];
 		context.put(REQUEST, request);
 	}
 
 	@Override
 	public void after(MethodInfo methodInfo, Context context) {
-		var response = (Response) methodInfo.getRetValue();
-		var request = (Request) methodInfo.getArgs()[0];
-		var success = checkSuccess(response, methodInfo.getThrowable());
+		Response response = (Response) methodInfo.getRetValue();
+		Request request = (Request) methodInfo.getArgs()[0];
+		boolean success = checkSuccess(response, methodInfo.getThrowable());
 		this.elasticsearchMetric.collectMetric(ElasticsearchCtxUtils.getIndex(request.getEndpoint()),
 				ContextUtils.getDuration(context), success);
 	}

@@ -142,7 +142,16 @@ public class MockReport {
 		}
 	}
 
-	public record MockMetricReporterFactory(MetricReporterFactory metricReporterFactory) implements MetricReporterFactory {
+	public static class MockMetricReporterFactory implements MetricReporterFactory {
+		private final MetricReporterFactory metricReporterFactory;
+
+		public MockMetricReporterFactory(MetricReporterFactory metricReporterFactory) {
+			this.metricReporterFactory = metricReporterFactory;
+		}
+
+		public MetricReporterFactory metricReporterFactory() {
+			return metricReporterFactory;
+		}
 
 		@Override
 		public Reporter reporter(IPluginConfig config) {
@@ -150,7 +159,16 @@ public class MockReport {
 		}
 	}
 
-	public record MockReporter(Reporter delegate) implements Reporter {
+	public static class MockReporter implements Reporter {
+		private final Reporter delegate;
+
+		public MockReporter(Reporter delegate) {
+			this.delegate = delegate;
+		}
+
+		public Reporter delegate() {
+			return delegate;
+		}
 
 		@Override
 		public void report(String msg) {

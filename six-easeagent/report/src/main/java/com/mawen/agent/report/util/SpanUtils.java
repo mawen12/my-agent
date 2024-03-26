@@ -12,10 +12,11 @@ public class SpanUtils {
 	private SpanUtils(){}
 
 	public static boolean isValidSpan(Object next) {
-		if (next instanceof ReportSpan s) {
-			return s.timestamp() > 0;
+		if (next instanceof ReportSpan) {
+			return ((ReportSpan)next).timestamp() > 0;
 		}
-		else if (next instanceof Span s) {
+		else if (next instanceof Span) {
+			Span s = ((Span)next);
 			return s.timestamp() != null && s.timestamp() > 0;
 		}
 		return false;

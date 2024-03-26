@@ -21,7 +21,7 @@ public class HttpCall implements Call<Void>{
 
 	@Override
 	public Void execute() throws IOException {
-		try (var response = call.execute()) {
+		try (Response response = call.execute()) {
 			parseResponse(response);
 		}
 		return null;
@@ -39,7 +39,17 @@ public class HttpCall implements Call<Void>{
 		throw new IOException("response failed: " + response);
 	}
 
-	record V2CallbackAdapter<V>(Callback<V> delegate) implements okhttp3.Callback {
+	static class V2CallbackAdapter<V> implements okhttp3.Callback {
+		private final Callback<V> delegate;
+
+		public V2CallbackAdapter(Callback<V> delegate) {
+			this.delegate = delegate;
+		}
+
+		public Callback<V> delegate() {
+			return delegate;
+		}
+
 		@Override
 		public void onFailure(@NotNull okhttp3.Call call, @NotNull IOException e) {
 			delegate.onError(e);

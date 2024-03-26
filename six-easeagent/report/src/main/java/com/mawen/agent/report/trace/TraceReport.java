@@ -10,6 +10,7 @@ import com.mawen.agent.report.async.trace.SDKAsyncReporter;
 import com.mawen.agent.report.async.trace.TraceAsyncProps;
 import com.mawen.agent.report.encoder.span.GlobalExtrasSupplier;
 import com.mawen.agent.report.plugin.ReporterRegistry;
+import com.mawen.agent.report.sender.SenderWithEncoder;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -28,11 +29,11 @@ public class TraceReport {
 	}
 
 	private RefreshableReporter<ReportSpan> initSpanRefreshableReporter(Config reportConfig) {
-		var sender = ReporterRegistry.getSender(ReportConfigConst.TRACE_SENDER, reportConfig);
+		SenderWithEncoder sender = ReporterRegistry.getSender(ReportConfigConst.TRACE_SENDER, reportConfig);
 
-		var traceProperties = new TraceAsyncProps(reportConfig);
+		TraceAsyncProps traceProperties = new TraceAsyncProps(reportConfig);
 
-		var extrasSupplier = new GlobalExtrasSupplier() {
+		GlobalExtrasSupplier extrasSupplier = new GlobalExtrasSupplier() {
 
 			Config gConfig = Agent.getConfig();
 			AutoRefreshConfigItem<String> serviceName = new AutoRefreshConfigItem<>(gConfig, ConfigConst.SERVICE_NAME, Config::getString);
@@ -48,7 +49,7 @@ public class TraceReport {
 			}
 		};
 
-		var reporter = SDKAsyncReporter.builderSDKAsyncReporter(sender, traceProperties, extrasSupplier);
+		SDKAsyncReporter<ReportSpan> reporter = SDKAsyncReporter.builderSDKAsyncReporter(sender, traceProperties, extrasSupplier);
 
 		reporter.startFlushThread();
 

@@ -21,7 +21,7 @@ public class AgentJavaConstantValue extends JavaConstantValue {
 
 	@Override
 	public Size apply(MethodVisitor methodVisitor, Implementation.Context implementationContext) {
-		var index = (Integer) constant.accept(Visitor.INSTANCE);
+		Integer index = (Integer) constant.accept(Visitor.INSTANCE);
 		methodVisitor.visitLdcInsn(index);
 		return constant.getTypeDescription().getStackSize().toIncreasingSize();
 	}

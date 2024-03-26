@@ -331,15 +331,18 @@ public class MethodMatcher implements IMethodMatcher {
 			if (this.left == null || this.operator == null) {
 				return matcher;
 			}
-			return switch (this.operator) {
-				case OR -> new OrMethodMatcher(this.left, matcher);
-				case AND -> new AndMethodMatcher(this.left, matcher);
-				default -> matcher;
-			};
+			switch (this.operator) {
+				case OR:
+					return new OrMethodMatcher(this.left, matcher);
+				case AND:
+					return new AndMethodMatcher(this.left, matcher);
+				default:
+					return matcher;
+			}
 		}
 
 		private MethodMatcherBuilder operate(Operator opt) {
-			var builder = new MethodMatcherBuilder();
+			MethodMatcherBuilder builder = new MethodMatcherBuilder();
 			builder.left = this.build();
 			builder.operator = opt;
 

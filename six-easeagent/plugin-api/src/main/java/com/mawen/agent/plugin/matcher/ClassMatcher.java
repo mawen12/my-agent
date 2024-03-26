@@ -21,7 +21,8 @@ public class ClassMatcher implements IClassMatcher {
 	private int notModifier = Modifier.ACC_NONE;
 
 
-	protected ClassMatcher(){}
+	protected ClassMatcher() {
+	}
 
 	private ClassMatcher(String name, ClassMatch type, int modifier, int notModifier) {
 		this.name = name;
@@ -61,7 +62,8 @@ public class ClassMatcher implements IClassMatcher {
 		private Operator operator = Operator.AND;
 		private boolean isNegate = false;
 
-		ClassMatcherBuilder(){}
+		ClassMatcherBuilder() {
+		}
 
 		public ClassMatcherBuilder or() {
 			return operator(Operator.OR);
@@ -89,7 +91,8 @@ public class ClassMatcher implements IClassMatcher {
 				if (this.matchType.equals(ClassMatch.SUPER_CLASS)) {
 					// replace
 					return this.name(className).matchType(ClassMatch.SUPER_CLASS);
-				} else {
+				}
+				else {
 					// and operate
 					ClassMatcherBuilder builder = new ClassMatcherBuilder();
 					builder.hasSuperClass(className).matchType(ClassMatch.SUPER_CLASS);
@@ -187,12 +190,14 @@ public class ClassMatcher implements IClassMatcher {
 				return matcher;
 			}
 
-			matcher = switch (this.operator) {
-				case OR -> new OrClassMatcher(this.left, matcher);
-				case AND -> new AndClassMatcher(this.left, matcher);
-				default -> matcher;
-			};
-			return matcher;
+			switch (this.operator) {
+				case OR:
+					return new OrClassMatcher(this.left, matcher);
+				case AND:
+					return new AndClassMatcher(this.left, matcher);
+				default:
+					return matcher;
+			}
 		}
 	}
 

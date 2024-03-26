@@ -1,6 +1,9 @@
 package com.mawen.agent.metrics.jvm.gc;
 
+import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
+import java.util.List;
+import java.util.Map;
 
 import javax.management.NotificationEmitter;
 import javax.management.NotificationListener;
@@ -8,17 +11,21 @@ import javax.management.openmbean.CompositeData;
 
 import com.mawen.agent.plugin.api.config.AutoRefreshPluginConfigRegistry;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
+import com.mawen.agent.plugin.api.metric.Counter;
+import com.mawen.agent.plugin.api.metric.Meter;
 import com.mawen.agent.plugin.api.metric.MetricRegistry;
 import com.mawen.agent.plugin.api.metric.ServiceMetric;
 import com.mawen.agent.plugin.api.metric.ServiceMetricRegistry;
 import com.mawen.agent.plugin.api.metric.ServiceMetricSupplier;
 import com.mawen.agent.plugin.api.metric.name.MetricField;
+import com.mawen.agent.plugin.api.metric.name.MetricName;
 import com.mawen.agent.plugin.api.metric.name.MetricSubType;
 import com.mawen.agent.plugin.api.metric.name.MetricValueFetcher;
 import com.mawen.agent.plugin.api.metric.name.NameFactory;
 import com.mawen.agent.plugin.api.metric.name.Tags;
 import com.mawen.agent.plugin.utils.ImmutableMap;
 import com.sun.management.GarbageCollectionNotificationInfo;
+import com.sun.management.GcInfo;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -28,7 +35,7 @@ public class JVMGCMetricV2 extends ServiceMetric {
 
 	private static final String NO_GC = "No GC";
 
-	public static final ServiceMetricSupplier<JVMGCMetricV2> METRIC_SUPPLIER = new ServiceMetricSupplier<>() {
+	public static final ServiceMetricSupplier<JVMGCMetricV2> METRIC_SUPPLIER = new ServiceMetricSupplier<JVMGCMetricV2>() {
 		@Override
 		public NameFactory newNameFactory() {
 			return JVMGCMetricV2.nameFactory();
@@ -71,12 +78,13 @@ public class JVMGCMetricV2 extends ServiceMetric {
 	}
 
 	public void collect() {
-		for (var mBean : ManagementFactory.getGarbageCollectorMXBeans()) {
-			if (!(mBean instanceof NotificationEmitter notificationEmitter)) {
+		for (GarbageCollectorMXBean mBean : ManagementFactory.getGarbageCollectorMXBeans()) {
+			if (!(mBean instanceof NotificationEmitter)) {
 				continue;
 			}
 
-			var listener = getListener();
+			NotificationEmitter notificationEmitter = (NotificationEmitter) mBean;
+			NotificationListener listener = getListener();
 			notificationEmitter.addNotificationListener(listener, null, null);
 		}
 	}
@@ -91,24 +99,24 @@ public class JVMGCMetricV2 extends ServiceMetric {
 				return;
 			}
 
-			var compositeData = (CompositeData) notification.getUserData();
-			var notificationInfo = GarbageCollectionNotificationInfo.from(compositeData);
-			var gcCause = notificationInfo.getGcCause();
-			var gcInfo = notificationInfo.getGcInfo();
-			var duration = gcInfo.getDuration();
+			CompositeData compositeData = (CompositeData) notification.getUserData();
+			GarbageCollectionNotificationInfo notificationInfo = GarbageCollectionNotificationInfo.from(compositeData);
+			String gcCause = notificationInfo.getGcCause();
+			GcInfo gcInfo = notificationInfo.getGcInfo();
+			long duration = gcInfo.getDuration();
 
-			var gcName = notificationInfo.getGcName();
-			var meterNames = nameFactory.meterNames(gcName);
+			String gcName = notificationInfo.getGcName();
+			Map<MetricSubType, MetricName> meterNames = nameFactory.meterNames(gcName);
 			meterNames.forEach((type, name) -> {
-				var meter = metricRegistry.meter(name.name());
+				Meter meter = metricRegistry.meter(name.name());
 				if (!NO_GC.equals(gcCause)) {
 					meter.mark();
 				}
 			});
 
-			var counterNames = nameFactory.counterNames(gcName);
+			Map<MetricSubType, MetricName> counterNames = nameFactory.counterNames(gcName);
 			counterNames.forEach((type, name) -> {
-				var counter = metricRegistry.counter(name.name());
+				Counter counter = metricRegistry.counter(name.name());
 				if (!NO_GC.equals(gcCause)) {
 					counter.inc(duration);
 				}

@@ -14,7 +14,7 @@ public class AgentThreadFactory implements ThreadFactory {
 
 	@Override
 	public Thread newThread(@Nullable Runnable r) {
-		var thread = new Thread(r, "agent-" + createCount.incrementAndGet());
+		Thread thread = new Thread(r, "agent-" + createCount.incrementAndGet());
 		thread.setDaemon(true);
 		return thread;
 	}

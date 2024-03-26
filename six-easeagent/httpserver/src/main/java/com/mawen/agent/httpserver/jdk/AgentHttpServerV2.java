@@ -3,6 +3,7 @@ package com.mawen.agent.httpserver.jdk;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.mawen.agent.httpserver.IHttpHandler;
@@ -26,7 +27,7 @@ public class AgentHttpServerV2 implements IHttpServer {
 			this.httpRootHandler = new RootContextHandler();
 			this.server.createContext("/", this.httpRootHandler);
 
-			var executorService = Executors.newFixedThreadPool(1, new AgentThreadFactory());
+			ExecutorService executorService = Executors.newFixedThreadPool(1, new AgentThreadFactory());
 			this.server.setExecutor(executorService);
 
 			this.server.start();

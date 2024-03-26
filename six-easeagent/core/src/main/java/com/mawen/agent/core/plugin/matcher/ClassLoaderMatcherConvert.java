@@ -21,7 +21,7 @@ public enum ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher, 
 
 	@Override
 	public ElementMatcher<ClassLoader> convert(IClassLoaderMatcher source) {
-		var negate = false;
+		boolean negate = false;
 		ElementMatcher<ClassLoader> matcher;
 		if (source instanceof NegateClassLoaderMatcher) {
 			negate = true;
@@ -32,20 +32,43 @@ public enum ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher, 
 			matcher = any();
 		}
 		else {
-			matcher = switch (source.getClassLoaderName()) {
-				case BOOTSTRAP_NAME -> ElementMatchers.isBootstrapClassLoader();
-				case EXTERNAL_NAME -> ElementMatchers.isExtensionClassLoader();
-				case SYSTEM_NAME -> ElementMatchers.isSystemClassLoader();
-				case AGENT_NAME -> is(Bootstrap.class.getClassLoader())
-						.or(is(FinalClassLoaderSupplier.CLASSLOADER));
-				default -> new NameMatcher(source.getClassLoaderName());
+			switch (source.getClassLoaderName()) {
+				case BOOTSTRAP_NAME: {
+					matcher = ElementMatchers.isBootstrapClassLoader();
+					break;
+				}
+				case EXTERNAL_NAME: {
+					matcher = ElementMatchers.isExtensionClassLoader();
+					break;
+				}
+				case SYSTEM_NAME: {
+					matcher = ElementMatchers.isSystemClassLoader();
+					break;
+				}
+				case AGENT_NAME: {
+					matcher = is(Bootstrap.class.getClassLoader())
+							.or(is(FinalClassLoaderSupplier.CLASSLOADER));
+					break;
+				}
+				default: {
+					matcher = new NameMatcher(source.getClassLoaderName());
+				}
 			};
 		}
 
 		return negate ? not(matcher) : matcher;
 	}
 
-	record NameMatcher(String className) implements ElementMatcher<ClassLoader> {
+	static class NameMatcher implements ElementMatcher<ClassLoader> {
+		private final String className;
+
+		public NameMatcher(String className) {
+			this.className = className;
+		}
+
+		public String className() {
+			return className;
+		}
 
 		@Override
 		public boolean matches(ClassLoader target) {

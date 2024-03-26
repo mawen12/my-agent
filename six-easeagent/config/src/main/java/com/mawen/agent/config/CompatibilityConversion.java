@@ -72,11 +72,11 @@ public class CompatibilityConversion {
 	}
 
 	public static Map<String, String> transform(Map<String, String> oldConfigs) {
-		var changedKeys = new HashMap<String, Object>();
-		var newConfigs = new HashMap<String, String>();
-		for (var entry : oldConfigs.entrySet()) {
-			var conversion = transformConversion(entry.getKey());
-			var changed = conversion.transform(newConfigs, entry.getValue());
+		Map<String, Object> changedKeys = new HashMap<>();
+		Map<String, String> newConfigs = new HashMap<>();
+		for (Map.Entry<String, String> entry : oldConfigs.entrySet()) {
+			Conversion<?> conversion = transformConversion(entry.getKey());
+			Object changed = conversion.transform(newConfigs, entry.getValue());
 			if (conversion.isChange()) {
 				changedKeys.put(entry.getKey(), changed);
 			}
@@ -124,21 +124,21 @@ public class CompatibilityConversion {
 	}
 
 	private static Conversion<?> conversion(String key, Set<String> skipTest, String pluginId) {
-		var keys = ConfigConst.split(key);
+		String[] keys = ConfigConst.split(key);
 		if (keys.length < 4) {
 			return new FinalConversion(key, false);
 		}
-		var key2 = keys[2];
+		String key2 = keys[2];
 		if (skipTest.contains(key2)) {
 			return new FinalConversion(key, false);
 		}
-		var builder = KEY_TO_NAMESPACE.get(key2);
+		BiFunction<String, String, Conversion<?>> builder = KEY_TO_NAMESPACE.get(key2);
 		if (builder == null) {
 			builder = SingleBuilder.observability(key2);
 		}
-		var properties = new String[keys.length - 3];
+		String[] properties = new String[keys.length - 3];
 		int index = 0;
-		for (var i = 0; i < keys.length; i++) {
+		for (int i = 0; i < keys.length; i++) {
 			properties[index++] = keys[i];
 		}
 		return builder.apply(pluginId, ConfigConst.join(properties));
@@ -150,7 +150,18 @@ public class CompatibilityConversion {
 		boolean isChange();
 	}
 
-	record FinalConversion(String key, boolean change) implements Conversion<String> {
+	static class FinalConversion implements Conversion<String> {
+		private final String key;
+		private final boolean change;
+
+		public FinalConversion(String key, boolean change) {
+			this.key = key;
+			this.change = change;
+		}
+
+		public String key() {
+			return key;
+		}
 
 		@Override
 		public String transform(Map<String, String> configs, String value) {
@@ -164,7 +175,18 @@ public class CompatibilityConversion {
 		}
 	}
 
-	record MultipleFinalConversion(List<FinalConversion> conversions, boolean change) implements Conversion<List<String>> {
+	static class MultipleFinalConversion implements Conversion<List<String>> {
+		private final List<FinalConversion> conversions;
+		private final boolean change;
+
+		public MultipleFinalConversion(List<FinalConversion> conversions, boolean change) {
+			this.conversions = conversions;
+			this.change = change;
+		}
+
+		public List<FinalConversion> conversions() {
+			return conversions;
+		}
 
 		@Override
 		public List<String> transform(Map<String, String> configs, String value) {
@@ -181,7 +203,34 @@ public class CompatibilityConversion {
 		}
 	}
 
-	record SingleConversion(String domain, String namespace, String id, String property) implements Conversion<String> {
+	static class SingleConversion implements Conversion<String> {
+		private final String domain;
+		private final String namespace;
+		private final String id;
+		private final String property;
+
+		public SingleConversion(String domain, String namespace, String id, String property) {
+			this.domain = domain;
+			this.namespace = namespace;
+			this.id = id;
+			this.property = property;
+		}
+
+		public String domain() {
+			return domain;
+		}
+
+		public String namespace() {
+			return namespace;
+		}
+
+		public String id() {
+			return id;
+		}
+
+		public String property() {
+			return property;
+		}
 
 		@Override
 		public String transform(Map<String, String> configs, String value) {
@@ -196,7 +245,34 @@ public class CompatibilityConversion {
 		}
 	}
 
-	record MultipleConversion(String domain, List<String> namespaces, String id, String property) implements Conversion<List<String>> {
+	static class MultipleConversion implements Conversion<List<String>> {
+		private final String domain;
+		private final List<String> namespaces;
+		private final String id;
+		private final String property;
+
+		public MultipleConversion(String domain, List<String> namespaces, String id, String property) {
+			this.domain = domain;
+			this.namespaces = namespaces;
+			this.id = id;
+			this.property = property;
+		}
+
+		public String domain() {
+			return domain;
+		}
+
+		public List<String> namespaces() {
+			return namespaces;
+		}
+
+		public String id() {
+			return id;
+		}
+
+		public String property() {
+			return property;
+		}
 
 		@Override
 		public List<String> transform(Map<String, String> configs, String value) {
@@ -214,7 +290,22 @@ public class CompatibilityConversion {
 			return true;
 		}
 
-		record SingleBuilder(String domain, String namespace) implements BiFunction<String, String, Conversion<?>> {
+		static class SingleBuilder implements BiFunction<String, String, Conversion<?>> {
+			private final String domain;
+			private final String namespace;
+
+			public SingleBuilder(String domain, String namespace) {
+				this.domain = domain;
+				this.namespace = namespace;
+			}
+
+			public String domain() {
+				return domain;
+			}
+
+			public String namespace() {
+				return namespace;
+			}
 
 			@Override
 			public Conversion<?> apply(String id, String property) {
@@ -227,7 +318,22 @@ public class CompatibilityConversion {
 		}
 	}
 
-	record MultipleBuilder(String domain, List<String> namespaces) implements BiFunction<String, String, Conversion<?>> {
+	static class MultipleBuilder implements BiFunction<String, String, Conversion<?>> {
+		private final String domain;
+		private final List<String> namespaces;
+
+		public MultipleBuilder(String domain, List<String> namespaces) {
+			this.domain = domain;
+			this.namespaces = namespaces;
+		}
+
+		public String domain() {
+			return domain;
+		}
+
+		public List<String> namespaces() {
+			return namespaces;
+		}
 
 		@Override
 		public Conversion<?> apply(String id, String property) {

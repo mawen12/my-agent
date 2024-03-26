@@ -16,7 +16,22 @@ import zipkin2.reporter.Reporter;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/29
  */
-record ConvertSpanReporter(Reporter<ReportSpan> delegate, Tag<Throwable> errorTag) implements Reporter<MutableSpan> {
+class ConvertSpanReporter implements Reporter<MutableSpan> {
+	private final Reporter<ReportSpan> delegate;
+	private final Tag<Throwable> errorTag;
+
+	public ConvertSpanReporter(Reporter<ReportSpan> delegate, Tag<Throwable> errorTag) {
+		this.delegate = delegate;
+		this.errorTag = errorTag;
+	}
+
+	public Reporter<ReportSpan> delegate() {
+		return delegate;
+	}
+
+	public Tag<Throwable> errorTag() {
+		return errorTag;
+	}
 
 	static final Map<Kind, Span.Kind> BRAVE_TO_ZIPKIN_KIND = generateKindMap();
 
@@ -89,8 +104,10 @@ record ConvertSpanReporter(Reporter<ReportSpan> delegate, Tag<Throwable> errorTa
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) return true;
-		if (!(obj instanceof ConvertSpanReporter other)) return false;
-		return delegate.equals(other.delegate);
+		if (!(obj instanceof ConvertSpanReporter)) return false;
+
+		ConvertSpanReporter that = (ConvertSpanReporter) obj;
+		return delegate.equals(that.delegate);
 	}
 
 	@Override

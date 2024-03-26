@@ -92,7 +92,16 @@ public class TimerImpl implements Timer {
 		return timer;
 	}
 
-	public record ContextImpl(com.codahale.metrics.Timer.Context context) implements Context {
+	public static class ContextImpl implements Context {
+		private final com.codahale.metrics.Timer.Context context;
+
+		public ContextImpl(com.codahale.metrics.Timer.Context context) {
+			this.context = context;
+		}
+
+		public com.codahale.metrics.Timer.Context context() {
+			return context;
+		}
 
 		@Override
 		public long stop() {

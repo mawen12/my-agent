@@ -44,12 +44,12 @@ public class ConfigFactory {
 		Configs configs = loadDefaultConfigs(loader, CONFIG_PROP_FILE);
 
 		// load yaml configuration file if exist
-		var yConfigs = loadDefaultConfigs(loader, CONFIG_YAML_FILE);
+		Configs yConfigs = loadDefaultConfigs(loader, CONFIG_YAML_FILE);
 		configs.mergeConfigs(yConfigs);
 
 		// override by user special config file
 		if (StringUtils.isNotEmpty(pathname)) {
-			var configFromOuterFile = ConfigLoader.loadFromFile(new File(pathname));
+			Configs configFromOuterFile = ConfigLoader.loadFromFile(new File(pathname));
 			log.info("Loaded user special config file: {}", pathname);
 			configs.mergeConfigs(configFromOuterFile);
 		}
@@ -59,7 +59,7 @@ public class ConfigFactory {
 	}
 
 	private static Configs loadDefaultConfigs(ClassLoader loader, String file) {
-		var globalConfigs = JarFileConfigLoader.load(file);
+		Configs globalConfigs = JarFileConfigLoader.load(file);
 		return NoNull.of(globalConfigs, ConfigLoader.loadFromClasspath(loader, file));
 	}
 

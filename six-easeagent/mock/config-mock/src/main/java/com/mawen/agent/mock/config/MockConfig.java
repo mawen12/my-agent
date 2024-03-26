@@ -1,7 +1,9 @@
 package com.mawen.agent.mock.config;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.mawen.agent.config.Configs;
 import com.mawen.agent.config.MockConfigLoader;
@@ -18,7 +20,7 @@ public class MockConfig {
 	private static final PluginConfigManager PLUGIN_CONFIG_MANAGER;
 
 	static {
-		var initConfigs = new HashMap<String, String>();
+		Map<String, String> initConfigs = new HashMap<>();
 		initConfigs.put("name", "demo-service");
 		initConfigs.put("system", "demo-system");
 
@@ -28,13 +30,13 @@ public class MockConfig {
 		initConfigs.put("plugin.observability.global.tracing.enabled", "true");
 		initConfigs.put("plugin.observability.global.metric.enabled", "true");
 		CONFIGS = new Configs(initConfigs);
-		var classLoader = Thread.currentThread().getContextClassLoader();
-		var url = classLoader.getResource(MOCK_CONFIG_YAML_FILE);
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		URL url = classLoader.getResource(MOCK_CONFIG_YAML_FILE);
 		if (url == null) {
 			url = classLoader.getResource(MOCK_CONFIG_PROP_FILE);
 		}
 		if (url != null) {
-			var configsFromOuterFile = MockConfigLoader.loadFromFile(new File(url.getFile()));
+			Configs configsFromOuterFile = MockConfigLoader.loadFromFile(new File(url.getFile()));
 			CONFIGS.mergeConfigs(configsFromOuterFile);
 		}
 		PLUGIN_CONFIG_MANAGER = PluginConfigManager.builder(CONFIGS).build();

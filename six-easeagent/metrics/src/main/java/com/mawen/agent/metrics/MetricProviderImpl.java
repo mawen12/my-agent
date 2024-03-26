@@ -16,6 +16,7 @@ import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.api.metric.MetricProvider;
 import com.mawen.agent.plugin.api.metric.MetricRegistry;
 import com.mawen.agent.plugin.api.metric.MetricRegistrySupplier;
+import com.mawen.agent.plugin.api.metric.name.MetricType;
 import com.mawen.agent.plugin.api.metric.name.NameFactory;
 import com.mawen.agent.plugin.api.metric.name.Tags;
 import com.mawen.agent.plugin.report.AgentReport;
@@ -71,14 +72,28 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
 	}
 
 	public static List<KeyType> keyTypes(NameFactory nameFactory) {
-		var keyTypes = new ArrayList<KeyType>();
-		for (var metricType : nameFactory.metricTypes()) {
+		List<KeyType> keyTypes = new ArrayList<>();
+		for (MetricType metricType : nameFactory.metricTypes()) {
 			switch (metricType) {
-				case TimerType -> keyTypes.add(KeyType.Timer);
-				case GaugeType -> keyTypes.add(KeyType.Gauge);
-				case CounterType -> keyTypes.add(KeyType.Counter);
-				case HistogramType -> keyTypes.add(KeyType.Histogram);
-				case MeterType -> keyTypes.add(KeyType.Meter);
+				case TimerType: {
+					keyTypes.add(KeyType.Timer);
+					break;
+				}
+				case GaugeType: {
+					keyTypes.add(KeyType.Gauge);
+					break;
+				}
+				case CounterType: {
+					keyTypes.add(KeyType.Counter);
+					break;
+				}
+				case HistogramType: {
+					keyTypes.add(KeyType.Histogram);
+					break;
+				}
+				case MeterType: {
+					keyTypes.add(KeyType.Meter);
+				}
 			}
 		}
 		return keyTypes;
@@ -88,11 +103,11 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
 
 		@Override
 		public MetricRegistry newMetricRegistry(IPluginConfig config, NameFactory nameFactory, Tags tags) {
-			var keyTypes = keyTypes(nameFactory);
-			var converterAdapter = new ConverterAdapter(nameFactory, keyTypes, additionalAttributes, tags);
-			var metricRegistry = MetricRegistryService.DEFAULT.createMetricRegistry(converterAdapter, additionalAttributes, tags);
+			List<KeyType> keyTypes = keyTypes(nameFactory);
+			ConverterAdapter converterAdapter = new ConverterAdapter(nameFactory, keyTypes, additionalAttributes, tags);
+			com.codahale.metrics.MetricRegistry metricRegistry = MetricRegistryService.DEFAULT.createMetricRegistry(converterAdapter, additionalAttributes, tags);
 
-			var result = MetricRegistryImpl.build(metricRegistry);
+			MetricRegistry result = MetricRegistryImpl.build(metricRegistry);
 			registerMetricRegistry(result);
 			return result;
 		}

@@ -2,6 +2,7 @@ package com.mawen.agent.core.plugin;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
@@ -17,9 +18,9 @@ public class BaseLoader {
 	private static final Logger log = Agent.getLogger(BaseLoader.class);
 
 	public static <T> List<T> load(Class<T> serviceClass) {
-		var result = new ArrayList<T>();
-		var services = ServiceLoader.load(serviceClass);
-		for (var it = services.iterator(); it.hasNext(); ) {
+		List<T> result = new ArrayList<>();
+		ServiceLoader<T> services = ServiceLoader.load(serviceClass);
+		for (Iterator<T> it = services.iterator(); it.hasNext(); ) {
 			try {
 				result.add(it.next());
 			}
@@ -31,7 +32,7 @@ public class BaseLoader {
 	}
 
 	public static <T extends Ordered> List<T> loadOrdered(Class<T> serviceClass) {
-		var result = load(serviceClass);
+		List<T> result = load(serviceClass);
 		result.sort(Comparator.comparing(Ordered::order));
 		return result;
 	}

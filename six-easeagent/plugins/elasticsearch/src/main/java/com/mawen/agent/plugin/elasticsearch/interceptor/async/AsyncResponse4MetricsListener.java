@@ -17,11 +17,29 @@ import static com.mawen.agent.plugin.elasticsearch.interceptor.ElasticsearchCtxU
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/4
  */
-public record AsyncResponse4MetricsListener(
-		ResponseListener delegate,
-		AsyncContext asyncContext,
-		ElasticsearchMetric elasticsearchMetric
-) implements ResponseListener {
+public class AsyncResponse4MetricsListener implements ResponseListener {
+
+	private final ResponseListener delegate;
+	private final AsyncContext asyncContext;
+	private final ElasticsearchMetric elasticsearchMetric;
+
+	public AsyncResponse4MetricsListener(ResponseListener delegate, AsyncContext asyncContext, ElasticsearchMetric elasticsearchMetric) {
+		this.delegate = delegate;
+		this.asyncContext = asyncContext;
+		this.elasticsearchMetric = elasticsearchMetric;
+	}
+
+	public ResponseListener delegate() {
+		return delegate;
+	}
+
+	public AsyncContext asyncContext() {
+		return asyncContext;
+	}
+
+	public ElasticsearchMetric elasticsearchMetric() {
+		return elasticsearchMetric;
+	}
 
 	@Override
 	public void onSuccess(Response response) {

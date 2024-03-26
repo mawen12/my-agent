@@ -31,7 +31,8 @@ public class InterceptorPluginDecorator implements Interceptor {
 	}
 
 	public IPluginConfig getConfig() {
-		if (config instanceof AutoRefreshPluginConfigImpl autoRefreshPluginConfig) {
+		if (config instanceof AutoRefreshPluginConfigImpl) {
+			AutoRefreshPluginConfigImpl autoRefreshPluginConfig = (AutoRefreshPluginConfigImpl) config;
 			return autoRefreshPluginConfig.getConfig();
 		}
 		return config;
@@ -49,8 +50,8 @@ public class InterceptorPluginDecorator implements Interceptor {
 
 	@Override
 	public void before(MethodInfo methodInfo, Context context) {
-		var cfg = getConfig();
-		var innerContext = (InitializeContext) context;
+		IPluginConfig cfg = getConfig();
+		InitializeContext innerContext = (InitializeContext) context;
 		innerContext.pushConfig(config);
 		if (cfg == null || cfg.enabled() || cfg instanceof NoOpIPluginConfig) {
 			innerContext.pushRetBound();
@@ -62,8 +63,8 @@ public class InterceptorPluginDecorator implements Interceptor {
 
 	@Override
 	public void after(MethodInfo methodInfo, Context context) {
-		var cfg = getConfig();
-		var innerContext = (InitializeContext) context;
+		IPluginConfig cfg = getConfig();
+		InitializeContext innerContext = (InitializeContext) context;
 		try {
 			if (cfg == null || cfg.enabled() || cfg instanceof NoOpIPluginConfig) {
 				try {
@@ -87,8 +88,8 @@ public class InterceptorPluginDecorator implements Interceptor {
 
 	@Override
 	public int order() {
-		var pluginOrder = this.plugin.order();
-		var interceptorOrder = this.interceptor.order();
+		int pluginOrder = this.plugin.order();
+		int interceptorOrder = this.interceptor.order();
 		return (interceptorOrder << 8) + pluginOrder;
 	}
 }

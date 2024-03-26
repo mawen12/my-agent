@@ -16,6 +16,7 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
 import com.mawen.agent.metrics.impl.CounterImpl;
 import com.mawen.agent.metrics.impl.MeterImpl;
@@ -63,16 +64,31 @@ public class ConverterAdapter extends AbstractConverter {
 			SortedMap<String, Histogram> histograms,
 			SortedMap<String, Meter> meters,
 			SortedMap<String, Timer> timers) {
-		var results = new HashSet<String>();
-		for (var keyType : this.keyTypes) {
+		Set<String> results = new HashSet<>();
+		for (KeyType keyType : this.keyTypes) {
 			if (keyType != null) {
 				switch (keyType) {
-					case Timer -> keys(timers.keySet(), results);
-					case Histogram -> keys(histograms.keySet(), results);
-					case Gauge -> keys(gauges.keySet(), results);
-					case Counter -> keys(counters.keySet(), results);
-					case Meter -> keys(meters.keySet(), results);
-					default -> {}
+					case Timer:  {
+						keys(timers.keySet(), results);
+						break;
+					}
+					case Histogram: {
+						keys(histograms.keySet(), results);
+						break;
+					}
+					case Gauge: {
+						keys(gauges.keySet(), results);
+						break;
+					}
+					case Counter: {
+						keys(counters.keySet(), results);
+						break;
+					}
+					case Meter: {
+						keys(meters.keySet(), results);
+						break;
+					}
+					default: {}
 				}
 			}
 		}
@@ -81,14 +97,15 @@ public class ConverterAdapter extends AbstractConverter {
 
 	@Override
 	protected void writeGauges(String key, MetricSubType metricSubType, SortedMap<String, Gauge> gauges, Map<String, Object> output) {
-		var map = nameFactory.gaugeNames(key);
+		Map<MetricSubType, MetricName> map = nameFactory.gaugeNames(key);
 		consumerMetric(map, metricSubType, v -> {
-			var gauge = gauges.get(v.name());
+			Gauge gauge = gauges.get(v.name());
 			if (gauge == null) {
 				return;
 			}
-			var value = gauge.getValue();
-			if (value instanceof GaugeMetricModel model) {
+			Object value = gauge.getValue();
+			if (value instanceof GaugeMetricModel) {
+				GaugeMetricModel model = (GaugeMetricModel) value;
 				output.putAll(model.toHashMap());
 			}
 			else if (value instanceof Number || value instanceof Boolean) {
@@ -102,7 +119,7 @@ public class ConverterAdapter extends AbstractConverter {
 
 	@Override
 	protected void writeCounters(String key, MetricSubType metricSubType, SortedMap<String, Counter> counters, Map<String, Object> output) {
-		var map = nameFactory.counterNames(key);
+		Map<MetricSubType, MetricName> map = nameFactory.counterNames(key);
 		consumerMetric(map, metricSubType, v -> {
 			Optional.ofNullable(counters.get(v.name()))
 					.ifPresent(c -> v.valueFetcher().forEach((fieldName, fetcher) -> appendField(output, fieldName, fetcher, CounterImpl.build(c))));
@@ -117,7 +134,7 @@ public class ConverterAdapter extends AbstractConverter {
 
 	@Override
 	protected void writeMeters(String key, MetricSubType metricSubType, SortedMap<String, Meter> meters, Map<String, Object> output) {
-		var map = nameFactory.meterNames(key);
+		Map<MetricSubType, MetricName> map = nameFactory.meterNames(key);
 		consumerMetric(map, metricSubType, v -> Optional
 				.ofNullable(meters.get(v.name()))
 				.ifPresent(m -> v.valueFetcher().forEach((fieldName, fetcher) -> appendField(output, fieldName, fetcher, MeterImpl.build(m)))));
@@ -125,11 +142,11 @@ public class ConverterAdapter extends AbstractConverter {
 
 	@Override
 	protected void writeTimers(String key, MetricSubType metricSubType, SortedMap<String, Timer> timers, Map<String, Object> output) {
-		var map = nameFactory.timerNames(key);
+		Map<MetricSubType, MetricName> map = nameFactory.timerNames(key);
 		consumerMetric(map, metricSubType, v -> Optional
 				.ofNullable(timers.get(v.name()))
 				.ifPresent(t -> {
-					final var snapshot = t.getSnapshot();
+					final Snapshot snapshot = t.getSnapshot();
 					v.valueFetcher().forEach((fieldName, fetcher) -> {
 						if (fetcher.getClazz().equals(com.mawen.agent.plugin.api.metric.Snapshot.class)) {
 							appendField(output, fieldName, fetcher, SnapshotImpl.build(snapshot));
@@ -173,26 +190,38 @@ public class ConverterAdapter extends AbstractConverter {
 
 	private void appendField(Map<String, Object> output, MetricField fieldName, MetricValueFetcher fetcher, Metric metric) {
 		switch (fieldName.getType()) {
-			case DURATION -> appendDuration(output, fieldName.getField(), fetcher.apply(metric), fieldName.getScale());
-			case RATE -> appendRate(output, fieldName.getField(), fetcher.apply(metric), fieldName.getScale());
-			default -> output.put(fieldName.getField(), fetcher.apply(metric));
+			case DURATION: {
+				appendDuration(output, fieldName.getField(), fetcher.apply(metric), fieldName.getScale());
+				break;
+			}
+			case RATE: {
+				appendRate(output, fieldName.getField(), fetcher.apply(metric), fieldName.getScale());
+				break;
+			}
+			default: {
+				output.put(fieldName.getField(), fetcher.apply(metric));
+			}
 		}
 	}
 
 	private void appendRate(Map<String, Object> output, String key, Object value, int scale) {
-		if (value instanceof Long l) {
+		if (value instanceof Long) {
+			Long l = (Long) value;
 			output.put(key, convertRate(l));
 		}
-		else if (value instanceof Double d) {
+		else if (value instanceof Double) {
+			Double d = (Double) value;
 			output.put(key, toDouble(convertRate(d), scale));
 		}
 	}
 
 	private void appendDuration(Map<String, Object> output, String key, Object value, int scale) {
-		if (value instanceof Long l) {
+		if (value instanceof Long) {
+			Long l = (Long) value;
 			output.put(key, convertDuration(l));
 		}
-		else if (value instanceof Double d) {
+		else if (value instanceof Double) {
+			Double d = (Double) value;
 			output.put(key, toDouble(convertDuration(d), scale));
 		}
 	}

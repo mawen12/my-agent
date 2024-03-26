@@ -6,6 +6,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import com.mawen.agent.log4j2.Logger;
@@ -18,12 +19,14 @@ import com.mawen.agent.plugin.api.context.AsyncContext;
 import com.mawen.agent.plugin.api.context.RequestContext;
 import com.mawen.agent.plugin.api.trace.Getter;
 import com.mawen.agent.plugin.api.trace.ITracing;
+import com.mawen.agent.plugin.api.trace.Injector;
 import com.mawen.agent.plugin.api.trace.MessagingRequest;
 import com.mawen.agent.plugin.api.trace.Request;
 import com.mawen.agent.plugin.api.trace.Scope;
 import com.mawen.agent.plugin.api.trace.Setter;
 import com.mawen.agent.plugin.api.trace.Span;
 import com.mawen.agent.plugin.api.trace.Tracing;
+import com.mawen.agent.plugin.async.ThreadLocalCurrentContext;
 import com.mawen.agent.plugin.bridge.NoOpCleaner;
 import com.mawen.agent.plugin.bridge.NoOpIPluginConfig;
 import com.mawen.agent.plugin.bridge.trace.NoOpTracing;
@@ -99,10 +102,11 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public int enter(Object key) {
-		var count = entered.get(key);
+		Integer count = entered.get(key);
 		if (count == null) {
 			count = 1;
-		} else {
+		}
+		else {
 			count++;
 		}
 		entered.put(key, count);
@@ -111,7 +115,7 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public int exit(Object key) {
-		var count = entered.get(key);
+		Integer count = entered.get(key);
 		if (count == null) {
 			return 0;
 		}
@@ -126,11 +130,12 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public Cleaner importAsync(AsyncContext snapshot) {
-		var scope = tracing.importAsync(snapshot.getSpanContext());
+		Scope scope = tracing.importAsync(snapshot.getSpanContext());
 		context.putAll(snapshot.getAll());
 		if (hasCleaner) {
 			return new AsyncCleaner(scope, false);
-		} else {
+		}
+		else {
 			hasCleaner = true;
 			return new AsyncCleaner(scope, true);
 		}
@@ -143,7 +148,7 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public boolean isWrapped(Runnable task) {
-		return task instanceof CurrentContextRunnable;
+		return task instanceof ThreadLocalCurrentContext.CurrentContextRunnable;
 	}
 
 	@Override
@@ -168,13 +173,13 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public void consumerInject(Span span, MessagingRequest request) {
-		var injector = tracing.messagingTracing().consumerInjector();
+		Injector<MessagingRequest> injector = tracing.messagingTracing().consumerInjector();
 		injector.inject(span, request);
 	}
 
 	@Override
 	public void producerInject(Span span, MessagingRequest request) {
-		var injector = tracing.messagingTracing().producerInjector();
+		Injector<MessagingRequest> injector = tracing.messagingTracing().producerInjector();
 		injector.inject(span, request);
 	}
 
@@ -190,14 +195,14 @@ public class SessionContext implements InitializeContext {
 
 	@Override
 	public void injectForwardedHeaders(Setter setter) {
-		var fields = ProgressFields.getForwardHeaderSet();
+		Set<String> fields = ProgressFields.getForwardHeaderSet();
 		if (fields.isEmpty()) {
 			return;
 		}
-		for (var field : fields) {
-			var o = context.get(field);
-			if (o instanceof String str) {
-				setter.setHeader(field, str);
+		for (String field : fields) {
+			Object o = context.get(field);
+			if (o instanceof String) {
+				setter.setHeader(field, (String) o);
 			}
 		}
 	}
@@ -238,7 +243,8 @@ public class SessionContext implements InitializeContext {
 	public <T> void push(T obj) {
 		if (obj == null) {
 			this.retStack.push(NullObject.NULL);
-		} else {
+		}
+		else {
 			this.retStack.push(obj);
 		}
 	}
@@ -248,7 +254,7 @@ public class SessionContext implements InitializeContext {
 		if (this.retStack.size() <= this.retBound.peek().size) {
 			return null;
 		}
-		var o = this.retStack.pop();
+		Object o = this.retStack.pop();
 		if (o == NullObject.NULL) {
 			return null;
 		}
@@ -260,7 +266,7 @@ public class SessionContext implements InitializeContext {
 		if (this.retStack.isEmpty()) {
 			return null;
 		}
-		var o = this.retStack.pop();
+		Object o = this.retStack.pop();
 		if (o == NullObject.NULL) {
 			return null;
 		}
@@ -314,14 +320,14 @@ public class SessionContext implements InitializeContext {
 	}
 
 	private Cleaner importForwardedHeaders(Getter getter, Setter setter) {
-		var fields = ProgressFields.getForwardHeaderSet();
+		Set<String> fields = ProgressFields.getForwardHeaderSet();
 		if (fields.isEmpty()) {
 			return NoOpCleaner.INSTANCE;
 		}
 
-		var fieldArr = new ArrayList<String>(fields.size());
-		for (var field : fields) {
-			var o = getter.header(field);
+		List<String> fieldArr = new ArrayList<>(fields.size());
+		for (String field : fields) {
+			String o = getter.header(field);
 			if (o == null) {
 				continue;
 			}
@@ -354,10 +360,26 @@ public class SessionContext implements InitializeContext {
 		}
 	}
 
-	public record CurrentContextRunnable(AsyncContext asyncContext, Runnable task) implements Runnable {
+	public class CurrentContextRunnable implements Runnable {
+		private final AsyncContext asyncContext;
+		private final Runnable task;
+
+		public CurrentContextRunnable(AsyncContext asyncContext, Runnable task) {
+			this.asyncContext = asyncContext;
+			this.task = task;
+		}
+
+		public AsyncContext getAsyncContext() {
+			return asyncContext;
+		}
+
+		public Runnable getTask() {
+			return task;
+		}
+
 		@Override
 		public void run() {
-			try (var cleaner = asyncContext.importToCurrent()) {
+			try (Cleaner cleaner = asyncContext.importToCurrent()) {
 				task.run();
 			}
 		}

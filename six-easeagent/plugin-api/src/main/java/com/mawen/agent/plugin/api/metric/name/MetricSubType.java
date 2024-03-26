@@ -27,7 +27,7 @@ public enum MetricSubType {
 	}
 
 	public static MetricSubType valueFor(String code) {
-		for (var value : MetricSubType.values()) {
+		for (MetricSubType value : MetricSubType.values()) {
 			if (value.code.equals(code)) {
 				return value;
 			}

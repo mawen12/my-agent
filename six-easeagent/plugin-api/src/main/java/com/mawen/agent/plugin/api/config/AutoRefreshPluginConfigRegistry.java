@@ -11,7 +11,7 @@ import com.mawen.agent.plugin.bridge.Agent;
  * @since 2024/2/24
  */
 public class AutoRefreshPluginConfigRegistry {
-	private static final AutoRefreshConfigSupplier<IPluginConfig> AUTO_REFRESH_CONFIG_IMPL_SUPPLIER = new AutoRefreshConfigSupplier<>() {
+	private static final AutoRefreshConfigSupplier<IPluginConfig> AUTO_REFRESH_CONFIG_IMPL_SUPPLIER = new AutoRefreshConfigSupplier<IPluginConfig>() {
 
 		@Override
 		public AutoRefreshPluginConfigImpl newInstance() {
@@ -35,10 +35,11 @@ public class AutoRefreshPluginConfigRegistry {
 		return getOrCreate(domain, namespace, id, AUTO_REFRESH_CONFIG_IMPL_SUPPLIER);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <C extends IPluginConfig> C getOrCreate(String domain, String namespace,
 	                                                      String id, AutoRefreshConfigSupplier<C> supplier) {
-		var key = new Key(domain, namespace, id, supplier.getType());
-		var autoRefreshConfig = configs.get(key);
+		Key key = new Key(domain, namespace, id, supplier.getType());
+		IPluginConfig autoRefreshConfig = configs.get(key);
 		if (autoRefreshConfig != null) {
 			triggerChange(domain, namespace, id, autoRefreshConfig);
 		}
@@ -49,7 +50,7 @@ public class AutoRefreshPluginConfigRegistry {
 				triggerChange(domain, namespace, id, autoRefreshConfig);
 				return (C) autoRefreshConfig;
 			}
-			var newConfig = supplier.newInstance();
+			C newConfig = supplier.newInstance();
 			triggerChange(domain, namespace, id, newConfig);
 			configs.put(key, newConfig);
 			return newConfig;
@@ -57,12 +58,39 @@ public class AutoRefreshPluginConfigRegistry {
 	}
 
 	private static <C extends IPluginConfig> void triggerChange(String domain, String namespace, String id, C newConfig) {
-		var config = Agent.getConfig(domain, namespace, id);
-		if (newConfig instanceof AutoRefreshPluginConfigImpl autoRefreshPluginConfig) {
-			autoRefreshPluginConfig.setConfig(config);
+		IPluginConfig config = Agent.getConfig(domain, namespace, id);
+		if (newConfig instanceof AutoRefreshPluginConfigImpl) {
+			((AutoRefreshPluginConfigImpl)newConfig).setConfig(config);
 		}
 	}
 
-	record Key(String domain, String namespace, String id, Type type) {
+	static class Key {
+		private final String domain;
+		private final String namespace;
+		private final String id;
+		private final Type type;
+
+		public Key(String domain, String namespace, String id, Type type) {
+			this.domain = domain;
+			this.namespace = namespace;
+			this.id = id;
+			this.type = type;
+		}
+
+		public String domain() {
+			return domain;
+		}
+
+		public String namespace() {
+			return namespace;
+		}
+
+		public String id() {
+			return id;
+		}
+
+		public Type type() {
+			return type;
+		}
 	}
 }

@@ -11,11 +11,11 @@ public class SystemEnv {
 	private static final Map<String, String> ENVIRONMENTS = new ConcurrentHashMap<>();
 
 	public static String get(String name) {
-		var value = ENVIRONMENTS.get(name);
+		String value = ENVIRONMENTS.get(name);
 		if (value != null) {
 			return value;
 		}
-		var result = System.getenv(name);
+		String result = System.getenv(name);
 		if (result == null) {
 			return null;
 		}

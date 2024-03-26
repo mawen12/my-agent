@@ -14,21 +14,22 @@ public class AgentDynamicFieldAccessor {
 
 	public static final String DYNAMIC_FIELD_NAME = "agent_dynamic_$$$_data";
 
+	@SuppressWarnings("unchecked")
 	public static <T> T getDynamicFieldValue(Object target) {
-		if (!(target instanceof DynamicFieldAccessor dynamicFieldAccessor)) {
+		if (!(target instanceof DynamicFieldAccessor)) {
 			log.warn(target.getClass().getName()," must implements DynamicFieldAccessor");
 			return null;
 		}
 
-		return (T) (dynamicFieldAccessor.getAgent$$DynamicField$$Data());
+		return (T) (((DynamicFieldAccessor)target).getAgent$$DynamicField$$Data());
 	}
 
 	public static void setDynamicFieldValue(Object target, Object value) {
-		if (!(target instanceof DynamicFieldAccessor dynamicFieldAccessor)) {
+		if (!(target instanceof DynamicFieldAccessor )) {
 			log.warn(target.getClass().getName()," must implements DynamicFieldAccessor");
 			return;
 		}
-		dynamicFieldAccessor.setAgent$$DynamicField$$Data(value);
+		((DynamicFieldAccessor)target).setAgent$$DynamicField$$Data(value);
 	}
 
 	public static Field getDynamicFieldFormClass(Class<?> clazz) {

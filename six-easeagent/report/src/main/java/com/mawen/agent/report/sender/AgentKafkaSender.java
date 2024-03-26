@@ -44,7 +44,7 @@ public class AgentKafkaSender implements Sender {
 	public void init(Config config, String prefix) {
 		this.config = config;
 		this.prefix = prefix;
-		var outputServer = config.getString(BOOTSTRAP_SERVERS);
+		String outputServer = config.getString(BOOTSTRAP_SERVERS);
 		if (StringUtils.isEmpty(outputServer)) {
 			this.enabled = false;
 			return;
@@ -73,7 +73,7 @@ public class AgentKafkaSender implements Sender {
 		if (!enabled) {
 			return new NoOpCall<>();
 		}
-		var call = this.sender.sendSpans(encodedData.getData());
+		zipkin2.Call<Void> call = this.sender.sendSpans(encodedData.getData());
 		return new ZipkinCallWrapper<>(call);
 	}
 

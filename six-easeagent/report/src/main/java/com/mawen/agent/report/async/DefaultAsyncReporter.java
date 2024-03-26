@@ -88,7 +88,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 
 	@Override
 	public void setPending(int queuedMaxSpans, int queuedMaxBytes) {
-		var copyPending = this.pending;
+		AgentByteBoundedQueue<S> copyPending = this.pending;
 		this.pending = new AgentByteBoundedQueue<>(queuedMaxSpans, queuedMaxBytes);
 		consumerData(copyPending);
 	}
@@ -105,8 +105,8 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 		}
 
 		metrics.incrementItems(1);
-		var nextSizeInBytes = encoder.sizeInBytes(next);
-		var messageSizeOfNextSpan = encoder.packageSizeInBytes(Collections.singletonList(nextSizeInBytes));
+		int nextSizeInBytes = encoder.sizeInBytes(next);
+		int messageSizeOfNextSpan = encoder.packageSizeInBytes(Collections.singletonList(nextSizeInBytes));
 		metrics.incrementSpanBytes(nextSizeInBytes);
 		if (closed.get() || messageSizeOfNextSpan > messageMaxBytes || !pending.offer(next,nextSizeInBytes)) {
 			metrics.incrementItemsDropped(1);
@@ -142,7 +142,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 			logger.warning("Interrupted waiting for in-flight spans to send");
 			Thread.currentThread().interrupt();
 		}
-		var count = pending.clear();
+		int count = pending.clear();
 		if (count > 0) {
 			metrics.incrementItemsDropped(count);
 			logger.log(Level.WARNING,"Dropped {0} spans due to AsyncReporter.close()", count);
@@ -157,10 +157,10 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 	@Override
 	public void startFlushThread() {
 		if (this.messageTimeoutNanos > 0) {
-			var flushThreads = new CopyOnWriteArrayList<Thread>();
-			for (var i = 0; i < asyncProperties.getReportThread(); i++) {
-				final var consumer = AgentBufferNextMessage.create(encoder, this.messageMaxBytes, this.messageTimeoutNanos);
-				var flushThread = this.threadFactory.newThread(new Flusher<>(this, consumer));
+			List<Thread> flushThreads = new CopyOnWriteArrayList<>();
+			for (int i = 0; i < asyncProperties.getReportThread(); i++) {
+				AgentBufferNextMessage<S> consumer = AgentBufferNextMessage.create(encoder, this.messageMaxBytes, this.messageTimeoutNanos);
+				Thread flushThread = this.threadFactory.newThread(new Flusher<>(this, consumer));
 				flushThread.setName(NAME_PREFIX + "{" + this.sender + "}");
 				flushThread.setDaemon(true);
 				flushThread.start();
@@ -171,7 +171,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 
 	@Override
 	public void closeFlushThread() {
-		for (var thread : this.flushThreads) {
+		for (Thread thread : this.flushThreads) {
 			thread.interrupt();
 		}
 	}
@@ -213,7 +213,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 			sender.send(nextMessage).execute();
 		}
 		catch (IOException | RuntimeException t) {
-			var count = nextMessage.size();
+			int count = nextMessage.size();
 			Call.propagateIfFatal(t);
 			metrics.incrementMessagesDropped(t);
 			metrics.incrementItemsDropped(count);
@@ -238,7 +238,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 	}
 
 	private void consumerData(final AgentByteBoundedQueue<S> copyPending) {
-		var flushThread = this.threadFactory.newThread(() -> {
+		Thread flushThread = this.threadFactory.newThread(() -> {
 			final AgentBufferNextMessage<S> bufferNextMessage = AgentBufferNextMessage.create(encoder, this.messageMaxBytes, 0);
 			while (copyPending.getCount() > 0) {
 				flush(bufferNextMessage,copyPending);
@@ -324,15 +324,15 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 			Encoder<S> encoder = this.sender.getEncoder();
 			if (encoder == null) throw new NullPointerException("encoder == null");
 
-			final var result = new DefaultAsyncReporter<S>(this, this.props);
+			final DefaultAsyncReporter result = new DefaultAsyncReporter<S>(this, this.props);
 
 			if (this.messageTimeoutNanos > 0) {
 				// Start a thread that flushes the queue in a loop
 				List<Thread> flushThreads = new CopyOnWriteArrayList<>();
-				for (var i = 0; i < this.props.getReportThread(); i++) {
-					final var consumer = AgentBufferNextMessage.create(encoder, this.messageMaxBytes, this.messageTimeoutNanos);
+				for (int i = 0; i < this.props.getReportThread(); i++) {
+					AgentBufferNextMessage<S> consumer = AgentBufferNextMessage.create(encoder, this.messageMaxBytes, this.messageTimeoutNanos);
 
-					var flushThread = this.threadFactory.newThread(new Flusher<>(result, consumer));
+					Thread flushThread = this.threadFactory.newThread(new Flusher<>(result, consumer));
 					flushThread.setName(NAME_PREFIX + "{" + this.sender + "}");
 					flushThread.setDaemon(true);
 					flushThread.start();
@@ -365,7 +365,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 					reporter.flush(consumer, reporter.pending);
 				}
 			} finally {
-				var count = consumer.count();
+				int count = consumer.count();
 				if (count > 0) {
 					reporter.metrics.incrementItemsDropped(count);
 					logger.log(Level.WARNING, "Dropped {0} spans due to AsyncReporter.close()", count);

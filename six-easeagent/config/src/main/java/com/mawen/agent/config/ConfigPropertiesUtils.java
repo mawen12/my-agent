@@ -16,7 +16,7 @@ public final class ConfigPropertiesUtils {
 	private ConfigPropertiesUtils() {}
 
 	public static String getString(String propertyName) {
-		var value = System.getProperty(propertyName);
+		String value = System.getProperty(propertyName);
 
 		return NoNull.of(value, SystemEnv.get(toEnvVarName(propertyName)));
 	}

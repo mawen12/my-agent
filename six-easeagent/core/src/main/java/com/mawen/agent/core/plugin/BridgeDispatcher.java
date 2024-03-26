@@ -14,7 +14,7 @@ public class BridgeDispatcher implements IDispatcher {
 
 	@Override
 	public void enter(int chainIndex, MethodInfo info) {
-		var context = Agent.initializeContextSupplier.getContext();
+		InitializeContext context = Agent.initializeContextSupplier.getContext();
 		if (context.isNoop()) {
 			return;
 		}
@@ -23,12 +23,15 @@ public class BridgeDispatcher implements IDispatcher {
 
 	@Override
 	public Object exit(int chainIndex, MethodInfo info, Context context, Object result, Throwable e) {
-		if (context.isNoop() || !(context instanceof InitializeContext iContext)) {
+		if (context.isNoop() || !(context instanceof InitializeContext)) {
 			return result;
 		}
 
 		info.throwable(e);
 		info.retValue(result);
+
+		InitializeContext iContext = (InitializeContext) context;
+
 		Dispatcher.exit(chainIndex, info, iContext);
 		if (info.isChanged()) {
 			result = info.getRetValue();

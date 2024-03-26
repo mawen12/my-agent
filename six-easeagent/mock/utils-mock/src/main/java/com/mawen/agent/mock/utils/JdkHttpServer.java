@@ -1,12 +1,15 @@
 package com.mawen.agent.mock.utils;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
@@ -43,7 +46,7 @@ public class JdkHttpServer {
 	}
 
 	public JdkHttpServer start() {
-		var context = server.createContext(path);
+		HttpContext context = server.createContext(path);
 		context.setHandler(JdkHttpServer.this::handleRequest);
 		server.start();
 		return this;
@@ -54,7 +57,7 @@ public class JdkHttpServer {
 	}
 
 	public void handleRequest(HttpExchange exchange) throws IOException {
-		var requestURI = exchange.getRequestURI();
+		URI requestURI = exchange.getRequestURI();
 		lastHeaders.set(exchange.getRequestHeaders());
 		lastHttpExchange.set(exchange);
 		if (this.headersConsumer != null) {
@@ -63,9 +66,9 @@ public class JdkHttpServer {
 		if (this.exchangeConsumer != null) {
 			this.exchangeConsumer.accept(exchange);
 		}
-		var response = String.format("This is the response at %s port: %s", requestURI, port);
+		String response = String.format("This is the response at %s port: %s", requestURI, port);
 		exchange.sendResponseHeaders(200, response.getBytes().length);
-		var os = exchange.getResponseBody();
+		OutputStream os = exchange.getResponseBody();
 		os.write(response.getBytes());
 		os.close();
 	}
@@ -146,10 +149,10 @@ public class JdkHttpServer {
 		}
 
 		public JdkHttpServer build() throws IOException {
-			var httpServer = buildHttpServer();
-			var p = httpServer.getAddress().getPort();
-			var httpPath = path == null ? "/example" : path;
-			var jdkHttpServer = new JdkHttpServer(p, httpServer, httpPath);
+			HttpServer httpServer = buildHttpServer();
+			int p = httpServer.getAddress().getPort();
+			String httpPath = path == null ? "/example" : path;
+			JdkHttpServer jdkHttpServer = new JdkHttpServer(p, httpServer, httpPath);
 			jdkHttpServer.setHeadersConsumer(headersConsumer);
 			jdkHttpServer.setExchangeConsumer(exchangeConsumer);
 			return jdkHttpServer;

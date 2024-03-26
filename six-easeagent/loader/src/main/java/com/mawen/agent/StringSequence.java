@@ -36,8 +36,8 @@ public class StringSequence implements CharSequence {
 
 	@Override
 	public StringSequence subSequence(int start, int end) {
-		var subSequenceStart = this.start + start;
-		var subSequenceEnd = this.start + end;
+		int subSequenceStart = this.start + start;
+		int subSequenceEnd = this.start + end;
 		if (subSequenceStart > this.end) {
 			throw new StringIndexOutOfBoundsException(subSequenceStart);
 		}
@@ -48,10 +48,6 @@ public class StringSequence implements CharSequence {
 			return this;
 		}
 		return new StringSequence(this.source, subSequenceStart, subSequenceEnd);
-	}
-
-	public boolean isEmpty() {
-		return length() == 0;
 	}
 
 	@Override
@@ -81,8 +77,8 @@ public class StringSequence implements CharSequence {
 	}
 
 	boolean startsWith(String prefix, int offset) {
-		var prefixLength = prefix.length();
-		var length = length();
+		int prefixLength = prefix.length();
+		int length = length();
 		if (length - prefixLength - offset < 0) {
 			return false;
 		}
@@ -92,8 +88,9 @@ public class StringSequence implements CharSequence {
 	@Override
 	public final boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof StringSequence other)) return false;
+		if (!(o instanceof StringSequence)) return false;
 
+		StringSequence other = (StringSequence) o;
 		int n = length();
 		if (n != other.length()) {
 			return false;
@@ -110,9 +107,9 @@ public class StringSequence implements CharSequence {
 
 	@Override
 	public int hashCode() {
-		var hashVal = this.hash;
+		int hashVal = this.hash;
 		if (hashVal == 0 && length() > 0) {
-			for (var i = this.start; i < this.end; i++) {
+			for (int i = this.start; i < this.end; i++) {
 				hashVal = 31 * hashVal + this.source.charAt(i);
 			}
 			this.hash = hashVal;

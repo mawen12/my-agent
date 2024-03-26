@@ -26,10 +26,10 @@ public class PluginSourceConfig {
 	}
 
 	public static PluginSourceConfig build(String domain, String namespace, String id, Map<String, String> source) {
-		var pluginSource = new HashMap<String, String>();
-		var properties = new HashMap<PluginProperty, String>();
+		Map<String, String> pluginSource = new HashMap<>();
+		Map<PluginProperty, String> properties = new HashMap<PluginProperty, String>();
 		for (Map.Entry<String, String> sourceEntry : source.entrySet()) {
-			var key = sourceEntry.getKey();
+			String key = sourceEntry.getKey();
 			if (!ConfigUtils.isPluginConfig(key, domain, namespace, id)) {
 				continue;
 			}

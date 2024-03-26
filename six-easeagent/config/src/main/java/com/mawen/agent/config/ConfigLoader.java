@@ -22,7 +22,7 @@ public class ConfigLoader {
 	private static final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
 
 	static Configs loadFromClasspath(ClassLoader classLoader, String file) {
-		try (var in = classLoader.getResourceAsStream(file)) {
+		try (InputStream in = classLoader.getResourceAsStream(file)) {
 			return ConfigLoader.loadFromStream(in, file);
 		}
 		catch (IOException e) {
@@ -49,7 +49,7 @@ public class ConfigLoader {
 	}
 
 	static Configs loadFromFile(File file) {
-		try (var in = new FileInputStream(file)) {
+		try (InputStream in = new FileInputStream(file)) {
 			return ConfigLoader.loadFromStream(in, file.getAbsolutePath());
 		}
 		catch (IOException e) {
@@ -63,7 +63,7 @@ public class ConfigLoader {
 	}
 
 	private static Map<String, String> extractPropsMap(InputStream in) throws IOException {
-		var properties = new Properties();
+		Properties properties = new Properties();
 		properties.load(in);
 
 		return properties.stringPropertyNames()

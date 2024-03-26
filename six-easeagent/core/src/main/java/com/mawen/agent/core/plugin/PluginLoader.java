@@ -2,6 +2,7 @@ package com.mawen.agent.core.plugin;
 
 import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,9 +37,9 @@ public class PluginLoader {
 		log.info("Loading plugins >>>>>");
 		pluginLoad();
 		providerLoad();
-		var sortedTransformations = pointsLoad();
+		Set<ClassTransformation> sortedTransformations = pointsLoad();
 
-		for (var transformation : sortedTransformations) {
+		for (ClassTransformation transformation : sortedTransformations) {
 			ab = ab.type(transformation.getClassMatcher(), transformation.getClassLoaderMatcher())
 					.transform(compound(transformation.isHasDynamicField(), transformation.getMethodTransformations()));
 		}
@@ -47,7 +48,7 @@ public class PluginLoader {
 	}
 
 	public static void pluginLoad() {
-		for (var plugin : BaseLoader.loadOrdered(AgentPlugin.class)) {
+		for (AgentPlugin plugin : BaseLoader.loadOrdered(AgentPlugin.class)) {
 			log.info("Loading plugin {}:{} [class {}]", plugin.getDomain(), plugin.getNamespace(), plugin.getClass().getName());
 
 			try {
@@ -60,7 +61,7 @@ public class PluginLoader {
 	}
 
 	public static void providerLoad() {
-		for (var provider : BaseLoader.load(InterceptorProvider.class)) {
+		for (InterceptorProvider provider : BaseLoader.load(InterceptorProvider.class)) {
 			log.info("loading provider: {}", provider.getClass().getName());
 
 			try {
@@ -73,7 +74,7 @@ public class PluginLoader {
 	}
 
 	public static Set<ClassTransformation> pointsLoad() {
-		var points = BaseLoader.load(Points.class);
+		List<Points> points = BaseLoader.load(Points.class);
 		return points.stream()
 				.map(point -> {
 					try {
@@ -90,7 +91,7 @@ public class PluginLoader {
 
 	public static AgentBuilder.Transformer compound(boolean hasDynamicField,
 	                                                Iterable<MethodTransformation> transformers) {
-		var agentTransformers = StreamSupport.stream(transformers.spliterator(), false)
+		List<AgentBuilder.Transformer> agentTransformers = StreamSupport.stream(transformers.spliterator(), false)
 				.map(ForAdviceTransformer::new)
 				.collect(Collectors.<AgentBuilder.Transformer>toList());
 

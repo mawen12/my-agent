@@ -1,6 +1,7 @@
 package com.mawen.agent.report.plugin;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
@@ -25,15 +26,15 @@ public abstract class ReporterLoader {
 	}
 
 	public static void encodersLoad() {
-		for (var encoder : load(Encoder.class)) {
-			var supplier = encoderLoad(encoder);
+		for (Encoder encoder : load(Encoder.class)) {
+			Supplier<Encoder<?>> supplier = encoderLoad(encoder);
 			ReporterRegistry.registryEncoder(encoder.name(), supplier);
 		}
 	}
 
 	public static void sendersLoad() {
-		for (var sender : load(Sender.class)) {
-			var supplier = senderLoad(sender);
+		for (Sender sender : load(Sender.class)) {
+			Supplier<Sender> supplier = senderLoad(sender);
 			ReporterRegistry.registrySender(sender.name(), supplier);
 		}
 	}
@@ -65,9 +66,9 @@ public abstract class ReporterLoader {
 	}
 
 	private static <T> List<T> load(Class<T> serviceClass) {
-		var result = new ArrayList<T>();
-		var services = ServiceLoader.load(serviceClass);
-		for (var it = services.iterator(); it.hasNext(); ) {
+		List<T> result = new ArrayList<>();
+		ServiceLoader<T> services = ServiceLoader.load(serviceClass);
+		for (Iterator<T> it = services.iterator(); it.hasNext(); ) {
 			try {
 				result.add(it.next());
 			}

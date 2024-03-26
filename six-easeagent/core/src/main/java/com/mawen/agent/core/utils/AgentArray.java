@@ -44,7 +44,7 @@ public class AgentArray<E> implements AppendBootstrapLoader {
 	}
 
 	public int add(E element) {
-		var current = size.get();
+		int current = size.get();
 		while (!size.compareAndSet(current, current + 1)) {
 			current = size.get();
 		}
@@ -107,17 +107,17 @@ public class AgentArray<E> implements AppendBootstrapLoader {
 	}
 
 	public int indexOf(Object o) {
-		var length = size();
+		int length = size();
 		Object s;
 		if (o == null) {
-			for (var i = 0; i < length; i++) {
+			for (int i = 0; i < length; i++) {
 				s = e[i];
 				if (s == null) {
 					return i;
 				}
 			}
 		} else {
-			for (var i = 0; i < length; i++) {
+			for (int i = 0; i < length; i++) {
 				s = e[i];
 				if (o.equals(s)) {
 					return i;
@@ -138,7 +138,7 @@ public class AgentArray<E> implements AppendBootstrapLoader {
 	public void forEach(Consumer<? super E> action) {
 		Objects.requireNonNull(action);
 		E element;
-		for (var i = 0; i < size.get(); i++) {
+		for (int i = 0; i < size.get(); i++) {
 			element = (E) e[i];
 			action.accept(element);
 		}

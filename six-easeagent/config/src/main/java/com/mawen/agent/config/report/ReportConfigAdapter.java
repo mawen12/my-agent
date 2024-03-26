@@ -17,7 +17,7 @@ import static com.mawen.agent.config.report.ReportConfigConst.*;
 public class ReportConfigAdapter {
 
 	public static Map<String, String> extractReporterConfig(Config configs) {
-		var config = ConfigUtils.extractByPrefix(configs.getConfigs(), REPORT);
+		Map<String, String> config = ConfigUtils.extractByPrefix(configs.getConfigs(), REPORT);
 
 		// default config
 		config.put(TRACE_SENDER, NoNull.of(config.get(TRACE_ENCODER), SPAN_JSON_ENCODER_NAME));
@@ -34,7 +34,7 @@ public class ReportConfigAdapter {
 	}
 
 	public static String getDefaultAppender(Map<String, String> cfg) {
-		var outputAppender = cfg.get(join(OUTPUT_SERVER_V2, APPEND_TYPE_KEY));
+		String outputAppender = cfg.get(join(OUTPUT_SERVER_V2, APPEND_TYPE_KEY));
 		return StringUtils.isNotEmpty(outputAppender) ? outputAppender : Const.DEFAULT_APPEND_TYPE;
 	}
 

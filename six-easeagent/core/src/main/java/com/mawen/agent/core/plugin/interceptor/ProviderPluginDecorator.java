@@ -10,12 +10,27 @@ import com.mawen.agent.plugin.interceptor.InterceptorProvider;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-public record ProviderPluginDecorator(AgentPlugin plugin,  InterceptorProvider provider) implements InterceptorProvider {
+public class ProviderPluginDecorator implements InterceptorProvider {
+	private final AgentPlugin plugin;
+	private final InterceptorProvider provider;
+
+	public ProviderPluginDecorator(AgentPlugin plugin, InterceptorProvider provider) {
+		this.plugin = plugin;
+		this.provider = provider;
+	}
+
+	public AgentPlugin plugin() {
+		return plugin;
+	}
+
+	public InterceptorProvider provider() {
+		return provider;
+	}
 
 	@Override
 	public Supplier<Interceptor> getInterceptorProvider() {
 		return () -> {
-			var origin = ProviderPluginDecorator.this.provider.getInterceptorProvider();
+			Supplier<Interceptor> origin = ProviderPluginDecorator.this.provider.getInterceptorProvider();
 			return new InterceptorPluginDecorator(origin.get(), this.plugin);
 		};
 	}

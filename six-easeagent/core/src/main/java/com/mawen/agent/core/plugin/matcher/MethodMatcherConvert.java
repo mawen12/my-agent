@@ -3,6 +3,7 @@ package com.mawen.agent.core.plugin.matcher;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.asm.Modifier;
+import com.mawen.agent.plugin.enums.StringMatch;
 import com.mawen.agent.plugin.matcher.ClassMatcher;
 import com.mawen.agent.plugin.matcher.IMethodMatcher;
 import com.mawen.agent.plugin.matcher.MethodMatcher;
@@ -10,6 +11,7 @@ import com.mawen.agent.plugin.matcher.operator.AndMethodMatcher;
 import com.mawen.agent.plugin.matcher.operator.NegateMethodMatcher;
 import com.mawen.agent.plugin.matcher.operator.OrMethodMatcher;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.NegatingMatcher;
 
@@ -33,18 +35,21 @@ public enum MethodMatcherConvert implements Converter<IMethodMatcher, ElementMat
 			return null;
 		}
 
-		if (source instanceof AndMethodMatcher andMatcher) {
-			var leftMatcher = this.convert(andMatcher.getLeft());
-			var rightMatcher = this.convert(andMatcher.getRight());
+		if (source instanceof AndMethodMatcher) {
+			AndMethodMatcher andMatcher = (AndMethodMatcher) source;
+			ElementMatcher.Junction<MethodDescription> leftMatcher = this.convert(andMatcher.getLeft());
+			ElementMatcher.Junction<MethodDescription> rightMatcher = this.convert(andMatcher.getRight());
 			return leftMatcher.and(rightMatcher);
 		}
-		else if (source instanceof OrMethodMatcher orMatcher) {
-			var leftMatcher = this.convert(orMatcher.getLeft());
-			var rightMatcher = this.convert(orMatcher.getRight());
+		else if (source instanceof OrMethodMatcher) {
+			OrMethodMatcher orMatcher = (OrMethodMatcher) source;
+			ElementMatcher.Junction<MethodDescription> leftMatcher = this.convert(orMatcher.getLeft());
+			ElementMatcher.Junction<MethodDescription> rightMatcher = this.convert(orMatcher.getRight());
 			return leftMatcher.or(rightMatcher);
 		}
-		else if (source instanceof NegateMethodMatcher matcher) {
-			var notMatcher = this.convert(matcher.getMatcher());
+		else if (source instanceof NegateMethodMatcher) {
+			NegateMethodMatcher matcher = (NegateMethodMatcher) source;
+			ElementMatcher.Junction<MethodDescription> notMatcher = this.convert(matcher.getMatcher());
 			return new NegatingMatcher<>(notMatcher);
 		}
 
@@ -54,19 +59,31 @@ public enum MethodMatcherConvert implements Converter<IMethodMatcher, ElementMat
 	private ElementMatcher.Junction<MethodDescription> convert(MethodMatcher matcher) {
 		ElementMatcher.Junction<MethodDescription> c = null;
 		if (matcher.getName() != null && matcher.getNameMatchType() != null) {
-			var name = matcher.getName();
-			var nameMatchType = matcher.getNameMatchType();
+			String name = matcher.getName();
+			StringMatch nameMatchType = matcher.getNameMatchType();
 
-			c = switch (nameMatchType) {
-				case EQUALS -> "<init>".equals(matcher.getName()) ? isConstructor() : named(name);
-				case START_WITH -> nameStartsWith(name);
-				case END_WITH -> nameStartsWith(name);
-				case CONTAINS -> nameContains(matcher.getName());
-				default -> null;
+			switch (nameMatchType) {
+				case EQUALS: {
+					c= "<init>".equals(matcher.getName()) ? isConstructor() : named(name);
+					break;
+				}
+				case START_WITH: {
+					c= nameStartsWith(name);
+					break;
+				}
+				case END_WITH: {
+					c= nameStartsWith(name);
+					break;
+				}
+				case CONTAINS: {
+					c= nameContains(matcher.getName());
+					break;
+				}
+				default: c = null;
 			};
 		}
 
-		var mc = fromModifier(matcher.getModifier(), false);
+		ElementMatcher.Junction<MethodDescription> mc = fromModifier(matcher.getModifier(), false);
 		if (mc != null) {
 			c = c == null ? mc : c.and(mc);
 		}
@@ -86,7 +103,7 @@ public enum MethodMatcherConvert implements Converter<IMethodMatcher, ElementMat
 			c = c == null ? mc : c.and(mc);
 		}
 
-		var args = matcher.getArgs();
+		String[] args = matcher.getArgs();
 		if (args != null) {
 			for (int i = 0; i < args.length; i++) {
 				if (args[i] != null) {
@@ -102,7 +119,7 @@ public enum MethodMatcherConvert implements Converter<IMethodMatcher, ElementMat
 		}
 
 		if (matcher.getOverriddenFrom() != null) {
-			var cls = ClassMatcherConvert.INSTANCE.convert(matcher.getOverriddenFrom());
+			ElementMatcher.Junction<TypeDescription> cls = ClassMatcherConvert.INSTANCE.convert(matcher.getOverriddenFrom());
 			mc = isOverriddenFrom(cls);
 			c = c == null ? mc : c.and(mc);
 		}

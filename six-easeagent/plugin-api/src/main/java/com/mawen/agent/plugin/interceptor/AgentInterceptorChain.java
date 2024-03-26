@@ -31,7 +31,7 @@ public class AgentInterceptorChain {
 		if (pos == interceptors.size()) {
 			return;
 		}
-		var interceptor = interceptors.get(pos);
+		Interceptor interceptor = interceptors.get(pos);
 		try {
 			interceptor.before(methodInfo, context);
 		}
@@ -46,7 +46,7 @@ public class AgentInterceptorChain {
 		if (pos < 0) {
 			return methodInfo.getRetValue();
 		}
-		var interceptor = interceptors.get(pos);
+		Interceptor interceptor = interceptors.get(pos);
 		try {
 			interceptor.after(methodInfo, context);
 		}

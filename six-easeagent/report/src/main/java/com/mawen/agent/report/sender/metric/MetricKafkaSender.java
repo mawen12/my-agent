@@ -83,7 +83,7 @@ public class MetricKafkaSender implements Sender {
 		if (logger != null) {
 			return;
 		}
-		var loggerName = prepareAppenderAndLogger();
+		String loggerName = prepareAppenderAndLogger();
 		logger = com.mawen.agent.report.sender.metric.log4j.LoggerFactory.getLoggerContext().getLogger(loggerName);
 	}
 

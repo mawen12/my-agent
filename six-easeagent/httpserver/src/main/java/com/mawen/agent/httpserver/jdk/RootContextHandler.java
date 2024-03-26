@@ -3,6 +3,7 @@ package com.mawen.agent.httpserver.jdk;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -46,10 +47,10 @@ public class RootContextHandler implements HttpHandler {
 		}
 
 		public void removeRoute(String url) {
-			var uriToDelete = UriResource.normalizeUri(url);
-			var iter = mappings.iterator();
+			String uriToDelete = UriResource.normalizeUri(url);
+			Iterator<UriResource> iter = mappings.iterator();
 			while (iter.hasNext()) {
-				var uriResource = iter.next();
+				UriResource uriResource = iter.next();
 				if (uriToDelete.equals(uriResource.getUri())) {
 					iter.remove();
 					break;

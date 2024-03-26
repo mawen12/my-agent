@@ -10,5 +10,32 @@ import com.mawen.agent.plugin.api.metric.MetricRegistrySupplier;
  * @since 2024/3/4
  */
 
-public record GlobalContext(Configs configs, MetricRegistrySupplier metric, ILoggerFactory loggerFactory, Mdc mdc) {
+public class GlobalContext {
+	private final Configs configs;
+	private final MetricRegistrySupplier metric;
+	private final ILoggerFactory loggerFactory;
+	private final Mdc mdc;
+
+	public GlobalContext(Configs configs, MetricRegistrySupplier metric, ILoggerFactory loggerFactory, Mdc mdc) {
+		this.configs = configs;
+		this.metric = metric;
+		this.loggerFactory = loggerFactory;
+		this.mdc = mdc;
+	}
+
+	public Configs configs() {
+		return configs;
+	}
+
+	public MetricRegistrySupplier metric() {
+		return metric;
+	}
+
+	public ILoggerFactory loggerFactory() {
+		return loggerFactory;
+	}
+
+	public Mdc mdc() {
+		return mdc;
+	}
 }

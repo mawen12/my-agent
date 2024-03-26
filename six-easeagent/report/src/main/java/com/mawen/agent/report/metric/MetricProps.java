@@ -70,7 +70,7 @@ public interface MetricProps {
 					&& reportConfig.getBoolean(join(this.senderPrefix, ENABLED_KEY));
 
 			// low priority: global level
-			var pCfg = ConfigUtils.extractByPrefix(reportConfig, REPORT);
+			Map<String, String> pCfg = ConfigUtils.extractByPrefix(reportConfig, REPORT);
 			pCfg.putAll(ConfigUtils.extractAndConvertPrefix(pCfg, METRIC_SENDER, senderPrefix));
 			pCfg.putAll(ConfigUtils.extractAndConvertPrefix(pCfg, METRIC_ENCODER, getEncoderKey(senderPrefix)));
 
@@ -114,7 +114,7 @@ public interface MetricProps {
 
 		@Override
 		public Configs asReportConfig() {
-			var cfg = this.config.getConfigs();
+			Map<String, String> cfg = this.config.getConfigs();
 			cfg.putAll(this.pluginConfigMap);
 			return new Configs(cfg);
 		}
@@ -126,10 +126,11 @@ public interface MetricProps {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (!(obj instanceof Default other)) {
+			if (!(obj instanceof Default)) {
 				return false;
 			}
 
+			Default other = (Default) obj;
 			return this.pluginConfigMap.equals(other.pluginConfigMap);
 		}
 

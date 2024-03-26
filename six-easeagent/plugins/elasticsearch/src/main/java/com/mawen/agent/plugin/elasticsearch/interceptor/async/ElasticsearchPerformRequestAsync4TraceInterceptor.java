@@ -2,6 +2,7 @@ package com.mawen.agent.plugin.elasticsearch.interceptor.async;
 
 import com.mawen.agent.plugin.annotation.AdviceTo;
 import com.mawen.agent.plugin.api.Context;
+import com.mawen.agent.plugin.api.context.AsyncContext;
 import com.mawen.agent.plugin.elasticsearch.ElasticsearchPlugin;
 import com.mawen.agent.plugin.elasticsearch.interceptor.ElasticsearchBaseTraceInterceptor;
 import com.mawen.agent.plugin.elasticsearch.interceptor.ElasticsearchCtxUtils;
@@ -19,9 +20,9 @@ public class ElasticsearchPerformRequestAsync4TraceInterceptor extends Elasticse
 	@Override
 	public void before(MethodInfo methodInfo, Context context) {
 		ElasticsearchCtxUtils.initSpan(methodInfo, context);
-		var asyncContext = context.exportAsync();
-		var listener = (ResponseListener) methodInfo.getArgs()[1];
-		var asyncResponseListener = new AsyncResponse4TraceListener(listener, asyncContext);
+		AsyncContext asyncContext = context.exportAsync();
+		ResponseListener listener = (ResponseListener) methodInfo.getArgs()[1];
+		AsyncResponse4TraceListener asyncResponseListener = new AsyncResponse4TraceListener(listener, asyncContext);
 		methodInfo.changeArg(1, asyncResponseListener);
 	}
 }

@@ -21,7 +21,7 @@ public class AllUrlsSupplier implements UrlSupplier{
 		if (!enabled()) {
 			return new URL[0];
 		}
-		var classLoader = Thread.currentThread().getContextClassLoader();
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		return ClassLoaderUtils.getAllURLs(classLoader);
 	}
 
@@ -29,7 +29,7 @@ public class AllUrlsSupplier implements UrlSupplier{
 		if (enabled) {
 			return true;
 		}
-		var enabledStr = System.getProperty(USE_ENV);
+		String enabledStr = System.getProperty(USE_ENV);
 		if (enabledStr == null) {
 			return false;
 		}

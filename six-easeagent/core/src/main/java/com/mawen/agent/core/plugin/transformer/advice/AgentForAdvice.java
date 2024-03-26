@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Lists;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.asm.AsmVisitorWrapper;
@@ -63,7 +64,7 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 
 	@Override
 	public AgentForAdvice include(ClassLoader... classLoader) {
-		var classFileLocators = Arrays.stream(classLoader)
+		LinkedHashSet<ClassFileLocator> classFileLocators = Arrays.stream(classLoader)
 				.map(ClassFileLocator.ForClassLoader::of)
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 
@@ -72,7 +73,7 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 
 	@Override
 	public AgentForAdvice include(ClassFileLocator... classFileLocator) {
-		return include(List.of(classFileLocator));
+		return include(Lists.newArrayList(classFileLocator));
 	}
 
 	@Override
@@ -104,11 +105,11 @@ public class AgentForAdvice extends AgentBuilder.Transformer.ForAdvice {
 
 	@Override
 	public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader, JavaModule module) {
-		var classFileLocator = new ClassFileLocator.Compound(this.classFileLocator, locationStrategy.classFileLocator(classLoader, module));
-		var typePool = poolStrategy.typePool(classFileLocator, classLoader);
-		var asmVisitorWrapper = new AsmVisitorWrapper.ForDeclaredMethods();
+		ClassFileLocator classFileLocator = new ClassFileLocator.Compound(this.classFileLocator, locationStrategy.classFileLocator(classLoader, module));
+		TypePool typePool = poolStrategy.typePool(classFileLocator, classLoader);
+		AsmVisitorWrapper.ForDeclaredMethods asmVisitorWrapper = new AsmVisitorWrapper.ForDeclaredMethods();
 
-		for (var entry : entries) {
+		for (Entry entry : entries) {
 			asmVisitorWrapper = asmVisitorWrapper.invokable(
 					entry.getMatcher().resolve(typeDescription),
 					entry.resolve(advice, typePool, classFileLocator)

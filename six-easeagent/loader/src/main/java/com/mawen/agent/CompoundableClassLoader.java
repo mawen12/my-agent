@@ -32,13 +32,13 @@ public class CompoundableClassLoader extends LaunchedURLClassLoader {
 			return super.loadClass(name, resolve);
 		}
 		catch (ClassNotFoundException e) {
-			for (var external : externals) {
+			for (WeakReference<ClassLoader> external : externals) {
 				try {
-					var cl = external.get();
+					ClassLoader cl = external.get();
 					if (cl == null) {
 						continue;
 					}
-					final var aClass = cl.loadClass(name);
+					final Class<?> aClass = cl.loadClass(name);
 					if (resolve) {
 						resolveClass(aClass);
 					}
@@ -55,11 +55,11 @@ public class CompoundableClassLoader extends LaunchedURLClassLoader {
 
 	@Override
 	public URL findResource(String name) {
-		var url = super.findResource(name);
+		URL url = super.findResource(name);
 		if (url == null) {
-			for (var external : externals) {
+			for (WeakReference<ClassLoader> external : externals) {
 				try {
-					var cl = external.get();
+					ClassLoader cl = external.get();
 					url = cl.getResource(name);
 					if (url != null) {
 						return url;

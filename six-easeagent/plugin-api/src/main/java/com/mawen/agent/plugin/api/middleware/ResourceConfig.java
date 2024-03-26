@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.utils.SystemEnv;
 import com.mawen.agent.plugin.utils.common.JsonUtil;
 
@@ -21,11 +22,11 @@ public class ResourceConfig {
 	private final List<HostAndPort> hostAndPorts = new ArrayList<>();
 
 	public static ResourceConfig getResourceConfig(String env, boolean needParse) {
-		var str = SystemEnv.get(env);
+		String str = SystemEnv.get(env);
 		if (str == null) {
 			return null;
 		}
-		var resourceConfig = JsonUtil.toObject(str, new TypeReference<ResourceConfig>() {});
+		ResourceConfig resourceConfig = JsonUtil.toObject(str, new TypeReference<ResourceConfig>() {});
 		resourceConfig.parseHostAndPort(needParse);
 		if (resourceConfig.hasUrl()) {
 			return resourceConfig;
@@ -41,14 +42,14 @@ public class ResourceConfig {
 		if (uris == null || uris.isEmpty()) {
 			return;
 		}
-		var list = uris.split(",");
-		for (var uri : list) {
+		String[] list = uris.split(",");
+		for (String uri : list) {
 			uriList.add(uri);
-			var begin = uri.indexOf(":");
-			var end = uri.lastIndexOf(":");
+			int begin = uri.indexOf(":");
+			int end = uri.lastIndexOf(":");
 			if (begin == end) {
-				var arr = uri.split(":");
-				var obj = new HostAndPort();
+				String[] arr = uri.split(":");
+				HostAndPort obj = new HostAndPort();
 				obj.setHost(arr[0]);
 				obj.setPort(Integer.parseInt(arr[1]));
 				this.hostAndPorts.add(obj);
@@ -130,8 +131,9 @@ public class ResourceConfig {
 		@Override
 		public final boolean equals(Object o) {
 			if (this == o) return true;
-			if (!(o instanceof HostAndPort that)) return false;
+			if (!(o instanceof HostAndPort)) return false;
 
+			HostAndPort that = (HostAndPort) o;
 			return Objects.equals(host, that.host) && Objects.equals(port, that.port);
 		}
 

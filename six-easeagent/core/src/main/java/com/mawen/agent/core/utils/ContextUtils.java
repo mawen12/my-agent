@@ -37,7 +37,7 @@ public class ContextUtils implements AppendBootstrapLoader {
 	}
 
 	public static Long getDuration(Context context, Object startKey) {
-		var now = SystemClock.now();
+		long now = SystemClock.now();
 		return now - (Long) context.remove(startKey);
 	}
 

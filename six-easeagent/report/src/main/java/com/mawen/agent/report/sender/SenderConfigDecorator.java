@@ -86,7 +86,7 @@ public class SenderConfigDecorator implements SenderWithEncoder {
 	}
 
 	private static String getEncoderKey(String prefix) {
-		var idx = prefix.lastIndexOf(".");
+		int idx = prefix.lastIndexOf(".");
 		if (idx == 0) {
 			return ENCODER_KEY;
 		} else {
@@ -95,8 +95,8 @@ public class SenderConfigDecorator implements SenderWithEncoder {
 	}
 
 	private static Map<String, String> extractSenderConfig(String cfgPrefix, Config config) {
-		var extract = extractByPrefix(config, cfgPrefix);
-		var cfg = new HashMap<>(extract);
+		Map<String, String> extract = extractByPrefix(config, cfgPrefix);
+		Map<String, String> cfg = new HashMap<>(extract);
 
 		// outputServer config
 		cfg.putAll(extractByPrefix(config, REPORT));

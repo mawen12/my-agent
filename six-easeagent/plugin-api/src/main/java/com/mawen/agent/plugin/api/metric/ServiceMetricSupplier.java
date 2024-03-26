@@ -17,7 +17,7 @@ public abstract class ServiceMetricSupplier<T extends ServiceMetric> {
 	private final Type type;
 
 	public ServiceMetricSupplier() {
-		var superClass = getClass().getGenericSuperclass();
+		Type superClass = getClass().getGenericSuperclass();
 		if (superClass instanceof Class<?>) {
 			throw new IllegalArgumentException("Internal error: TypeReference constructed without actual type information");
 		}

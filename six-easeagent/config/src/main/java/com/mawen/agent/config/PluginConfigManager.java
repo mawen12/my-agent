@@ -29,7 +29,7 @@ public class PluginConfigManager implements IConfigFactory {
 	}
 
 	public static PluginConfigManager.Builder builder(Configs configs) {
-		var pluginConfigManager = new PluginConfigManager(configs, new HashMap<>(), new HashMap<>());
+		PluginConfigManager pluginConfigManager = new PluginConfigManager(configs, new HashMap<>(), new HashMap<>());
 		return pluginConfigManager.new Builder();
 	}
 
@@ -49,14 +49,14 @@ public class PluginConfigManager implements IConfigFactory {
 	}
 
 	public synchronized PluginConfig getConfig(String domain, String namespace, String id, PluginConfig oldConfig) {
-		var key = new Key(domain, namespace, id);
-		var pluginConfig = pluginConfigs.get(key);
+		Key key = new Key(domain, namespace, id);
+		PluginConfig pluginConfig = pluginConfigs.get(key);
 		if (pluginConfig != null) {
 			return pluginConfig;
 		}
-		var globalConfig = getGlobalConfig(domain, id);
-		var coverConfig = getCoverConfig(domain, namespace, id);
-		var newPluginConfig = PluginConfig.build(domain, id, globalConfig, namespace, coverConfig, oldConfig);
+		Map<String, String> globalConfig = getGlobalConfig(domain, id);
+		Map<String, String> coverConfig = getCoverConfig(domain, namespace, id);
+		PluginConfig newPluginConfig = PluginConfig.build(domain, id, globalConfig, namespace, coverConfig, oldConfig);
 		pluginConfigs.put(key, newPluginConfig);
 		return newPluginConfig;
 	}
@@ -70,7 +70,7 @@ public class PluginConfigManager implements IConfigFactory {
 	}
 
 	private Map<String, String> getConfigSource(String domain, String namespace, String id) {
-		var sourceConfig = pluginSourceConfigs.get(new Key(domain, namespace, id));
+		PluginSourceConfig sourceConfig = pluginSourceConfigs.get(new Key(domain, namespace, id));
 		if (sourceConfig == null) {
 			return Collections.emptyMap();
 		}
@@ -93,12 +93,12 @@ public class PluginConfigManager implements IConfigFactory {
 	public class Builder {
 		public PluginConfigManager build() {
 			synchronized (PluginConfigManager.this) {
-				var sources = config.getConfigs();
-				var sourceKeys = keys(sources.keySet());
-				for (var sourceKey : sourceKeys) {
+				Map<String, String> sources = config.getConfigs();
+				Set<Key> sourceKeys = keys(sources.keySet());
+				for (Key sourceKey : sourceKeys) {
 					pluginSourceConfigs.put(sourceKey, PluginSourceConfig.build(sourceKey.domain(), sourceKey.namespace(), sourceKey.id(), sources));
 				}
-				for (var key : pluginSourceConfigs.keySet()) {
+				for (Key key : pluginSourceConfigs.keySet()) {
 					getConfig(key.domain(), key.namespace(), key.id());
 				}
 			}
@@ -106,5 +106,28 @@ public class PluginConfigManager implements IConfigFactory {
 		}
 	}
 
-	public record Key(String domain, String namespace, String id) {}
+	public static class Key {
+		private final String domain;
+		private final String namespace;
+		private final String id;
+
+		public Key(String domain, String namespace, String id) {
+			this.domain = domain;
+			this.namespace = namespace;
+			this.id = id;
+		}
+
+		public String domain() {
+			return domain;
+		}
+
+		public String namespace() {
+			return namespace;
+		}
+
+		public String id() {
+			return id;
+		}
+	}
+
 }

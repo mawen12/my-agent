@@ -1,6 +1,7 @@
 package com.mawen.agent.metrics.impl;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 import com.mawen.agent.plugin.api.metric.Counter;
 import com.mawen.agent.plugin.api.metric.Gauge;
@@ -15,35 +16,35 @@ import com.mawen.agent.plugin.api.metric.Timer;
  */
 public abstract class MetricInstance<T extends Metric> {
 
-	public static final MetricInstance<Counter> COUNTER = new MetricInstance<>() {
+	public static final MetricInstance<Counter> COUNTER = new MetricInstance<Counter>() {
 		@Override
 		protected Counter toInstance(String name, Metric metric) {
 			return (Counter) metric;
 		}
 	};
 
-	public static final MetricInstance<Histogram> HISTOGRAM = new MetricInstance<>() {
+	public static final MetricInstance<Histogram> HISTOGRAM = new MetricInstance<Histogram>() {
 		@Override
 		protected Histogram toInstance(String name, Metric metric) {
 			return (Histogram) metric;
 		}
 	};
 
-	public static final MetricInstance<Meter> METER = new MetricInstance<>() {
+	public static final MetricInstance<Meter> METER = new MetricInstance<Meter>() {
 		@Override
 		protected Meter toInstance(String name, Metric metric) {
 			return (Meter) metric;
 		}
 	};
 
-	public static final MetricInstance<Timer> TIMER = new MetricInstance<>() {
+	public static final MetricInstance<Timer> TIMER = new MetricInstance<Timer>() {
 		@Override
 		protected Timer toInstance(String name, Metric metric) {
 			return (Timer) metric;
 		}
 	};
 
-	public static final MetricInstance<Gauge> GAUGE = new MetricInstance<>() {
+	public static final MetricInstance<Gauge> GAUGE = new MetricInstance<Gauge>() {
 		@Override
 		protected Gauge toInstance(String name, Metric metric) {
 			return (Gauge) metric;
@@ -53,14 +54,15 @@ public abstract class MetricInstance<T extends Metric> {
 	private final Class<?> type;
 
 	private MetricInstance() {
-		var superclass = getClass().getGenericSuperclass();
+		Type superclass = getClass().getGenericSuperclass();
 		if (superclass instanceof Class<?>) {
 			throw new IllegalArgumentException("Internal error: MetricInstance constructed without actual type information");
 		}
-		var t = ((ParameterizedType) superclass).getActualTypeArguments()[0];
-		if (!(t instanceof Class<?> clazz)) {
+		Type t = ((ParameterizedType) superclass).getActualTypeArguments()[0];
+		if (!(t instanceof Class<?>)) {
 			throw new IllegalArgumentException();
 		}
+		Class<?> clazz = (Class<?>) t;
 		type = clazz;
 	}
 

@@ -6,7 +6,23 @@ package com.mawen.agent.plugin.report.tracing;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/24
  */
-public record Annotation(long timestamp, String value) implements Comparable<Annotation> {
+public class Annotation implements Comparable<Annotation> {
+	private final long timestamp;
+	private final String value;
+
+	public Annotation(long timestamp, String value) {
+		this.timestamp = timestamp;
+		this.value = value;
+	}
+
+	public long timestamp() {
+		return timestamp;
+	}
+
+	public String value() {
+		return value;
+	}
+
 	@Override
 	public int compareTo(Annotation that) {
 		if (this == that) return 0;

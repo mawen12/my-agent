@@ -36,7 +36,7 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory {
 
 	@Override
 	public Reporter reporter(IPluginConfig pluginConfig) {
-		var reporter = reporters.get(pluginConfig.namespace());
+		DefaultMetricReporter reporter = reporters.get(pluginConfig.namespace());
 		if (reporter != null) {
 			return reporter;
 		}

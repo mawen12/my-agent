@@ -37,7 +37,7 @@ public class AccessLogJsonEncoder extends JsonEncoder<AccessLogInfo> {
 	@Override
 	public EncodedData encode(AccessLogInfo input) {
 		try {
-			var d = input.getEncodedData();
+			EncodedData d = input.getEncodedData();
 			if (d == null) {
 				d = new ByteWrapper(JsonCodec.write(writer,input));
 				input.setEncodedData(d);

@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.mawen.agent.core.plugin.Dispatcher;
+import com.mawen.agent.core.plugin.matcher.MethodTransformation;
 import com.mawen.agent.core.plugin.transformer.advice.AgentAdvice;
 import com.mawen.agent.core.plugin.transformer.advice.AgentJavaConstantValue;
 import com.mawen.agent.core.plugin.transformer.advice.MethodIdentityJavaConstant;
@@ -31,15 +32,15 @@ public class AdviceRegistry {
 			MethodDescription instrumentedMethod,
 			AgentAdvice.Dispatcher.Resolved.ForMethodEnter methodEnter,
 			AgentAdvice.Dispatcher.Resolved.ForMethodExit methodExit) {
-		var clazz = instrumentedType.getName();
-		var method = instrumentedMethod.getName();
-		var methodDescriptor = instrumentedMethod.getDescriptor();
-		var key = clazz.concat(":").concat(method).concat(methodDescriptor);
-		var newIdentity = new PointcutsUniqueId();
-		var pointcutsUniqueId = methodsSet.putIfAbsent(key, newIdentity);
+		String clazz = instrumentedType.getName();
+		String method = instrumentedMethod.getName();
+		String methodDescriptor = instrumentedMethod.getDescriptor();
+		String key = clazz.concat(":").concat(method).concat(methodDescriptor);
+		PointcutsUniqueId newIdentity = new PointcutsUniqueId();
+		PointcutsUniqueId pointcutsUniqueId = methodsSet.putIfAbsent(key, newIdentity);
 
 		Integer pointcutIndex;
-		var merge = false;
+		boolean merge = false;
 
 		if (pointcutsUniqueId != null) {
 			newIdentity.tryRelease();
@@ -47,27 +48,30 @@ public class AdviceRegistry {
 			if (pointcutsUniqueId.checkPointcutExist(pointcutIndex)) {
 				if (pointcutsUniqueId.checkClassLoaderExist()) {
 					return 0;
-				} else {
+				}
+				else {
 					updateStackManipulation(methodEnter, pointcutsUniqueId.getUniqueId());
 					updateStackManipulation(methodExit, pointcutsUniqueId.getUniqueId());
 					return pointcutsUniqueId.getUniqueId();
 				}
-			} else {
+			}
+			else {
 				merge = true;
 			}
-		} else {
+		}
+		else {
 			pointcutsUniqueId = newIdentity;
 			pointcutIndex = updateStackManipulation(methodEnter, pointcutsUniqueId.getUniqueId());
 			updateStackManipulation(methodExit, pointcutsUniqueId.getUniqueId());
 		}
 
-		var methodTransformation = PluginRegistry.getMethodTransformation(pointcutIndex);
+		MethodTransformation methodTransformation = PluginRegistry.getMethodTransformation(pointcutIndex);
 		if (methodTransformation == null) {
 			log.error("MethodTransformation get fail for {}", pointcutIndex);
 			return 0;
 		}
-		var uniqueId = pointcutsUniqueId.getUniqueId();
-		var chain = methodTransformation.getAgentInterceptorChain(uniqueId, clazz, method, methodDescriptor);
+		int uniqueId = pointcutsUniqueId.getUniqueId();
+		AgentInterceptorChain chain = methodTransformation.getAgentInterceptorChain(uniqueId, clazz, method, methodDescriptor);
 
 		try {
 			pointcutsUniqueId.lock();
@@ -92,18 +96,20 @@ public class AdviceRegistry {
 	}
 
 	static Integer getPointcutIndex(AgentAdvice.Dispatcher.Resolved resolved) {
-		var index = 0;
-		var map = resolved.getOffsetMapping();
-		for (var entry : map.entrySet()) {
-			var om = entry.getValue();
-			if (!(om instanceof AgentAdvice.OffsetMapping.ForStackManipulation f)) {
+		int index = 0;
+		Map<Integer, AgentAdvice.OffsetMapping> map = resolved.getOffsetMapping();
+		for (Map.Entry<Integer, AgentAdvice.OffsetMapping> entry : map.entrySet()) {
+			AgentAdvice.OffsetMapping om = entry.getValue();
+			if (!(om instanceof AgentAdvice.OffsetMapping.ForStackManipulation)) {
 				continue;
 			}
 
-			if (!(f.getStackManipulation() instanceof AgentJavaConstantValue value)) {
+			AgentAdvice.OffsetMapping.ForStackManipulation f = (AgentAdvice.OffsetMapping.ForStackManipulation) om;
+			if (!(f.getStackManipulation() instanceof AgentJavaConstantValue)) {
 				continue;
 			}
 
+			AgentJavaConstantValue value = (AgentJavaConstantValue) f.getStackManipulation();
 			index = value.getPointcutIndex();
 			break;
 		}
@@ -111,23 +117,24 @@ public class AdviceRegistry {
 	}
 
 	static Integer updateStackManipulation(AgentAdvice.Dispatcher.Resolved resolved, Integer value) {
-		var index = 0;
-		var map = resolved.getOffsetMapping();
+		int index = 0;
+		Map<Integer, AgentAdvice.OffsetMapping> map = resolved.getOffsetMapping();
 
-		for (var entry : map.entrySet()) {
-			var om = entry.getValue();
-			if (!(om instanceof AgentAdvice.OffsetMapping.ForStackManipulation f)) {
+		for (Map.Entry<Integer, AgentAdvice.OffsetMapping> entry : map.entrySet()) {
+			AgentAdvice.OffsetMapping om = entry.getValue();
+			if (!(om instanceof AgentAdvice.OffsetMapping.ForStackManipulation)) {
 				continue;
 			}
 
-			if (!(f.getStackManipulation() instanceof AgentJavaConstantValue oldValue)) {
+			AgentAdvice.OffsetMapping.ForStackManipulation f = (AgentAdvice.OffsetMapping.ForStackManipulation) om;
+			if (!(f.getStackManipulation() instanceof AgentJavaConstantValue)) {
 				continue;
 			}
-
+			AgentJavaConstantValue oldValue = (AgentJavaConstantValue) f.getStackManipulation();
 			index = oldValue.getPointcutIndex();
 
-			var constant = new MethodIdentityJavaConstant(value);
-			var stackManipulation = new AgentJavaConstantValue(constant, index);
+			MethodIdentityJavaConstant constant = new MethodIdentityJavaConstant(value);
+			AgentJavaConstantValue stackManipulation = new AgentJavaConstantValue(constant, index);
 			map.put(entry.getKey(), f.with(stackManipulation));
 			break;
 		}
@@ -147,7 +154,8 @@ public class AdviceRegistry {
 		CURRENT_CLASS_LOADER.remove();
 	}
 
-	private AdviceRegistry(){}
+	private AdviceRegistry() {
+	}
 
 	private static class PointcutsUniqueId {
 		static AtomicInteger index = new AtomicInteger(1);

@@ -41,8 +41,8 @@ public class ProgressFields {
 			return new Fields(keyPrefix, Collections.emptySet(), Collections.emptyMap(), Collections.emptyMap());
 		}
 		Map<String, String> keyValues = new HashMap<>();
-		for (var entry : map.entrySet()) {
-			var key = entry.getKey().replace(keyPrefix, "");
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			String key = entry.getKey().replace(keyPrefix, "");
 			keyValues.put(key, entry.getValue());
 		}
 		return new Fields(keyPrefix, Collections.unmodifiableSet(new HashSet<>(map.values())), keyValues, map);

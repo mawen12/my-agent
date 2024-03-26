@@ -18,7 +18,8 @@ public class DynamicFieldAdvice {
 
 		@Advice.OnMethodExit
 		public static void exit(@Advice.This(optional = true) Object target) {
-			if (target instanceof DynamicFieldAccessor accessor) {
+			if (target instanceof DynamicFieldAccessor) {
+				DynamicFieldAccessor accessor = (DynamicFieldAccessor) target;
 				if (accessor.getAgent$$DynamicField$$Data() == null) {
 					accessor.setAgent$$DynamicField$$Data(NullObject.NULL);
 				}

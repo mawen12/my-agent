@@ -36,7 +36,7 @@ public class SystemClock {
 	}
 
 	private void scheduleClockUpdating() {
-		var scheduler = new ScheduledThreadPoolExecutor(1, (r) -> {
+		ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(1, (r) -> {
 			Thread thread = new Thread(r, "System Clock");
 			thread.setDaemon(true);
 			return thread;

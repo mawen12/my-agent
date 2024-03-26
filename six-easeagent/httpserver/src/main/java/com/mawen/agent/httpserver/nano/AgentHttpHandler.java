@@ -52,13 +52,13 @@ public abstract class AgentHttpHandler extends RouterNanoHTTPD.DefaultHandler {
 
 	protected String buildRequestBody(IHTTPSession session) {
 		try {
-			var files = new HashMap<String, String>();
-			var method = session.getMethod();
+			Map<String, String> files = new HashMap<>();
+			Method method = session.getMethod();
 			if (!methods.contains(method)) {
 				return null;
 			}
 			session.parseBody(files);
-			var content = files.get("content");
+			String content = files.get("content");
 			if (content != null) {
 				Path path = Paths.get(content);
 				byte[] bytes = Files.readAllBytes(path);

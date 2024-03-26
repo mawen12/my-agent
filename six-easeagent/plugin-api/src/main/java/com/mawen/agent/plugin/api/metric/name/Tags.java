@@ -94,8 +94,9 @@ public class Tags {
 	@Override
 	public final boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof Tags tags1)) return false;
+		if (!(o instanceof Tags)) return false;
 
+		Tags tags1 = (Tags) o;
 		return category.equals(tags1.category) && type.equals(tags1.type) && keyFieldName.equals(tags1.keyFieldName) && tags.equals(tags1.tags);
 	}
 

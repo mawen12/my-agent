@@ -20,8 +20,8 @@ public class LogAsyncProps implements AsyncProps {
 	private volatile int messageMaxBytes;
 
 	public LogAsyncProps(Config config, String prefix) {
-		var onePercentageMemory = AsyncProps.onePercentOfMemory();
-		var keyPrefix = StringUtils.isEmpty(prefix) ? LOG_ASYNC : prefix;
+		int onePercentageMemory = AsyncProps.onePercentOfMemory();
+		String keyPrefix = StringUtils.isEmpty(prefix) ? LOG_ASYNC : prefix;
 
 		bindProp(join(keyPrefix, join(ASYNC_KEY, ASYNC_THREAD_KEY)),
 				config, Config::getInt, v -> this.reportThread = v, 1);

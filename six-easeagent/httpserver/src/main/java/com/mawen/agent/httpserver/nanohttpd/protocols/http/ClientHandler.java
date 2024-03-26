@@ -9,7 +9,28 @@ import java.net.Socket;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/27
  */
-public record ClientHandler(NanoHTTPD httpd, InputStream inputStream, Socket acceptSocket) implements Runnable {
+public class ClientHandler implements Runnable {
+	private final NanoHTTPD httpd;
+	private final InputStream inputStream;
+	private final Socket acceptSocket;
+
+	public ClientHandler(NanoHTTPD httpd, InputStream inputStream, Socket acceptSocket) {
+		this.httpd = httpd;
+		this.inputStream = inputStream;
+		this.acceptSocket = acceptSocket;
+	}
+
+	public NanoHTTPD httpd() {
+		return httpd;
+	}
+
+	public InputStream inputStream() {
+		return inputStream;
+	}
+
+	public Socket acceptSocket() {
+		return acceptSocket;
+	}
 
 	@Override
 	public void run() {

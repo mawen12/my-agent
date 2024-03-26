@@ -24,14 +24,14 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
 
 	public ForAdviceTransformer(MethodTransformation methodTransformation) {
 
-		var value = new MethodIdentityJavaConstant(methodTransformation.index());
-		var stackManipulation = new AgentJavaConstantValue(value, methodTransformation.index());
-		var typeDescription = value.getTypeDescription();
+		MethodIdentityJavaConstant value = new MethodIdentityJavaConstant(methodTransformation.index());
+		AgentJavaConstantValue stackManipulation = new AgentJavaConstantValue(value, methodTransformation.index());
+		TypeDescription typeDescription = value.getTypeDescription();
 
-		var factory = new AgentAdvice.OffsetMapping.ForStackManipulation.Factory<>(Index.class,
+		AgentAdvice.OffsetMapping.ForStackManipulation.Factory<Index> factory = new AgentAdvice.OffsetMapping.ForStackManipulation.Factory<>(Index.class,
 				stackManipulation, typeDescription.asGenericType());
 
-		var agentForAdvice = new AgentForAdvice(AgentAdvice.withCustomMapping().bind(factory));
+		AgentForAdvice agentForAdvice = new AgentForAdvice(AgentAdvice.withCustomMapping().bind(factory));
 		this.transformer = agentForAdvice
 				.include(getClass().getClassLoader())
 				.advice(methodTransformation.matcher(), CommonInlineAdvice.class.getCanonicalName());
@@ -42,7 +42,7 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
 		CompoundClassLoader.compound(this.getClass().getClassLoader(), classLoader);
 
 		AdviceRegistry.setCurrentClassLoader(classLoader);
-		var bd = transformer.transform(builder, typeDescription, classLoader, javaModule);
+		DynamicType.Builder<?> bd = transformer.transform(builder, typeDescription, classLoader, javaModule);
 		AdviceRegistry.clearCurrentClassLoader();
 		return bd;
 	}

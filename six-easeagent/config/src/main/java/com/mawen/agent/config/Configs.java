@@ -43,7 +43,7 @@ public class Configs implements Config {
 
 	@Override
 	public Integer getInt(String name) {
-		var value = this.source.get(name);
+		String value = this.source.get(name);
 		if (value == null) {
 			return null;
 		}
@@ -63,7 +63,7 @@ public class Configs implements Config {
 
 	@Override
 	public Boolean getBoolean(String name) {
-		var value = this.source.get(name);
+		String value = this.source.get(name);
 		if (value == null) {
 			return false;
 		}
@@ -77,7 +77,7 @@ public class Configs implements Config {
 
 	@Override
 	public Boolean getBooleanNullForUnset(String name) {
-		var value = this.source.get(name);
+		String value = this.source.get(name);
 
 		return value != null
 				? value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("false")
@@ -86,7 +86,7 @@ public class Configs implements Config {
 
 	@Override
 	public Double getDouble(String name) {
-		var value = this.source.get(name);
+		String value = this.source.get(name);
 		if (value == null) {
 			return null;
 		}
@@ -105,7 +105,7 @@ public class Configs implements Config {
 
 	@Override
 	public Long getLong(String name) {
-		var value = this.source.get(name);
+		String value = this.source.get(name);
 		if (value == null) {
 			return null;
 		}
@@ -124,7 +124,7 @@ public class Configs implements Config {
 
 	@Override
 	public List<String> getStringList(String name) {
-		var value = this.source.get(name);
+		String value = this.source.get(name);
 		if (value == null) {
 			return null;
 		}
@@ -143,7 +143,7 @@ public class Configs implements Config {
 
 
 	public void mergeConfigs(Configs configs) {
-		var merged = configs.getConfigs();
+		Map<String, String> merged = configs.getConfigs();
 		if (merged.isEmpty()) {
 			return;
 		}

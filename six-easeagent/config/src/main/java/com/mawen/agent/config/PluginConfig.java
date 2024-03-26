@@ -36,7 +36,7 @@ public class PluginConfig implements IPluginConfig {
 		this.id = id;
 		this.global = global;
 		this.cover = cover;
-		var b = getBoolean(Const.ENABLED_CONFIG);
+		Boolean b = getBoolean(Const.ENABLED_CONFIG);
 		if (b == null) {
 			enabled = false;
 		} else {
@@ -56,13 +56,13 @@ public class PluginConfig implements IPluginConfig {
 
 	@Override
 	public String getString(String property) {
-		var value = cover.get(property);
+		String value = cover.get(property);
 		return NoNull.of(value, global.get(property));
 	}
 
 	@Override
 	public Integer getInt(String property) {
-		var value = this.getString(property);
+		String value = this.getString(property);
 		if (value == null) {
 			return null;
 		}
@@ -76,13 +76,13 @@ public class PluginConfig implements IPluginConfig {
 
 	@Override
 	public Boolean getBoolean(String property) {
-		var value = cover.get(property);
-		var implB = true;
+		String value = cover.get(property);
+		boolean implB = true;
 		if (value != null) {
 			implB = isTrue(value);
 		}
 		value = global.get(property);
-		var globalB = false;
+		boolean globalB = false;
 		if (value != null) {
 			globalB = isTrue(value);
 		}
@@ -91,7 +91,7 @@ public class PluginConfig implements IPluginConfig {
 
 	@Override
 	public Double getDouble(String property) {
-		var value = this.getString(property);
+		String value = this.getString(property);
 		if (value == null) {
 			return null;
 		}
@@ -105,7 +105,7 @@ public class PluginConfig implements IPluginConfig {
 
 	@Override
 	public Long getLong(String property) {
-		var value = this.getString(property);
+		String value = this.getString(property);
 		if (value == null) {
 			return null;
 		}
@@ -119,7 +119,7 @@ public class PluginConfig implements IPluginConfig {
 
 	@Override
 	public List<String> getStringList(String property) {
-		var value = this.getString(property);
+		String value = this.getString(property);
 		if (StringUtils.isEmpty(value)) {
 			return Collections.emptyList();
 		}

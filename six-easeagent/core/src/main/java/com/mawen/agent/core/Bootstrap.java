@@ -3,6 +3,8 @@ package com.mawen.agent.core;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.net.URLClassLoader;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -57,21 +59,21 @@ public class Bootstrap {
 	}
 
 	public static void start(String args, Instrumentation inst, String javaAgentJarPath) throws IOException {
-		var begin = System.currentTimeMillis();
+		long begin = System.currentTimeMillis();
 		System.setProperty(ConfigConst.AGENT_JAR_PATH, javaAgentJarPath);
 
 		// add bootstrap classes
-		var bootstrapClassSet = AppendBootstrapClassLoaderSearch.by(inst, ClassInjector.UsingInstrumentation.Target.BOOTSTRAP);
+		Set<String> bootstrapClassSet = AppendBootstrapClassLoaderSearch.by(inst, ClassInjector.UsingInstrumentation.Target.BOOTSTRAP);
 		log.info("Injected class: {}", bootstrapClassSet);
 
 		// initiate configuration
-		var configPath = ConfigFactory.getConfigPath();
+		String configPath = ConfigFactory.getConfigPath();
 		if (StringUtils.isEmpty(configPath)) {
 			configPath = args;
 		}
 
-		var classLoader = Bootstrap.class.getClassLoader();
-		var cfg = ConfigFactory.loadConfigs(configPath, classLoader);
+		ClassLoader classLoader = Bootstrap.class.getClassLoader();
+		Configs cfg = ConfigFactory.loadConfigs(configPath, classLoader);
 
 		initAgentClassLoader(classLoader, Agent::setAgentClassLoader); // init ClassLoader
 
@@ -89,7 +91,7 @@ public class Bootstrap {
 
 		initProvider(cfg, Agent.agentReport); // init Provider & Beans
 
-		var installBegin = System.currentTimeMillis();
+		long installBegin = System.currentTimeMillis();
 
 		builder.installOn(inst);
 
@@ -122,14 +124,14 @@ public class Bootstrap {
 
 	private static void initHttpServer(Configs config) {
 		// inner httpserver
-		var port = config.getInt(ConfigFactory.AGENT_SERVER_PORT);
+		Integer port = config.getInt(ConfigFactory.AGENT_SERVER_PORT);
 		if (port == null) {
 			port = DEF_AGENT_SERVER_PORT;
 		}
 
-		var agentHttpServer = new AgentHttpServer(port);
+		AgentHttpServer agentHttpServer = new AgentHttpServer(port);
 
-		var httpServerEnabled = config.getBoolean(ConfigFactory.AGENT_SERVER_ENABLED);
+		boolean httpServerEnabled = config.getBoolean(ConfigFactory.AGENT_SERVER_ENABLED);
 		if (httpServerEnabled) {
 			agentHttpServer.startServer();
 			log.info("start agent http server on port:{}", port);
@@ -142,7 +144,7 @@ public class Bootstrap {
 
 	private static void initReporter(Configs configs) {
 		log.info("init reporter >>>>>");
-		var agentReport = DefaultAgentReport.create(configs);
+		AgentReport agentReport = DefaultAgentReport.create(configs);
 		Agent.agentReport = agentReport;
 		log.info("init reporter success!");
 	}
@@ -156,34 +158,39 @@ public class Bootstrap {
 
 	private static void initProvider(Configs cfg, AgentReport report) {
 		log.info("init provider >>>>>");
-		var providers = BaseLoader.loadOrdered(BeanProvider.class);
+		List<BeanProvider> providers = BaseLoader.loadOrdered(BeanProvider.class);
 		providers.forEach(it -> provider(it, cfg, report));
 		log.info("init provider success!");
 	}
 
 	private static void provider(BeanProvider provider, Configs cfg, AgentReport report) {
 		log.info("Load provider: {}", provider.getClass().getName());
-		if (provider instanceof ConfigAware configAware) {
+		if (provider instanceof ConfigAware) {
+			ConfigAware configAware = (ConfigAware) provider;
 			configAware.setConfig(cfg);
 		}
-		if (provider instanceof AgentReportAware reportAware) {
+		if (provider instanceof AgentReportAware) {
+			AgentReportAware reportAware = (AgentReportAware) provider;
 			reportAware.setAgentReport(report);
 		}
-		if (provider instanceof AgentInitializingBean initializingBean) {
+		if (provider instanceof AgentInitializingBean) {
+			AgentInitializingBean initializingBean = (AgentInitializingBean) provider;
 			initializingBean.afterPropertiesSet();
 		}
-		if (provider instanceof TracingProvider tracingProvider) {
+		if (provider instanceof TracingProvider) {
+			TracingProvider tracingProvider = (TracingProvider) provider;
 			contextManager.setTracing(tracingProvider);
 		}
-		if (provider instanceof MetricProvider metricProvider) {
+		if (provider instanceof MetricProvider) {
+			MetricProvider metricProvider = (MetricProvider) provider;
 			contextManager.setMetric(metricProvider);
 		}
 	}
 
 	public static AgentBuilder getAgentBuilder(Configs cfg, boolean test) {
 		// config may use to add some classes to be ignored in future
-		var buildBegin = System.currentTimeMillis();
-		var builder = new AgentBuilder.Default()
+		long buildBegin = System.currentTimeMillis();
+		AgentBuilder builder = new AgentBuilder.Default()
 				.with(DefaultAgentListener.INSTANCE)
 				.with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
 				.with(AgentBuilder.InitializationStrategy.NoOp.INSTANCE)
@@ -191,7 +198,7 @@ public class Bootstrap {
 				.with(AgentBuilder.LocationStrategy.ForClassLoader.STRONG
 						.withFallbackTo(ClassFileLocator.ForClassLoader.ofSystemLoader()));
 
-		var ignored = builder.ignore(isSynthetic())
+		AgentBuilder.Ignored ignored = Bootstrap.builder.ignore(isSynthetic())
 				.or(nameStartsWith("sun."))
 				.or(nameStartsWith("com.sun."))
 				.or(nameStartsWith("brave."))
@@ -210,14 +217,14 @@ public class Bootstrap {
 
 		// config used here to avoid warning of unused
 		if (!test && cfg != null) {
-			builder = ignored.or(nameStartsWith("com.mawen.agent."));
+			Bootstrap.builder = ignored.or(nameStartsWith("com.mawen.agent."));
 		}
 		else {
-			builder = ignored;
+			Bootstrap.builder = ignored;
 		}
 
 		log.info("AgentBuilder use time: {}ms", (System.currentTimeMillis() - buildBegin));
-		return builder;
+		return Bootstrap.builder;
 	}
 
 }

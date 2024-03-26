@@ -27,10 +27,10 @@ public class ReporterRegistry {
 	private ReporterRegistry(){}
 
 	public static void registryEncoder(String name, Supplier<Encoder<?>> encoder) {
-		var o = encoders.putIfAbsent(name, encoder);
+		Supplier<Encoder<?>> o = encoders.putIfAbsent(name, encoder);
 		if (o != null) {
-			var on = o.get().getClass().getSimpleName();
-			var cn = encoder.get().getClass().getSimpleName();
+			String on = o.get().getClass().getSimpleName();
+			String cn = encoder.get().getClass().getSimpleName();
 			logger.error("Encoder name conflict:{}, between {} and {}", name, on, cn);
 		}
 	}
@@ -40,32 +40,32 @@ public class ReporterRegistry {
 			logger.error("Encoder name \"{}\" is not exists!",name);
 			return (Encoder<T>) NoOpEncoder.INSTANCE;
 		}
-		var encoder = (Encoder<T>) encoders.get(name).get();
+		Encoder<T> encoder = (Encoder<T>) encoders.get(name).get();
 
 		return encoder != null ? encoder : (Encoder<T>) NoOpEncoder.INSTANCE;
 	}
 
 	public static void registrySender(String name, Supplier<Sender> sender) {
-		var o = senderSuppliers.putIfAbsent(name, sender);
+		Supplier<Sender> o = senderSuppliers.putIfAbsent(name, sender);
 		if (o != null) {
-			var on = sender.get().getClass().getSimpleName();
-			var cn = sender.get().getClass().getSimpleName();
+			String on = sender.get().getClass().getSimpleName();
+			String cn = sender.get().getClass().getSimpleName();
 			logger.error("Sender name conflict:{}, between {} and {}", name, on, cn);
 		}
 	}
 
 	public static SenderWithEncoder getSender(String prefix, Config config) {
-		var name = config.getString(join(prefix, APPEND_TYPE_KEY));
+		String name = config.getString(join(prefix, APPEND_TYPE_KEY));
 		if (name == null) {
 			logger.warn("Can not find sender name for:{}",join(prefix, APPEND_TYPE_KEY));
 		}
-		var sender = new SenderConfigDecorator(prefix, getSender(name), config);
+		SenderConfigDecorator sender = new SenderConfigDecorator(prefix, getSender(name), config);
 		sender.init(config,prefix);
 		return sender;
 	}
 
 	private static Sender getSender(String name) {
-		var supplier = senderSuppliers.get(name);
+		Supplier<Sender> supplier = senderSuppliers.get(name);
 		return supplier == null ? NoOpSender.INSTANCE : supplier.get();
 	}
 }

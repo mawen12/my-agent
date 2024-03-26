@@ -86,8 +86,9 @@ public class Endpoint {
 	@Override
 	public final boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof Endpoint endpoint)) return false;
+		if (!(o instanceof Endpoint)) return false;
 
+		Endpoint endpoint = (Endpoint) o;
 		return port == endpoint.port && Objects.equals(serviceName, endpoint.serviceName) && Objects.equals(ipV4, endpoint.ipV4) && Objects.equals(ipV6, endpoint.ipV6);
 	}
 

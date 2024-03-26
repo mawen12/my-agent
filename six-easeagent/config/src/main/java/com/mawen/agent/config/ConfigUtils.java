@@ -4,9 +4,11 @@ import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -47,17 +49,17 @@ public class ConfigUtils {
 	}
 
 	public static List<Map.Entry<String, String>> extractKVs(String prefix, JsonNode node) {
-		var rst = new LinkedList<Map.Entry<String, String>>();
+		List<Map.Entry<String, String>> rst = new LinkedList<>();
 		if (node.isObject()) {
-			var names = node.fieldNames();
+			Iterator<String> names = node.fieldNames();
 			while (names.hasNext()) {
-				var current = names.next();
+				String current = names.next();
 				rst.addAll(extractKVs(join(prefix, current), node.path(current)));
 			}
 		}
 		else if (node.isArray()) {
-			var len = node.size();
-			for (var i = 0; i < len; i++) {
+			int len = node.size();
+			for (int i = 0; i < len; i++) {
 				rst.addAll(extractKVs(join(prefix, i + ""), node.path(i)));
 			}
 		}
@@ -84,13 +86,13 @@ public class ConfigUtils {
 	}
 
 	public static PluginProperty pluginProperty(String path) {
-		var configs = path.split("\\" + ConfigConst.DELIMITER);
+		String[] configs = path.split("\\" + ConfigConst.DELIMITER);
 		if (configs.length < 5) {
 			throw new ValidException(String.format("Property[%s] must be format: %s", path,
 					ConfigConst.join(ConfigConst.PLUGIN, "<Domain>", "<Namespace>", "<Id>", "<Property>")));
 		}
 
-		for (var idOffsetEnd = 3; idOffsetEnd < configs.length - 1; idOffsetEnd++) {
+		for (int idOffsetEnd = 3; idOffsetEnd < configs.length - 1; idOffsetEnd++) {
 			new PluginProperty(configs[1], configs[2],
 					ConfigConst.join(Arrays.copyOfRange(configs, 3, idOffsetEnd)),
 					ConfigConst.join(Arrays.copyOfRange(configs, idOffsetEnd + 1, configs.length)));
@@ -113,9 +115,9 @@ public class ConfigUtils {
 	 * @return Extracted and converted KV map
 	 */
 	public static Map<String, String> extractAndConvertPrefix(Map<String, String> cfg, String fromPrefix, String toPrefix) {
-		var convert = new HashMap<String, String>();
+		Map<String, String> convert = new HashMap<>();
 
-		var keys = new HashSet<>();
+		Set<String> keys = new HashSet<>();
 		cfg.forEach((key, value) -> {
 			if (key.startsWith(fromPrefix)) {
 				keys.add(key);
@@ -142,7 +144,7 @@ public class ConfigUtils {
 	}
 
 	public static Map<String, String> extractByPrefix(Map<String, String> cfg, String prefix) {
-		var extract = new TreeMap<String, String>();
+		Map<String, String> extract = new TreeMap<>();
 
 		// override, new configuration KV override previous KV
 		cfg.forEach((key, value) -> {

@@ -16,7 +16,7 @@ public class AgentV2SpanRemoteEndpointWriter extends AbstractAgentV2SpanEndpoint
 		if (value.remoteEndpoint() == null) {
 			return 0;
 		}
-		var size = REMOTE_ENDPOINT_FIELD_NAME.length();
+		int size = REMOTE_ENDPOINT_FIELD_NAME.length();
 		size += this.endpointSizeInBytes(value.remoteEndpoint(), false);
 		return size;
 	}

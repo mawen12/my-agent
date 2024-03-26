@@ -28,7 +28,7 @@ public class AgentV2SpanWriter implements WriteBuffer.Writer<ReportSpan> {
 
 	@Override
 	public int sizeInBytes(ReportSpan value) {
-		final var size = new MutableInt(1);
+		final MutableInt size = new MutableInt(1);
 		writerList.forEach(w -> size.add(w.sizeInBytes(value)));
 		size.add(1);
 		return size.intValue();

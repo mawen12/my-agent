@@ -28,7 +28,7 @@ public class AnnotationTransformer implements AgentBuilder.Transformer {
 				.ofType(AgentInstrumented.class)
 				.define("value", methodTransformation.index())
 				.build();
-		var forMethod = new MemberAttributeExtension.ForMethod()
+		MemberAttributeExtension.ForMethod forMethod = new MemberAttributeExtension.ForMethod()
 				.annotateMethod(this.annotationDescription);
 		this.visitorWrapper = new ForMethodDelegate(annotationDescription.getAnnotationType(), forMethod, methodTransformation)
 				.on(methodTransformation.matcher());
@@ -40,8 +40,29 @@ public class AnnotationTransformer implements AgentBuilder.Transformer {
 		return builder.visit(this.visitorWrapper);
 	}
 
-	public static record ForMethodDelegate(TypeDescription annotation, MemberAttributeExtension.ForMethod forMethod, MethodTransformation methodTransformation)
+	public static class ForMethodDelegate
 			implements AsmVisitorWrapper.ForDeclaredMethods.MethodVisitorWrapper {
+		private final TypeDescription annotation;
+		private final MemberAttributeExtension.ForMethod forMethod;
+		private final MethodTransformation methodTransformation;
+
+		public ForMethodDelegate(TypeDescription annotation, MemberAttributeExtension.ForMethod forMethod, MethodTransformation methodTransformation) {
+			this.annotation = annotation;
+			this.forMethod = forMethod;
+			this.methodTransformation = methodTransformation;
+		}
+
+		public TypeDescription annotation() {
+			return annotation;
+		}
+
+		public MemberAttributeExtension.ForMethod forMethod() {
+			return forMethod;
+		}
+
+		public MethodTransformation methodTransformation() {
+			return methodTransformation;
+		}
 
 		@Override
 		public MethodVisitor wrap(TypeDescription typeDescription, MethodDescription methodDescription, MethodVisitor methodVisitor, Implementation.Context context, TypePool typePool, int i, int i1) {

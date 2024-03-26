@@ -13,7 +13,7 @@ public class URLClassLoaderSupplier implements ClassLoaderSupplier {
 
 	@Override
 	public ClassLoader get() {
-		var jarUrlsSupplier = new JarUrlsSupplier(new UrlSupplier[] {
+		JarUrlsSupplier jarUrlsSupplier = new JarUrlsSupplier(new UrlSupplier[] {
 				new AllUrlsSupplier(), new DirUrlsSupplier(), new JarPathUrlsSupplier()
 		});
 		return new URLClassLoader(Objects.requireNonNull(jarUrlsSupplier.get(), "urls must not be null"));

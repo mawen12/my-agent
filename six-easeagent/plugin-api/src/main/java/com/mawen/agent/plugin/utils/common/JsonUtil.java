@@ -35,6 +35,7 @@ public class JsonUtil {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Map<String, Object> toMap(String json) {
 		try {
 			return mapper.readValue(json, Map.class);

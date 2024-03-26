@@ -22,7 +22,7 @@ public class AgentV2SpanBaseWriter implements WriteBuffer.Writer<ReportSpan> {
 
 	@Override
 	public int sizeInBytes(ReportSpan value) {
-		var sizeInBytes = 0;
+		int sizeInBytes = 0;
 
 		// traceId
 		sizeInBytes += TRACE_ID_FIELD_NAME.length() + 1;

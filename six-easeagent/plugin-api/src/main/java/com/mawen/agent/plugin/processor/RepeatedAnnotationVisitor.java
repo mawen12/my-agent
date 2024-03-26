@@ -85,7 +85,7 @@ public class RepeatedAnnotationVisitor implements AnnotationValueVisitor<Set<Ann
 
 	@Override
 	public Set<AnnotationMirror> visitArray(List<? extends AnnotationValue> vals, Class<? extends Annotation> aClass) {
-		final var accept = new HashSet<AnnotationMirror>();
+		final Set<AnnotationMirror> accept = new HashSet<>();
 
 		for (AnnotationValue v : vals) {
 			accept.addAll(v.accept(this, aClass));
@@ -96,6 +96,11 @@ public class RepeatedAnnotationVisitor implements AnnotationValueVisitor<Set<Ann
 
 	@Override
 	public Set<AnnotationMirror> visitUnknown(AnnotationValue av, Class<? extends Annotation> aClass) {
+		return Collections.emptySet();
+	}
+
+	@Override
+	public Set<AnnotationMirror> visit(AnnotationValue av) {
 		return Collections.emptySet();
 	}
 }

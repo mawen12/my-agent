@@ -2,15 +2,19 @@ package com.mawen.agent.core.instrument;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.mawen.agent.core.Bootstrap;
 import com.mawen.agent.core.instrument.utils.AgentAttachmentRule;
 import com.mawen.agent.core.plugin.CommonInlineAdvice;
 import com.mawen.agent.core.plugin.PluginLoader;
+import com.mawen.agent.core.plugin.matcher.MethodTransformation;
 import com.mawen.agent.plugin.bridge.Agent;
 import com.mawen.agent.plugin.field.AgentDynamicFieldAccessor;
 import net.bytebuddy.agent.ByteBuddyAgent;
+import net.bytebuddy.agent.builder.AgentBuilder;
+import net.bytebuddy.agent.builder.ResettableClassFileTransformer;
 import net.bytebuddy.dynamic.ClassFileLocator;
 import net.bytebuddy.dynamic.loading.ByteArrayClassLoader;
 import net.bytebuddy.dynamic.scaffold.TypeWriter;
@@ -62,17 +66,17 @@ public class NonStaticMethodTransformTest extends TransformTestBase {
 		assertEquals(System.getProperty(TypeWriter.DUMP_PROPERTY), dumpFolder);
 
 		assertThat(ByteBuddyAgent.install(), instanceOf(Instrumentation.class));
-		var agentBuilder = Bootstrap.getAgentBuilder(null, true);
+		AgentBuilder agentBuilder = Bootstrap.getAgentBuilder(null, true);
 
-		var transformations = getMethodTransformations(globalIndex.incrementAndGet(), FOO, new FooProvider());
+		Set<MethodTransformation> transformations = getMethodTransformations(globalIndex.incrementAndGet(), FOO, new FooProvider());
 
-		var extendable = agentBuilder
+		AgentBuilder.Identified.Extendable extendable = agentBuilder
 				.type(named(Foo.class.getName()), ElementMatchers.is(classLoader))
 				.transform(PluginLoader.compound(true, transformations));
-		var transformer = extendable.installOnByteBuddyAgent();
+		ResettableClassFileTransformer transformer = extendable.installOnByteBuddyAgent();
 
 		try {
-			var type = classLoader.loadClass(Foo.class.getName());
+			Class<?> type = classLoader.loadClass(Foo.class.getName());
 			// check
 			Object instance = type.getDeclaredConstructor(String.class).newInstance("kkk");
 			AgentDynamicFieldAccessor.setDynamicFieldValue(instance, BAR);

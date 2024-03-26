@@ -44,8 +44,8 @@ public class YamlReader {
 			return Collections.emptyMap();
 		}
 
-		final var keyStack = new LinkedList<String>();
-		final var resultMap = new HashMap<String, String>();
+		final LinkedList<String> keyStack = new LinkedList<>();
+		final Map<String, String> resultMap = new HashMap<>();
 
 		compress(yaml, keyStack, resultMap);
 
@@ -63,7 +63,7 @@ public class YamlReader {
 			}
 
 			if (v instanceof List) {
-				var value = ((List<Object>) v).stream()
+				String value = ((List<Object>) v).stream()
 						.map(String::valueOf)
 						.collect(Collectors.joining(","));
 

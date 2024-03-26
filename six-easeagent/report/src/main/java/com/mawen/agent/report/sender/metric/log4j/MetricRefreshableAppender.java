@@ -47,7 +47,7 @@ public class MetricRefreshableAppender extends AbstractAppender implements Testa
 	}
 
 	private Appender getAppender() {
-		var senderName = metricProps.getSenderName();
+		String senderName = metricProps.getSenderName();
 		if ("mock".equals(senderName)) {
 			return getMockAppender();
 		}

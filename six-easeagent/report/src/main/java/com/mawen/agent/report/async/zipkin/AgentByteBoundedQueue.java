@@ -49,8 +49,8 @@ public class AgentByteBoundedQueue<S> implements WithSizeConsumer<S> {
 
 	public int clear() {
 		DataWrapper<S> data;
-		var result = 0;
-		var removeBytes = 0;
+		int result = 0;
+		int removeBytes = 0;
 		while ((data = queue.poll()) != null) {
 			removeBytes += data.getSizeInBytes();
 			result++;
@@ -78,9 +78,9 @@ public class AgentByteBoundedQueue<S> implements WithSizeConsumer<S> {
 	}
 
 	int doDrain(WithSizeConsumer<S> consumer, DataWrapper<S> firstPoll) {
-		var drainedCount=  0;
-		var drainedSizeInBytes = 0;
-		var next = firstPoll;
+		int drainedCount=  0;
+		int drainedSizeInBytes = 0;
+		DataWrapper<S> next = firstPoll;
 		do {
 			int nextSizeInBytes = next.getSizeInBytes();
 			if (consumer.offer(next.getElement(), nextSizeInBytes)) {

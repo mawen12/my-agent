@@ -17,10 +17,10 @@ public abstract class AbstractAgentV2SpanEndpointWriter implements WriteBuffer.W
 	static final String PORT_FIELD_NAME = "\"port\":";
 
 	protected int endpointSizeInBytes(Endpoint value, boolean writeEmptyServiceName) {
-		var sizeInBytes = 1; // ,
+		int sizeInBytes = 1; // ,
 
 		// serviceName
-		var serviceName = value.serviceName();
+		String serviceName = value.serviceName();
 		if (serviceName == null && writeEmptyServiceName) {
 			serviceName = "";
 		}
@@ -69,10 +69,10 @@ public abstract class AbstractAgentV2SpanEndpointWriter implements WriteBuffer.W
 	protected void writeEndpoint(Endpoint value, WriteBuffer b, boolean writeEmptyServiceName) {
 
 		b.writeByte('{');
-		var wroteField = false;
+		boolean wroteField = false;
 
 		// serviceName
-		var serviceName = value.serviceName();
+		String serviceName = value.serviceName();
 		if (serviceName == null && writeEmptyServiceName) {
 			serviceName = "";
 		}

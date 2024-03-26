@@ -1,5 +1,6 @@
 package com.mawen.agent.mock.context;
 
+import java.util.Iterator;
 import java.util.ServiceLoader;
 
 import com.mawen.agent.mock.config.MockConfig;
@@ -18,19 +19,19 @@ public class MockContextManager {
 	private static final ContextManager CONTEXT_MANAGER_MOCK = ContextManager.build(MockConfig.getConfigs());
 
 	static {
-		var loader = ServiceLoader.load(MockProvider.class);
-		var iterator = loader.iterator();
+		ServiceLoader<MockProvider> loader = ServiceLoader.load(MockProvider.class);
+		Iterator<MockProvider> iterator = loader.iterator();
 		while (iterator.hasNext()) {
-			var mockProvider = iterator.next();
-			var o = mockProvider.get();
+			MockProvider mockProvider = iterator.next();
+			Object o = mockProvider.get();
 			if (o == null) {
 				continue;
 			}
-			if (o instanceof TracingProvider tracingProvider) {
-				CONTEXT_MANAGER_MOCK.setTracing(tracingProvider);
+			if (o instanceof TracingProvider) {
+				CONTEXT_MANAGER_MOCK.setTracing((TracingProvider)o);
 			}
-			else if (o instanceof MetricProvider metricProvider) {
-				CONTEXT_MANAGER_MOCK.setMetric(metricProvider);
+			else if (o instanceof MetricProvider) {
+				CONTEXT_MANAGER_MOCK.setMetric((MetricProvider) o);
 			}
 		}
 	}

@@ -18,9 +18,9 @@ public class CompoundPluginTransformer implements AgentBuilder.Transformer {
 
 	public CompoundPluginTransformer(List<AgentBuilder.Transformer> transformers) {
 		this.transformers = new ArrayList<>();
-		for (var transformer : transformers) {
-			if (transformer instanceof CompoundPluginTransformer compoundPluginTransformer) {
-				this.transformers.addAll(compoundPluginTransformer.transformers);
+		for (AgentBuilder.Transformer transformer : transformers) {
+			if (transformer instanceof CompoundPluginTransformer ) {
+				this.transformers.addAll(((CompoundPluginTransformer)transformer).transformers);
 				continue;
 			}
 			this.transformers.add(transformer);
@@ -29,7 +29,7 @@ public class CompoundPluginTransformer implements AgentBuilder.Transformer {
 
 	@Override
 	public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader, JavaModule javaModule) {
-		for (var transformer : this.transformers) {
+		for (AgentBuilder.Transformer transformer : this.transformers) {
 			builder = transformer.transform(builder, typeDescription, classLoader, javaModule);
 		}
 		return builder;

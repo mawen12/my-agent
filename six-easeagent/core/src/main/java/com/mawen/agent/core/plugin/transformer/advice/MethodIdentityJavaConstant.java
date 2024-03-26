@@ -7,7 +7,16 @@ import net.bytebuddy.utility.JavaConstant;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/3/6
  */
-public record MethodIdentityJavaConstant(Integer identify) implements JavaConstant {
+public class MethodIdentityJavaConstant implements JavaConstant {
+	private final Integer identify;
+
+	public MethodIdentityJavaConstant(Integer identify) {
+		this.identify = identify;
+	}
+
+	public Integer identify() {
+		return identify;
+	}
 
 	@Override
 	public Object toDescription() {

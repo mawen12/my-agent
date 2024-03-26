@@ -2,7 +2,9 @@ package com.mawen.agent.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
@@ -16,17 +18,17 @@ public class JarFileConfigLoader {
 	private static final Logger log = LoggerFactory.getLogger(JarFileConfigLoader.class);
 
 	static Configs load(String file) {
-		var agentJarPath = System.getProperty(ConfigConst.AGENT_JAR_PATH);
+		String agentJarPath = System.getProperty(ConfigConst.AGENT_JAR_PATH);
 		if (agentJarPath == null) {
 			return null;
 		}
 		try {
-			var jarFile = new JarFile(new File(agentJarPath));
-			var zipEntry = jarFile.getEntry(file);
+			JarFile jarFile = new JarFile(new File(agentJarPath));
+			ZipEntry zipEntry = jarFile.getEntry(file);
 			if (zipEntry == null) {
 				return null;
 			}
-			try (var in = jarFile.getInputStream(zipEntry)) {
+			try (InputStream in = jarFile.getInputStream(zipEntry)) {
 				return ConfigLoader.loadFromStream(in, file);
 			}
 			catch (IOException e) {

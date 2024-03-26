@@ -37,7 +37,7 @@ public class AdditionalAttributes {
 			return InetAddress.getLocalHost().getHostName();
 		}
 		catch (UnknownHostException e) {
-			var host = e.getMessage();
+			String host = e.getMessage();
 			if (host != null) {
 				int colon = host.indexOf(':');
 				if (colon > 0) {

@@ -3,18 +3,25 @@ package com.mawen.agent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
+import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.JarFileArchive;
 
 /**
@@ -36,14 +43,14 @@ public class Main {
 	private static ClassLoader loader;
 
 	public static void premain(final String args, final Instrumentation inst) throws Exception {
-		var jar = getArchiveFileContains();
-		final var archive = new JarFileArchive(jar);
+		File jar = getArchiveFileContains();
+		final JarFileArchive archive = new JarFileArchive(jar);
 
 		// custom classloader
-		var urls = nestArchiveUrls(archive, LIB);
+		List<URL> urls = nestArchiveUrls(archive, LIB);
 		urls.addAll(nestArchiveUrls(archive, PLUGINS));
 		urls.addAll(nestArchiveUrls(archive, SLf4j2));
-		var p = new File(jar.getParent() + File.separator + "plugins");
+		File p = new File(jar.getParent() + File.separator + "plugins");
 		if (p.exists()) {
 			urls.addAll(directoryPluginUrls(p));
 		}
@@ -51,16 +58,16 @@ public class Main {
 		loader = new CompoundableClassLoader(urls.toArray(new URL[0]));
 
 		// install bootstrap jar
-		final var bootUrls = nestArchiveUrls(archive, BOOTSTRAP);
+		final List<URL> bootUrls = nestArchiveUrls(archive, BOOTSTRAP);
 		bootUrls.forEach(url -> installBootstrapJar(url, inst));
 
 		// init slf4j2 dir
 		initAgentSlf4j2Dir(archive, loader);
 
 		// init slf4j mdc and call Bootstrap#premain
-		final var attributes = archive.getManifest().getMainAttributes();
-		final var loggingProperty = attributes.getValue(LOGGING_PROPERTY);
-		final var bootstrap = attributes.getValue("Bootstrap-Class");
+		final Attributes attributes = archive.getManifest().getMainAttributes();
+		final String loggingProperty = attributes.getValue(LOGGING_PROPERTY);
+		final String bootstrap = attributes.getValue("Bootstrap-Class");
 		switchLoggingProperty(loader, loggingProperty, () -> {
 			initAgentSlf4jMDC(loader);
 			loader.loadClass(bootstrap)
@@ -71,16 +78,16 @@ public class Main {
 	}
 
 	private static File getArchiveFileContains() throws URISyntaxException {
-		final var protectionDomain = Main.class.getProtectionDomain();
-		final var codeSource = protectionDomain.getCodeSource();
-		final var location = (codeSource == null ? null : codeSource.getLocation().toURI());
-		final var path = (location == null ? null : location.getSchemeSpecificPart());
+		final ProtectionDomain protectionDomain = Main.class.getProtectionDomain();
+		final CodeSource codeSource = protectionDomain.getCodeSource();
+		final URI location = (codeSource == null ? null : codeSource.getLocation().toURI());
+		final String path = (location == null ? null : location.getSchemeSpecificPart());
 
 		if (path == null) {
 			throw new IllegalStateException("Unable to determine code source archive");
 		}
 
-		final var root = new File(path);
+		final File root = new File(path);
 		if (!root.exists() || root.isDirectory()) {
 			throw new IllegalStateException("Unable to determine code source archive from " + root);
 		}
@@ -88,12 +95,12 @@ public class Main {
 	}
 
 	private static List<URL> nestArchiveUrls(JarFileArchive archive, String prefix) throws IOException {
-		var archives = Lists.newArrayList(
+		List<Archive> archives = Lists.newArrayList(
 				archive.getNestedArchives(entry -> !entry.isDirectory() && entry.getName().startsWith(prefix),
 						entry -> true
 				));
 
-		final var urls = new ArrayList<URL>(archives.size());
+		final List<URL> urls = new ArrayList<>(archives.size());
 
 		archives.forEach(item -> {
 			try {
@@ -112,19 +119,19 @@ public class Main {
 			return new ArrayList<>();
 		}
 
-		var files = directory.listFiles();
+		File[] files = directory.listFiles();
 		if (files == null) {
 			return new ArrayList<>();
 		}
 
-		final var urls = new ArrayList<URL>(files.length);
+		final List<URL> urls = new ArrayList<>(files.length);
 
 		Arrays.stream(files).forEach(item -> {
 			if (!item.getName().endsWith("jar")) {
 				return;
 			}
 			try {
-				var pUrl = item.toURI().toURL();
+				URL pUrl = item.toURI().toURL();
 				urls.add(pUrl);
 			}
 			catch (MalformedURLException e) {
@@ -136,7 +143,7 @@ public class Main {
 
 	private static void installBootstrapJar(URL url, Instrumentation inst) {
 		try {
-			var file = JarUtils.getNestedJarFile(url);
+			JarFile file = JarUtils.getNestedJarFile(url);
 			inst.appendToBootstrapClassLoaderSearch(file);
 		}
 		catch (IOException e) {
@@ -145,22 +152,22 @@ public class Main {
 	}
 
 	private static void initAgentSlf4j2Dir(JarFileArchive archive, final ClassLoader bootstrapLoader) throws Exception {
-		final var slf4j2Urls = nestArchiveUrls(archive, SLf4j2).toArray(new URL[0]);
-		final var slf4j2Loader = new URLClassLoader(slf4j2Urls, null);
-		var classLoaderSupplier = bootstrapLoader.loadClass("com.mawen.agent.log4j2.FinalClassLoaderSupplier");
-		var field = classLoaderSupplier.getDeclaredField("CLASSLOADER");
+		URL[] slf4j2Urls = nestArchiveUrls(archive, SLf4j2).toArray(new URL[0]);
+		URLClassLoader slf4j2Loader = new URLClassLoader(slf4j2Urls, null);
+		Class<?> classLoaderSupplier = bootstrapLoader.loadClass("com.mawen.agent.log4j2.FinalClassLoaderSupplier");
+		Field field = classLoaderSupplier.getDeclaredField("CLASSLOADER");
 		field.set(null, slf4j2Loader);
 	}
 
 	private static void switchLoggingProperty(ClassLoader loader, String hostKey, Callable<Void> callable) throws Exception {
-		final var t = Thread.currentThread();
-		final var ccl = t.getContextClassLoader();
+		final Thread t = Thread.currentThread();
+		final ClassLoader ccl = t.getContextClassLoader();
 
 		t.setContextClassLoader(loader);
 
 		// get config from system properties
-		final var host = System.getProperty(hostKey);
-		final var agent = getLogConfigPath();
+		final String host = System.getProperty(hostKey);
+		final String agent = getLogConfigPath();
 
 		// Redirect config of host to agent
 		System.setProperty(hostKey, agent);
@@ -181,7 +188,7 @@ public class Main {
 	}
 
 	private static String getLogConfigPath() {
-		var logConfigPath = System.getProperty(AGENT_LOG_CONF);
+		String logConfigPath = System.getProperty(AGENT_LOG_CONF);
 		if (Strings.isNullOrEmpty(logConfigPath)) {
 			logConfigPath = System.getenv(AGENT_LOG_CONF_ENV_KEY);
 		}

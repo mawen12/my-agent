@@ -26,19 +26,19 @@ public class AgentV2SpanGlobalWriter implements WriteBuffer.Writer<ReportSpan> {
 
 	@Override
 	public int sizeInBytes(ReportSpan value) {
-		final var mutableInt = new MutableInt(0);
+		final MutableInt mutableInt = new MutableInt(0);
 		if (TextUtils.hasText(type)) {
 			mutableInt.add(TYPE_FIELD_NAME.length() + 1);
 			mutableInt.add(JsonEscaper.jsonEscapedSizeInBytes(type));
 		}
 
-		var tmpService = this.extras.service();
+		String tmpService = this.extras.service();
 		if (TextUtils.hasText(tmpService)) {
 			mutableInt.add(SERVICE_FIELD_NAME.length() + 1);
 			mutableInt.add(JsonEscaper.jsonEscapedSizeInBytes(tmpService));
 		}
 
-		var tmpSystem = this.extras.system();
+		String tmpSystem = this.extras.system();
 		if (TextUtils.hasText(tmpSystem)) {
 			mutableInt.add(SYSTEM_FIELD_NAME.length() + 1);
 			mutableInt.add(JsonEscaper.jsonEscapedSizeInBytes(tmpSystem));
@@ -55,14 +55,14 @@ public class AgentV2SpanGlobalWriter implements WriteBuffer.Writer<ReportSpan> {
 			buffer.writeByte(34);
 		}
 
-		var tmpService = this.extras.service();
+		String tmpService = this.extras.service();
 		if (TextUtils.hasText(tmpService)) {
 			buffer.writeAscii(SERVICE_FIELD_NAME);
 			buffer.writeUtf8(JsonEscaper.jsonEscape(tmpService));
 			buffer.writeByte(34);
 		}
 
-		var tmpSystem = this.extras.system();
+		String tmpSystem = this.extras.system();
 		if (TextUtils.hasText(tmpSystem)) {
 			buffer.writeAscii(SYSTEM_FIELD_NAME);
 			buffer.writeUtf8(JsonEscaper.jsonEscape(tmpSystem));
