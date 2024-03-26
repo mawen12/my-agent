@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Map;
 
 import com.mawen.agent.httpserver.nano.AgentHttpHandler;
@@ -14,6 +15,7 @@ import com.mawen.agent.httpserver.nanohttpd.protocols.http.response.Status;
 import com.mawen.agent.httpserver.nanohttpd.router.RouterNanoHTTPD;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
+import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.common.TextFormat;
 
@@ -32,20 +34,20 @@ public class PrometheusAgentHttpHandler extends AgentHttpHandler {
 
 	@Override
 	public Response process(RouterNanoHTTPD.UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
-		var headers = session.getHeaders();
-		var contentType = TextFormat.chooseContentType(headers.get("Accept"));
+		Map<String, String> headers = session.getHeaders();
+		String contentType = TextFormat.chooseContentType(headers.get("Accept"));
 
-		var samples = CollectorRegistry.defaultRegistry.filteredMetricFamilySamples(Collections.emptySet());
+		Enumeration<Collector.MetricFamilySamples> samples = CollectorRegistry.defaultRegistry.filteredMetricFamilySamples(Collections.emptySet());
 
-		var stringWriter = new StringWriter();
-		try (var writer = new BufferedWriter(stringWriter)) {
+		StringWriter stringWriter = new StringWriter();
+		try (BufferedWriter writer = new BufferedWriter(stringWriter)) {
 			TextFormat.writeFormat(contentType, writer, samples);
 			writer.flush();
 		}
 		catch (IOException e) {
 			log.warn("write data error. {}", e.getMessage());
 		}
-		var data = stringWriter.toString();
+		String data = stringWriter.toString();
 		return Response.newFixedLengthResponse(Status.OK, AgentHttpServer.JSON_TYPE, data);
 	}
 }

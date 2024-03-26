@@ -154,7 +154,8 @@ public class MessagingTracingImpl<R extends MessagingRequest> implements Messagi
 		@Override
 		public void inject(Span span, R request) {
 			Object span0 = span.unwrap();
-			if (span0 instanceof brave.Span braveSpan) {
+			if (span0 instanceof brave.Span) {
+				brave.Span braveSpan = (brave.Span) span0;
 				this.injector.inject(braveSpan.context(), request);
 			}
 		}

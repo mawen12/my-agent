@@ -74,7 +74,8 @@ public class TracingImpl implements ITracing {
 		}
 
 		Object context = snapshot.unwrap();
-		if (context instanceof TraceContext traceContext) {
+		if (context instanceof TraceContext) {
+			TraceContext traceContext = (TraceContext) context;
 			CurrentTraceContext.Scope scope = tracing().currentTraceContext().maybeScope(traceContext);
 			return new ScopeImpl(scope);
 		}

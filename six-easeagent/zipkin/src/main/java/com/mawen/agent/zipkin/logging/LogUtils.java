@@ -147,11 +147,14 @@ public class LogUtils {
 		if (e instanceof IllegalAccessException) {
 			throw new IllegalStateException("Could not access method or field: " + e.getMessage());
 		}
-		if (e instanceof InvocationTargetException ex) {
+		if (e instanceof InvocationTargetException) {
+			InvocationTargetException ex = (InvocationTargetException) e;
 			handleInvocationTargetException(ex);
 		}
-		if (e instanceof RuntimeException ex) {
+		if (e instanceof RuntimeException) {
+			RuntimeException ex = (RuntimeException) e;
 			throw ex;
+
 		}
 		throw new UndeclaredThrowableException(e);
 	}
@@ -161,10 +164,12 @@ public class LogUtils {
 	}
 
 	public static void rethrowRuntimeException(Throwable throwable) {
-		if (throwable instanceof RuntimeException ex) {
+		if (throwable instanceof RuntimeException) {
+			RuntimeException ex = (RuntimeException) throwable;
 			throw ex;
 		}
-		if (throwable instanceof Error ex) {
+		if (throwable instanceof Error) {
+			Error ex = (Error) throwable;
 			throw ex;
 		}
 		throw new UndeclaredThrowableException(throwable);

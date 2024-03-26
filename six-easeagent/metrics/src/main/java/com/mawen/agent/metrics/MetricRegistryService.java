@@ -29,10 +29,10 @@ public class MetricRegistryService {
 	private static final List<MetricRegistry> REGISTRY_LIST = new ArrayList<>();
 
 	public MetricRegistry createMetricRegistry(AbstractConverter abstractConverter, Supplier<Map<String, Object>> additionalAttributes, Tags tags) {
-		var metricRegistry = new MetricRegistry();
+		MetricRegistry metricRegistry = new MetricRegistry();
 		REGISTRY_LIST.add(metricRegistry);
-		var agentSampleBuilder = new AgentSampleBuilder(additionalAttributes, tags);
-		var agentPrometheusExports = new AgentPrometheusExports(metricRegistry, abstractConverter, agentSampleBuilder);
+		AgentSampleBuilder agentSampleBuilder = new AgentSampleBuilder(additionalAttributes, tags);
+		AgentPrometheusExports agentPrometheusExports = new AgentPrometheusExports(metricRegistry, abstractConverter, agentSampleBuilder);
 		agentPrometheusExports.register();
 		return metricRegistry;
 	}
@@ -48,8 +48,8 @@ public class MetricRegistryService {
 
 		@Override
 		public Collector.MetricFamilySamples.Sample createSample(String dropwizardName, String nameSuffix, List<String> additionalLabelNames, List<String> additionalLabelValues, double value) {
-			var newAdditionalLabelNames = new ArrayList<>(additionalLabelNames);
-			var newAdditionalLabelValues = new ArrayList<>(additionalLabelValues);
+			List<String> newAdditionalLabelNames = new ArrayList<>(additionalLabelNames);
+			List<String> newAdditionalLabelValues = new ArrayList<>(additionalLabelValues);
 			additionalAttributes(newAdditionalLabelNames, newAdditionalLabelValues);
 			tags(newAdditionalLabelNames, newAdditionalLabelValues);
 			return super.createSample(rebuildName(dropwizardName, newAdditionalLabelNames, newAdditionalLabelValues), nameSuffix, newAdditionalLabelNames, newAdditionalLabelValues, value);
@@ -60,11 +60,11 @@ public class MetricRegistryService {
 				return;
 			}
 
-			var labels = additionalAttributes.get();
+			Map<String, Object> labels = additionalAttributes.get();
 			if (labels == null || labels.isEmpty()) {
 				return;
 			}
-			for (var entry : labels.entrySet()) {
+			for (Map.Entry<String, Object> entry : labels.entrySet()) {
 				additionalLabelNames.add(entry.getKey());
 				additionalLabelValues.add(entry.getValue().toString());
 			}
@@ -75,11 +75,11 @@ public class MetricRegistryService {
 				return;
 			}
 
-			var other = tags.getTags();
+			Map<String, String> other = tags.getTags();
 			if (other == null || other.isEmpty()) {
 				return;
 			}
-			for (var entry : other.entrySet()) {
+			for (Map.Entry<String, String> entry : other.entrySet()) {
 				additionalLabelNames.add(entry.getKey());
 				additionalLabelValues.add(entry.getValue());
 			}
@@ -87,8 +87,8 @@ public class MetricRegistryService {
 
 		private String rebuildName(String name, List<String> additionalLabelNames, List<String> additionalLabelValues) {
 			try {
-				var metricName = MetricName.metricNameFor(name);
-				var builder = new StringBuilder();
+				MetricName metricName = MetricName.metricNameFor(name);
+				StringBuilder builder = new StringBuilder();
 				additionalLabelNames.add(METRIC_TYPE_LABEL_NAME);
 				additionalLabelValues.add(METRIC_SUB_TYPE_LABEL_NAME);
 

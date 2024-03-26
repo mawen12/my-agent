@@ -92,7 +92,7 @@ public class MetricRegistryImpl implements MetricRegistry {
 	}
 
 	private <T extends Metric> T getOrAdd(String name, MetricInstance<T> instance, MetricBuilder<T> builder) {
-		var metric = metricCache.get(name);
+		Metric metric = metricCache.get(name);
 		if (metric != null) {
 			return instance.to(name, metric);
 		}
@@ -101,7 +101,7 @@ public class MetricRegistryImpl implements MetricRegistry {
 			if (metric != null) {
 				return instance.to(name, metric);
 			}
-			var t = builder.newMetric(metricRegistry);
+			T t = builder.newMetric(metricRegistry);
 			metricCache.putIfAbsent(name, t);
 			return t;
 		}
