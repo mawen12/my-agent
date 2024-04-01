@@ -34,11 +34,6 @@
         </dependency>
         <dependency>
             <groupId>com.mawen</groupId>
-            <artifactId>httpserver</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mawen</groupId>
             <artifactId>log4j2-api</artifactId>
             <version>${project.version}</version>
         </dependency>

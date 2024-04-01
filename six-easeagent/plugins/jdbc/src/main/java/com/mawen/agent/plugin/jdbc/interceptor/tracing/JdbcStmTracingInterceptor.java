@@ -75,7 +75,7 @@ public class JdbcStmTracingInterceptor implements NonReentrantInterceptor {
 		DatabaseInfo databaseInfo = DatabaseInfo.getFromConnection(conn);
 		if (databaseInfo != null) {
 			span.remoteServiceName(databaseInfo.remoteServiceName());
-			span.remoteIpAndPort(databaseInfo.host(), databaseInfo.port());
+			span.remoteIpAndPort(databaseInfo.getHost(), databaseInfo.getPort());
 		}
 
 		span.start();

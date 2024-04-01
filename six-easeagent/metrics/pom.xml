@@ -22,11 +22,6 @@
             <artifactId>report</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.mawen</groupId>
-            <artifactId>httpserver</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>

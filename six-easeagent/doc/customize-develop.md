@@ -56,3 +56,6 @@ Use Micrometer to implement metric.
 - Like Stream contains non-terminal and terminal action
 - Make the API Intuitive and Fluent
 - Protect instance, manage object lifetime
+
+
+## Remove Custom HttpServer

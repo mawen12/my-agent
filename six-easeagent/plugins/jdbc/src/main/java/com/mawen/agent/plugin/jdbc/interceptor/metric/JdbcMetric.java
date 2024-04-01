@@ -1,6 +1,7 @@
 package com.mawen.agent.plugin.jdbc.interceptor.metric;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,6 +10,8 @@ import javax.annotation.Nonnull;
 
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.plugin.api.Context;
@@ -26,6 +29,7 @@ import com.mawen.agent.plugin.api.metric.name.NameFactory;
 import com.mawen.agent.plugin.api.metric.name.Tags;
 import com.mawen.agent.plugin.api.middleware.Redirect;
 import com.mawen.agent.plugin.api.middleware.RedirectProcessor;
+import com.mawen.agent.plugin.utils.ImmutableMap;
 
 /**
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
@@ -63,41 +67,42 @@ public class JdbcMetric extends ServiceMetric implements RemovalListener<String,
 	}
 
 	public static NameFactory nameFactory() {
-		return NameFactory.createBuilder()
-				.timerType(MetricSubType.DEFAULT,
-						Map.of(
-								MetricField.MIN_EXECUTION_TIME, MetricValueFetcher.SnapshotMinValue,
-								MetricField.MAX_EXECUTION_TIME, MetricValueFetcher.SnapshotMaxValue,
-								MetricField.MEAN_EXECUTION_TIME, MetricValueFetcher.SnapshotMeanValue,
-								MetricField.P25_EXECUTION_TIME, MetricValueFetcher.Snapshot25Percentile,
-								MetricField.P50_EXECUTION_TIME, MetricValueFetcher.Snapshot50Percentile,
-								MetricField.P75_EXECUTION_TIME, MetricValueFetcher.Snapshot75Percentile,
-								MetricField.P95_EXECUTION_TIME, MetricValueFetcher.Snapshot95Percentile,
-								MetricField.P98_EXECUTION_TIME, MetricValueFetcher.Snapshot98Percentile,
-								MetricField.P99_EXECUTION_TIME, MetricValueFetcher.Snapshot99Percentile,
-								MetricField.P999_EXECUTION_TIME, MetricValueFetcher.Snapshot999Percentile
-						))
-				.meterType(MetricSubType.DEFAULT,
-						Map.of(
-								MetricField.M1_RATE, MetricValueFetcher.MeteredM1RateIgnoreZero,
-								MetricField.M5_RATE, MetricValueFetcher.MeteredM5Rate,
-								MetricField.M15_RATE, MetricValueFetcher.MeteredM15Rate
-						))
-				.meterType(MetricSubType.ERROR,
-						Map.of(
-								MetricField.M1_ERROR_RATE, MetricValueFetcher.MeteredM1Rate,
-								MetricField.M5_ERROR_RATE, MetricValueFetcher.MeteredM5Rate,
-								MetricField.M15_ERROR_RATE, MetricValueFetcher.MeteredM15Rate
-						))
-				.counterType(MetricSubType.DEFAULT,
-						Map.of(
-								MetricField.EXECUTION_COUNT, MetricValueFetcher.CountingCount
-						))
-				.counterType(MetricSubType.ERROR,
-						Map.of(
-								MetricField.EXECUTION_ERROR_COUNT, MetricValueFetcher.CountingCount
-						))
-				.build();
+//		return NameFactory.createBuilder()
+//				.timerType(MetricSubType.DEFAULT,
+//						Maps.newHashMap().of(
+//								MetricField.MIN_EXECUTION_TIME, MetricValueFetcher.SnapshotMinValue,
+//								MetricField.MAX_EXECUTION_TIME, MetricValueFetcher.SnapshotMaxValue,
+//								MetricField.MEAN_EXECUTION_TIME, MetricValueFetcher.SnapshotMeanValue,
+//								MetricField.P25_EXECUTION_TIME, MetricValueFetcher.Snapshot25Percentile,
+//								MetricField.P50_EXECUTION_TIME, MetricValueFetcher.Snapshot50Percentile,
+//								MetricField.P75_EXECUTION_TIME, MetricValueFetcher.Snapshot75Percentile,
+//								MetricField.P95_EXECUTION_TIME, MetricValueFetcher.Snapshot95Percentile,
+//								MetricField.P98_EXECUTION_TIME, MetricValueFetcher.Snapshot98Percentile,
+//								MetricField.P99_EXECUTION_TIME, MetricValueFetcher.Snapshot99Percentile,
+//								MetricField.P999_EXECUTION_TIME, MetricValueFetcher.Snapshot999Percentile
+//						))
+//				.meterType(MetricSubType.DEFAULT,
+//						Map.of(
+//								MetricField.M1_RATE, MetricValueFetcher.MeteredM1RateIgnoreZero,
+//								MetricField.M5_RATE, MetricValueFetcher.MeteredM5Rate,
+//								MetricField.M15_RATE, MetricValueFetcher.MeteredM15Rate
+//						))
+//				.meterType(MetricSubType.ERROR,
+//						Map.of(
+//								MetricField.M1_ERROR_RATE, MetricValueFetcher.MeteredM1Rate,
+//								MetricField.M5_ERROR_RATE, MetricValueFetcher.MeteredM5Rate,
+//								MetricField.M15_ERROR_RATE, MetricValueFetcher.MeteredM15Rate
+//						))
+//				.counterType(MetricSubType.DEFAULT,
+//						Map.of(
+//								MetricField.EXECUTION_COUNT, MetricValueFetcher.CountingCount
+//						))
+//				.counterType(MetricSubType.ERROR,
+//						Map.of(
+//								MetricField.EXECUTION_ERROR_COUNT, MetricValueFetcher.CountingCount
+//						))
+//				.build();
+		return null;
 	}
 
 	public void collectMetric(String key, boolean success, Context context) {
@@ -124,7 +129,7 @@ public class JdbcMetric extends ServiceMetric implements RemovalListener<String,
 	public void onRemoval(RemovalNotification<String, String> notification) {
 		try {
 			String key = notification.getKey();
-			List<String> list = List.of(
+			List<String> list = Lists.newArrayList(
 					Optional.ofNullable(this.nameFactory.counterName(key, MetricSubType.DEFAULT)).orElse(""),
 					Optional.ofNullable(this.nameFactory.counterName(key, MetricSubType.ERROR)).orElse(""),
 					Optional.ofNullable(this.nameFactory.meterName(key, MetricSubType.DEFAULT)).orElse(""),

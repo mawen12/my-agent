@@ -17,7 +17,5 @@ public class LettuceTracingInterceptor extends CommonRedisTracingInterceptor{
 	protected void doTraceBefore(MethodInfo methodInfo, Context context) {
 		Object arg0 = methodInfo.getArgs()[0];
 		String cmd;
-
-
 	}
 }

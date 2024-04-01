@@ -16,7 +16,6 @@ import com.mawen.agent.config.Configs;
 import com.mawen.agent.core.plugin.BaseLoader;
 import com.mawen.agent.core.plugin.BridgeDispatcher;
 import com.mawen.agent.core.plugin.PluginLoader;
-import com.mawen.agent.httpserver.nano.AgentHttpServer;
 import com.mawen.agent.log4j2.Logger;
 import com.mawen.agent.log4j2.LoggerFactory;
 import com.mawen.agent.mock.context.ContextManager;
@@ -81,8 +80,6 @@ public class Bootstrap {
 
 		initDispatcher(BridgeDispatcher::new, Agent::setDispatcher); // init Dispatcher
 
-		initHttpServer(cfg); // init HttpServer
-
 		initRedirection(); // init Redirection
 
 		initReporter(cfg); // init Reporter
@@ -120,22 +117,6 @@ public class Bootstrap {
 	private static void initDispatcher(Supplier<IDispatcher> supplier, Consumer<IDispatcher> dispatcherSetter) {
 		IDispatcher dispatcher = supplier.get();
 		dispatcherSetter.accept(dispatcher);
-	}
-
-	private static void initHttpServer(Configs config) {
-		// inner httpserver
-		Integer port = config.getInt(ConfigFactory.AGENT_SERVER_PORT);
-		if (port == null) {
-			port = DEF_AGENT_SERVER_PORT;
-		}
-
-		AgentHttpServer agentHttpServer = new AgentHttpServer(port);
-
-		boolean httpServerEnabled = config.getBoolean(ConfigFactory.AGENT_SERVER_ENABLED);
-		if (httpServerEnabled) {
-			agentHttpServer.startServer();
-			log.info("start agent http server on port:{}", port);
-		}
 	}
 
 	private static void initRedirection() {

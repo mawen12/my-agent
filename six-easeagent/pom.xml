@@ -21,7 +21,6 @@
         <module>mock</module>
         <module>config</module>
         <module>report</module>
-        <module>httpserver</module>
         <module>plugins</module>
         <module>context</module>
         <module>metrics</module>

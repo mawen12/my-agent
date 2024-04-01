@@ -10,7 +10,35 @@ import com.mawen.agent.plugin.utils.common.StringUtils;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 0.0.2-SNAPSHOT
  */
-public record DatabaseInfo(String databaseType, String database, String host, int port) {
+public class DatabaseInfo {
+
+	private final String databaseType;
+	private final String database;
+	private final String host;
+	private final int port;
+
+	public DatabaseInfo(String databaseType, String database, String host, int port) {
+		this.databaseType = databaseType;
+		this.database = database;
+		this.host = host;
+		this.port = port;
+	}
+
+	public String getDatabaseType() {
+		return databaseType;
+	}
+
+	public String getDatabase() {
+		return database;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public int getPort() {
+		return port;
+	}
 
 	public static DatabaseInfo getFromConnection(Connection connection) {
 		try {
