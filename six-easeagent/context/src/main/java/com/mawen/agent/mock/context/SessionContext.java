@@ -25,7 +25,7 @@ import com.mawen.agent.plugin.api.trace.Setter;
 import com.mawen.agent.plugin.api.trace.Span;
 import com.mawen.agent.plugin.api.trace.Tracing;
 import com.mawen.agent.plugin.bridge.NoOpCleaner;
-import com.mawen.agent.plugin.bridge.NoOpIPluginConfig;
+import com.mawen.agent.plugin.bridge.NoOpPluginConfig;
 import com.mawen.agent.plugin.bridge.NoOpTracer;
 import com.mawen.agent.plugin.field.NullObject;
 import com.mawen.agent.plugin.utils.NoNull;
@@ -92,7 +92,7 @@ public class SessionContext implements InitializeContext {
 	public IPluginConfig getConfig() {
 		if (configs.isEmpty()) {
 			log.warn("context.configs was empty.");
-			return NoOpIPluginConfig.INSTANCE;
+			return NoOpPluginConfig.INSTANCE;
 		}
 		return configs.peek();
 	}
@@ -216,7 +216,7 @@ public class SessionContext implements InitializeContext {
 	public IPluginConfig popConfig() {
 		if (configs.isEmpty()) {
 			log.warn("context.configs was empty.");
-			return NoOpIPluginConfig.INSTANCE;
+			return NoOpPluginConfig.INSTANCE;
 		}
 		return configs.pop();
 	}

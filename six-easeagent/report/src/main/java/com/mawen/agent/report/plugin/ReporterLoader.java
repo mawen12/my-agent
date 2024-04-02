@@ -18,10 +18,8 @@ public abstract class ReporterLoader {
 	private static final Logger log = LoggerFactory.getLogger(ReporterLoader.class);
 
 	public static void load() {
-		log.info("Loading reporters >>>");
 		encodersLoad();
 		sendersLoad();
-		log.info("Loaded reporters <<<");
 	}
 
 	public static void encodersLoad() {

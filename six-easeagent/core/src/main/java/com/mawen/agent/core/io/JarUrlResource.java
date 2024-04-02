@@ -7,7 +7,13 @@ import org.springframework.util.ResourceUtils;
 
 /**
  * <pre>{@code
- * 	UrlResource urlResource = new JarUrlResource(ResourceUtils.FILE_URL_PREFIX + pathToUse + ResourceUtils.JAR_URL_SEPARATOR + "agent.properties");
+ * 	UrlResource resource = new JarUrlResource(ResourceUtils.FILE_URL_PREFIX + pathToUse + ResourceUtils.JAR_URL_SEPARATOR + "agent.properties");
+ * 	PropertySource propertySource = new ResourcePropertySource(urlResource);
+ * 	System.out.println(propertySource.getProperty("name"));
+ * }</pre>
+ *
+ * <pre>{@code
+ * 	UrlResource resource = new JarUrlResource(pathToUse, "agent.properties");
  * 	PropertySource propertySource = new ResourcePropertySource(urlResource);
  * 	System.out.println(propertySource.getProperty("name"));
  * }</pre>
@@ -19,5 +25,9 @@ public class JarUrlResource extends UrlResource {
 
 	public JarUrlResource(String path) throws MalformedURLException {
 		super(ResourceUtils.URL_PROTOCOL_JAR, path);
+	}
+
+	public JarUrlResource(String jarPath, String filePathInJar) throws MalformedURLException {
+		super(ResourceUtils.URL_PROTOCOL_JAR, ResourceUtils.FILE_URL_PREFIX + jarPath + ResourceUtils.JAR_URL_SEPARATOR + filePathInJar);
 	}
 }

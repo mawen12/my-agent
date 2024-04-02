@@ -34,7 +34,7 @@ public enum NoOpConfigFactory implements IConfigFactory {
 
 	@Override
 	public IPluginConfig getConfig(String domain, String namespace, String name) {
-		return new NoOpIPluginConfig(domain, namespace, name);
+		return new NoOpPluginConfig(domain, namespace, name);
 	}
 
 	enum NoOpConfig implements Config {

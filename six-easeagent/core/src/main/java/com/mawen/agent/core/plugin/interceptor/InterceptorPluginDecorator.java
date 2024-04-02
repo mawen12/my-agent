@@ -8,7 +8,7 @@ import com.mawen.agent.plugin.api.InitializeContext;
 import com.mawen.agent.plugin.api.config.AutoRefreshPluginConfigImpl;
 import com.mawen.agent.plugin.api.config.AutoRefreshPluginConfigRegistry;
 import com.mawen.agent.plugin.api.config.IPluginConfig;
-import com.mawen.agent.plugin.bridge.NoOpIPluginConfig;
+import com.mawen.agent.plugin.bridge.NoOpPluginConfig;
 import com.mawen.agent.plugin.interceptor.Interceptor;
 import com.mawen.agent.plugin.interceptor.MethodInfo;
 
@@ -49,7 +49,7 @@ public class InterceptorPluginDecorator implements Interceptor {
 		var cfg = getConfig();
 		var innerContext = (InitializeContext) context;
 		innerContext.pushConfig(config);
-		if (cfg == null || cfg.enabled() || cfg instanceof NoOpIPluginConfig) {
+		if (cfg == null || cfg.enabled() || cfg instanceof NoOpPluginConfig) {
 			innerContext.pushRetBound();
 			this.interceptor.before(methodInfo, context);
 		} else {
@@ -62,7 +62,7 @@ public class InterceptorPluginDecorator implements Interceptor {
 		var cfg = getConfig();
 		var innerContext = (InitializeContext) context;
 		try {
-			if (cfg == null || cfg.enabled() || cfg instanceof NoOpIPluginConfig) {
+			if (cfg == null || cfg.enabled() || cfg instanceof NoOpPluginConfig) {
 				try {
 					this.interceptor.after(methodInfo, context);
 				}

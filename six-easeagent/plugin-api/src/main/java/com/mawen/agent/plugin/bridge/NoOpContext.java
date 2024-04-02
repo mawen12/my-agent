@@ -50,7 +50,7 @@ public class NoOpContext {
 
 		@Override
 		public IPluginConfig popConfig() {
-			return NoOpIPluginConfig.INSTANCE;
+			return NoOpPluginConfig.INSTANCE;
 		}
 
 		@Override
@@ -130,7 +130,7 @@ public class NoOpContext {
 
 		@Override
 		public IPluginConfig getConfig() {
-			return NoOpIPluginConfig.INSTANCE;
+			return NoOpPluginConfig.INSTANCE;
 		}
 
 		@Override

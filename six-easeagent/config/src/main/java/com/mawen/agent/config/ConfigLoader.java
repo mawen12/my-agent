@@ -30,7 +30,7 @@ public class ConfigLoader {
 			return ConfigLoader.loadFromStream(in, file);
 		}
 		catch (IOException e) {
-			log.warn("Load config file: {} by classloader: {} failure: {}", file, classLoader.toString(), e);
+			log.warn("Load config file: {} by classloader: {} failure: {}", file, classLoader, e);
 		}
 		return new GlobalConfigs(Collections.emptyMap());
 	}

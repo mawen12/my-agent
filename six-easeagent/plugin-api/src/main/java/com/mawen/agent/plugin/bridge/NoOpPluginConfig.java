@@ -11,14 +11,14 @@ import com.mawen.agent.plugin.api.config.PluginConfigChangeListener;
  * @author <a href="1181963012mw@gmail.com">mawen12</a>
  * @since 2024/2/23
  */
-public class NoOpIPluginConfig implements IPluginConfig {
-	public static NoOpIPluginConfig INSTANCE = new NoOpIPluginConfig("Noop", "Noop", "Noop");
+public class NoOpPluginConfig implements IPluginConfig {
+	public static NoOpPluginConfig INSTANCE = new NoOpPluginConfig("Noop", "Noop", "Noop");
 
 	private final String domain;
 	private final String namespace;
 	private final String id;
 
-	public NoOpIPluginConfig(String domain, String namespace, String id) {
+	public NoOpPluginConfig(String domain, String namespace, String id) {
 		this.domain = domain;
 		this.namespace = namespace;
 		this.id = id;

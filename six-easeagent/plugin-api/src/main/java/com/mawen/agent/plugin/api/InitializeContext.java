@@ -2,7 +2,7 @@ package com.mawen.agent.plugin.api;
 
 import com.mawen.agent.plugin.api.config.IPluginConfig;
 import com.mawen.agent.plugin.api.trace.TracingContext;
-import com.mawen.agent.plugin.bridge.NoOpIPluginConfig;
+import com.mawen.agent.plugin.bridge.NoOpPluginConfig;
 
 /**
  * Subtype of {@link Context} and {@link TracingContext} which can
@@ -25,7 +25,7 @@ public interface InitializeContext extends TracingContext {
 	 * and returns that config as the value of this function.
 	 *
 	 * @return The config at the top of this stack (the last config of the <tt>Config</tt> object)
-	 * return {@link NoOpIPluginConfig#INSTANCE} if the stack is empty.
+	 * return {@link NoOpPluginConfig#INSTANCE} if the stack is empty.
 	 */
 	IPluginConfig popConfig();
 
